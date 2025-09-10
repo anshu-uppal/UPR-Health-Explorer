@@ -107,7 +107,7 @@ ui <- page_navbar(
       width = 390,
       accordion_panel(
         "Disclaimer and data sources",
-        markdown("This dashboard display the results of a **preliminary** analysis regarding recommendations from the first four cycles of the Universal Periodic Review (UPR). ***Results are subject to change as the classification methodology continues to be refined***.
+        markdown("This dashboard displays the results of a **preliminary** analysis regarding recommendations from the first four cycles of the Universal Periodic Review (UPR). ***Results are subject to change as the classification methodology continues to be refined***.
 
 UPR recommendations were downloaded from a database maintained by the Danish Institute for Human Rights: the ['SDG-Human Rights Data Explorer'](https://www.humanrights.dk/sdg-human-rights-data-explorer). Their database in turn relies partly on UPR Info's [Database of Recommendations](https://upr-info-database.uwazi.io/).
 
@@ -124,52 +124,79 @@ Grouping by Fragile/Conflict-affected Situations (**FCS status**) was made accor
   
   ## Main Content Pages ------------------------------------------------------
   # Each nav_panel is now a separate page accessible from the top navbar
+  ### About page ------------------
   nav_menu(title = "About", icon = icon("info-circle"),
-            nav_panel(title = "Right to Health and the UPR",
-                      card(
-              card_header("The Right to Health"),
-              card_body(
-                markdown("The Right to Health is central to the fulfillment of broader human rights obligations, serving as a powerful tool to advance well-being, equity, and dignity across all sectors of society. The Right to Health comprises the State's obligations to:  
+           nav_panel(title = "Right to Health and the UPR",
+                     card(
+                       card_header("The Right to Health"),
+                       card_body(
+                         markdown("The Right to Health is central to the fulfillment of broader human rights obligations, serving as a powerful tool to advance well-being, equity, and dignity across all sectors of society. The Right to Health comprises the State's obligations to:  
 -  **Respect**: refrain from interfering directly or indirectly with the enjoyment of the right to health.  
 -  **Protect**: take measures that prevent third parties from interfering with the guarantees of the right to health.  
 -  **Fulfill**: adopt appropriate legislative, administrative, budgetary, judicial, promotional, and other measures toward the full realization of the right to health.")
-              )
-            ),
-            layout_columns(
-              col_widths = c(9, 3),
-            card(
-              card_header("The Universal Periodic Review"),
-              card_body(
-                markdown(
-                  "The UPR is a **State-led**, periodic peer review mechanism to **evaluate each State’s “human rights obligations and commitments”**
+                       )
+                     ),
+                     card(
+                       card_header("The Universal Periodic Review (UPR)"),
+                       card_body(
+                         layout_columns(
+                           col_widths = c(11, 1),
+                           
+                           # --- Column 1: Text ---
+                           markdown(
+                             "The UPR is a **State-led**, periodic peer review mechanism to **evaluate each State’s “human rights obligations and commitments”**
                   The Reviews are guided by three main pre-session reports:  
                   -  **National Report** (prepared by State Under Review)
                   -  **Stakeholders Report** (summary of contributions, prepared by OHCHR)
                   -  **UN Compilation Report** (based on treaty bodies, special procedures, and reports from other UN entities)
                   
-                  More than 90,000 recommendations were issued during the first three cycles of the UPR. There is a growing focus on the right to health."))
-            ),
-            card(
-              full_screen = TRUE,
-              # card_header("UPR process graphic"),
-              card_body(img(src = "UPR_review_banner2.png",
-                            style = "height: 100%; width: 100%; object-fit: contain;"),
-                        padding = 0)
-            )
-            )),
-            nav_panel(title = "CeHDI",
-                      card(
-              card_header("Global Center for Health Diplomacy and Inclusion (CeHDI)"),
-              card_body(
-                markdown("[CeHDI](https://www.cehdi.org/) has a mission of amplifying and facilitating the inclusion of  the priorities and voices of the Global South within the global health architecture and building robust partnerships for global health equity and the right to health.")
-              )
-            ))
-            # , card(
-            #   card_header("Preliminary results?"),
-            #   card_body(img(src = "full_plot.png",
-            #                 style = "height: 100%; width: 100%; object-fit: contain;"),
-            #             padding = 0)
-            # )
+                  More than 90,000 recommendations were issued during the first three cycles of the UPR. There is a growing focus on the right to health."
+                           ),
+                           
+                           # --- Column 2: Clickable Image ---
+                           # Wrap the image in an actionLink to make it clickable
+                           actionLink(
+                             inputId = "upr_image_expand", # Give a unique ID to the link
+                             label = img(
+                               src = "WHO_UPR.png",
+                               style = "height: auto; width: 100%; object-fit: contain; cursor: pointer;" # Add cursor style for better UX
+                               , markdown("Source: <a href='https://iris.who.int/handle/10665/277114' target='_blank'>WHO</a>")
+                             )
+                           )
+                         )
+                       )
+                     ),
+                     card(
+                       card_header("Engagement with the UPR is associated with on-the-ground progress"),
+                       card_body(
+                         layout_columns(
+                           col_widths = c(11, 1),
+                         markdown("A **preliminary analysis** of recommendations related to maternal health suggests that higher engagement with the UPR process, in terms of the number of recommendations issued by reviewing states as well as support of recommendations by States Under Review, is associated with accelerated progress in reducing the maternal mortality ratio over time:"),
+                         actionLink(
+                           inputId = "upr_analysis", # Give a unique ID to the link
+                           label = img(
+                             src = "full_plot.png",
+                             style = "height: auto; width: 100%; object-fit: contain; cursor: pointer;" # Add cursor style for better UX
+                             )
+                           )
+                         # ,padding = 0
+                       )
+                         )
+                       )),
+           nav_panel(title = "CeHDI",
+                     card(
+                       card_header("Global Center for Health Diplomacy and Inclusion (CeHDI)"),
+                       card_body(
+                         markdown("[CeHDI](https://www.cehdi.org/) has a mission of amplifying and facilitating the inclusion of  the priorities and voices of the Global South within the global health architecture and building robust partnerships for global health equity and the right to health.")
+                         )
+                     )
+           )
+           # , card(
+           #   card_header("Preliminary results?"),
+           #   card_body(img(src = "full_plot.png",
+           #                 style = "height: 100%; width: 100%; object-fit: contain;"),
+           #             padding = 0)
+           # )
   ),
   
   nav_panel(title = "UPR: Regional", icon = icon("globe-americas"),
@@ -183,18 +210,18 @@ Grouping by Fragile/Conflict-affected Situations (**FCS status**) was made accor
                 nav_panel("Per UPR Cycle", plotOutput("upr_themes_cycle_global", height = "700px"))
               ),
               list(
-              card(
-                full_screen = TRUE,
-                card_header("Health-Related Recommendations"),
-                card_body(plotOutput("global_plot", height = "450px"))
-              ),
-              card(
-                full_screen = TRUE,
-                card_header("Regional map"),
-                card_body(plotOutput("regional_map"))
+                card(
+                  full_screen = TRUE,
+                  card_header("Health-Related Recommendations"),
+                  card_body(plotOutput("global_plot", height = "450px"))
+                ),
+                card(
+                  full_screen = TRUE,
+                  card_header("Regional map"),
+                  card_body(plotOutput("regional_map"))
+                )
               )
-            )
-  )),
+            )),
   
   nav_panel(title = "UPR: State Under Review", icon = icon("flag"),
             "UPR Recommendations: State Under Review",
@@ -284,6 +311,27 @@ Grouping by Fragile/Conflict-affected Situations (**FCS status**) was made accor
 
 # 3. SERVER: REACTIVE LOGIC ============================
 server <- function(input, output, session) {
+  
+  ## About page options ------------------------
+  observeEvent(input$upr_image_expand, {
+    showModal(modalDialog(
+      title = "Graphical overview of the UPR process",
+      img(src = "WHO_UPR.png", style = "width: 100%"),
+      size = "xl",           # Make the modal large
+      easyClose = TRUE,     # Allow closing by clicking outside
+      footer = NULL         # Remove the default buttons
+    ))
+  })
+  
+  observeEvent(input$upr_analysis, {
+    showModal(modalDialog(
+      title = "Preliminary analysis of MMR trajectories by engagement with UPR recommendations related to maternal health",
+      img(src = "full_plot.png", style = "width: 100%"),
+      size = "l",           # Make the modal large
+      easyClose = TRUE,     # Allow closing by clicking outside
+      footer = NULL         # Remove the default buttons
+    ))
+  })
   
   ## Reactive Expressions for Data Filtering ---------------------------------
   state_geo_reactive <- reactive({
@@ -448,8 +496,8 @@ server <- function(input, output, session) {
   output$regional_map <- renderPlot({
     p1 <- state_geo_reactive() |>
       mutate(selected_region = factor(case_when(region_dashboard == input$selected_region ~ input$selected_region,
-                                             .default = "Other"),
-                                   levels = c(input$selected_region, "Other"))) |>
+                                                .default = "Other"),
+                                      levels = c(input$selected_region, "Other"))) |>
       ggplot(aes(geometry = polygon, color = selected_region, fill = selected_region, lwd = selected_region)) +
       geom_sf() +
       scale_color_manual(values = c("green4", "grey80")) +
@@ -612,11 +660,11 @@ server <- function(input, output, session) {
         strip.background = element_rect(fill = NA, linewidth = 1, color = "black", linetype = 1),
         panel.grid = element_blank()
       ) 
-      # geom_text(
-      #   data = a |> filter(response_upr == "Supported"),
-      #   aes(label = paste0(n_tot_theme, " ", n_sup), x = perc_theme),
-      #   hjust = -0.15, size = 3, vjust = 0.25
-      # )
+    # geom_text(
+    #   data = a |> filter(response_upr == "Supported"),
+    #   aes(label = paste0(n_tot_theme, " ", n_sup), x = perc_theme),
+    #   hjust = -0.15, size = 3, vjust = 0.25
+    # )
     theme_plot
   })
   
@@ -1062,7 +1110,7 @@ server <- function(input, output, session) {
       mutate(country_name = fct_relevel(country_name, input$selected_SUR)) |>
       ggplot(aes(x = year, y = NumericValue)) +
       labs(
-        title = paste0("Trends in Maternal Mortality Ratio (MMR), since ", start_year),
+        title = paste0("Trends in Maternal Mortality Ratio (MMR)"),
         x = NULL, y = "MMR estimate (per 100,000 live births)",
         color = NULL,
         fill = NULL
@@ -1091,7 +1139,7 @@ server <- function(input, output, session) {
       geom_col(position = position_dodge()) +
       geom_errorbar(aes(xmin = lower, xmax = upper), width = 0.5, position = position_dodge(width = 0.9)) +
       labs(
-        y = "Maternal cause of death", x = "Age-standardized rate (per 100,000)", fill = NULL
+        y = "Maternal cause of death", x = "Age-standardized rate (per 100,000)\nin 2023", fill = NULL
         # , title = "Distribution of causes of maternal deaths (2021)"
       ) +
       scale_x_continuous(

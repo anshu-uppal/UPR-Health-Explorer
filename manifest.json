@@ -4493,7 +4493,7 @@
   },
   "files": {
     "app.R": {
-      "checksum": "913a1513ebeece7f81e4d4ce6bb7200a"
+      "checksum": "70ff1cdb6583c80f2285ada4f15eafd2"
     },
     "code/.gitkeep": {
       "checksum": "81051bcc2cf1bedf378224b0a93e2877"
@@ -4505,7 +4505,7 @@
       "checksum": "03c5a1c6dbb4a93d26197945f81063a8"
     },
     "code/external_data_OData.R": {
-      "checksum": "1c09c9887e1febaae62b9230563f5964"
+      "checksum": "f3105ce9c27881902c361a21583f1776"
     },
     "code/geo_code.R": {
       "checksum": "e732815c3bfe3ef592511c43c4a28e8c"
@@ -4517,31 +4517,31 @@
       "checksum": "81051bcc2cf1bedf378224b0a93e2877"
     },
     "data/API_data/abortion_rate.rds": {
-      "checksum": "d9094a56e0d33157d48d78b81a03c3de"
+      "checksum": "69703c2c5d5868b92f80c6f541c13f36"
     },
     "data/API_data/contraceptive_prevalence.rds": {
-      "checksum": "d65ad415dfc93475ea0f30c8c632c6ce"
+      "checksum": "ac346c0220093e53ac496f6f464ae5f0"
     },
     "data/API_data/family_planning.rds": {
-      "checksum": "d16fcd52273f8d0347cbaa0b5115ce35"
+      "checksum": "b3312d915d828ea961545978fa506dbc"
     },
     "data/API_data/gho_api.rds": {
       "checksum": "d89fddb1c679778528efebd6ef93521e"
     },
     "data/API_data/HIV_death.rds": {
-      "checksum": "2ac35e816b87d5f595f2c4a6cb24e31c"
+      "checksum": "3f0e3bc2a9a9a8576c107a2650d13688"
     },
     "data/API_data/HPV_coverage.rds": {
-      "checksum": "9f7366e702f54041cca842f1f3c29c45"
+      "checksum": "c58363d3a39b1dcc4028db742d2a7fc6"
     },
     "data/API_data/HPV_national.rds": {
-      "checksum": "db7cbfa53a1a3c5077e4ebb2a60aad8e"
+      "checksum": "8739eab17f30a366fb54583d8f268c05"
     },
     "data/API_data/informed_decisions.rds": {
-      "checksum": "1d4f6d1871ceb8db70f6320ff77dfcab"
+      "checksum": "ae3cd9cf37fd1cf307c1ec90afee8147"
     },
     "data/API_data/institutional_birth.rds": {
-      "checksum": "65cb4e5d1404c4566354b0ef0439612e"
+      "checksum": "32334e2aafd6bcdc0963141b80952b1d"
     },
     "data/API_data/live_births.rds": {
       "checksum": "3c269004f311ce6ee14f21c49d2a72ca"
@@ -4556,7 +4556,7 @@
       "checksum": "7b140bc4535a5c33e252b8301de36459"
     },
     "data/API_data/MMR.rds": {
-      "checksum": "6c77054dc7c7be15a4a955c2fea22019"
+      "checksum": "1a904687d8f1bd647d7e890d57363df7"
     },
     "data/API_data/mmr_data_WHO.rds": {
       "checksum": "c6c08e8962bde4df365c8d599d75afea"
@@ -4571,40 +4571,40 @@
       "checksum": "f5ce74671a4522b4659a27b1bb54fee2"
     },
     "data/API_data/postnatal_care.rds": {
-      "checksum": "84ab7c6a4dc9b902db1f484444124b6f"
+      "checksum": "ed7ffcdcc312f4e1188418591e08cda3"
     },
     "data/API_data/postnatal_care_3.rds": {
-      "checksum": "314db42c7d1984086cff7fa099bd930d"
+      "checksum": "6654315fa4c34296184c72afda81cc81"
     },
     "data/API_data/postnatal_care_5.rds": {
-      "checksum": "a102ed23fed34f7bb87ecc7f8874717a"
+      "checksum": "95419647cace368a939c70de7457456f"
     },
     "data/API_data/skilled_birth.rds": {
-      "checksum": "ccfbc1951223d8cbde5d34af8a7bc386"
+      "checksum": "bbd2f2f8e039b7f9b5bcfb4554247f77"
     },
     "data/API_data/UHC_all.rds": {
-      "checksum": "e2f8fdb540d01f0b6e717fbc7b7db79f"
+      "checksum": "2b69324f2a6d83c05b31ee1a06683c6c"
     },
     "data/API_data/UHC_AVAILABILITY_SCORE.rds": {
-      "checksum": "8051cc8fc2d267a5ac8ba5e4c1e897b7"
+      "checksum": "ee8c93ed8176c2fbdc597efced119905"
     },
     "data/API_data/UHC_INDEX_REPORTED.rds": {
-      "checksum": "2febb2b957974cd13b59a8dbe74e2ab2"
+      "checksum": "f9c95808901ab2e242cdfe0c3429c8cd"
     },
     "data/API_data/UHC_SCI_CAPACITY.rds": {
-      "checksum": "ebf80cd57a5b9c123deb08c41fdbcb43"
+      "checksum": "75a008ec79f93ca30255a0953a8afa04"
     },
     "data/API_data/UHC_SCI_INFECT.rds": {
-      "checksum": "0d1c8b7ea8aa0cd6c3ac36974a801542"
+      "checksum": "9ee34ab0e94bda9e163ed74ca860cfcb"
     },
     "data/API_data/UHC_SCI_NCD.rds": {
-      "checksum": "7ad90f4c9c49a2fa17a90be93eb80857"
+      "checksum": "daa8f32b37e1c6c364eb831ade5cd503"
     },
     "data/API_data/UHC_SCI_RMNCH.rds": {
-      "checksum": "e7095f6a6f5747365a176554ecf67c76"
+      "checksum": "030c7c37cb104fe50e39e733f05dece0"
     },
     "data/API_data/unintended_pregnancy.rds": {
-      "checksum": "b481285ed8f67b9951bf1b78a1c70a43"
+      "checksum": "a4923cee60f15a3407419f8a4b640676"
     },
     "data/API_data/world_abortion_laws.rds": {
       "checksum": "40afdb8307ed3b923536816b2b6741ae"
@@ -4710,6 +4710,9 @@
     },
     "www/UPR_review_banner2.png": {
       "checksum": "e204d570b21ab2df6348cd6414256f8d"
+    },
+    "www/WHO_UPR.png": {
+      "checksum": "a7e0045f05d6a778b259924dee1a1110"
     }
   },
   "users": null
