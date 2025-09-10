@@ -59,6 +59,7 @@ theme_labels <- tribble(
 
 
 # Human Development Index (HDI) ---------------------------------------
+# https://hdr.undp.org/data-center/documentation-and-downloads
 HDI <- vroom::vroom(here("data", "HDR25_Composite_indices_complete_time_series.csv")) |> 
   select(iso3, hdi_1990:hdi_2023) |> 
   pivot_longer(cols = hdi_1990:hdi_2023, names_to = "year", values_to = "HDI") |> 
