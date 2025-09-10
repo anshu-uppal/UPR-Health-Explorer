@@ -199,6 +199,7 @@ Grouping by Fragile/Conflict-affected Situations (**FCS status**) was made accor
            # )
   ),
   
+  ### UPR: Regional -----------------------
   nav_panel(title = "UPR: Regional", icon = icon("globe-americas"),
             h2("UPR Recommendations: Regional View"),
             layout_columns(
@@ -223,6 +224,7 @@ Grouping by Fragile/Conflict-affected Situations (**FCS status**) was made accor
               )
             )),
   
+  ### UPR: SuR -------------------------------
   nav_panel(title = "UPR: State Under Review", icon = icon("flag"),
             "UPR Recommendations: State Under Review",
             layout_columns(
@@ -242,6 +244,7 @@ Grouping by Fragile/Conflict-affected Situations (**FCS status**) was made accor
             )
   ),
   
+  ### Maternal mortality -----------------------
   nav_panel(title = "Maternal Mortality", icon = icon("female"),
             h2("Maternal Mortality Ratio (MMR): Number of maternal deaths per 100,000 live births."),
             layout_columns(
@@ -282,13 +285,15 @@ Grouping by Fragile/Conflict-affected Situations (**FCS status**) was made accor
             )
   ),
   
+  ### Family planning ------------------
   nav_panel(title = "Family Planning", icon = icon("users"),
             h2("Family Planning and Abortion"),
             layout_columns(
               full_screen = TRUE,
               col_widths = c(6, 6),
               list(
-                card(full_screen = TRUE,card_header("Abortion Laws (June 2023)"), plotOutput("abortion_map_sur")),
+                card(full_screen = TRUE,card_header("Abortion Laws (June 2023)"), plotOutput("abortion_map_sur"), 
+                     markdown("Source: <a href='https://reproductiverights.org/maps/worlds-abortion-laws/' target='_blank'>Center for Reproductive Rights</a>")),
                 card(full_screen = TRUE,card_header("Met Need for Family Planning (%)"), plotOutput("family_planning"))
               ),
               list(
