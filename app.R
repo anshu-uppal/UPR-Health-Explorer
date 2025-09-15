@@ -59,8 +59,12 @@ ui <- page_navbar(
   title = span(
     tags$a(
       href = "https://www.cehdi.org/", 
+      label = "Go to CeHDI homepage",
       # target = "_blank",
-      img(src = "logo_5.png", height = "40px", style = "margin-right:10px;")
+      img(src = "logo_5.png"
+          , height = "40px"
+          , style = "margin-right:10px;"
+          )
     ),
     actionLink(
       inputId = "home_button",
@@ -190,6 +194,7 @@ Grouping by Fragile/Conflict-affected Situations (**FCS status**) was made accor
            #                        )
            #            ),
            nav_panel(title = "Right to Health and the UPR",
+                     value = "home",
                      card(
                        card_header("The Right to Health and the Universal Periodic Review"),
                        card_body(
@@ -200,12 +205,7 @@ Grouping by Fragile/Conflict-affected Situations (**FCS status**) was made accor
 -  **Protect**: take measures that prevent third parties from interfering with the guarantees of the right to health.  
 -  **Fulfill**: adopt appropriate legislative, administrative, budgetary, judicial, promotional, and other measures toward the full realization of the right to health.  
 
-The <a href='https://www.ohchr.org/en/hr-bodies/upr/basic-facts' target='_blank'>**Universal Periodic Review (UPR)**</a> is a **State-led** mechanism to **evaluate each State’s 'human rights obligations and commitments.'** The Reviews are guided by three main pre-session reports:  
-
--  **National Report** (prepared by State Under Review)  
--  **Stakeholders Report** (summary of contributions, prepared by OHCHR)  
--  **UN Compilation Report** (based on treaty bodies, special procedures, and reports from other UN entities)"
-                           ),
+The <a href='https://www.ohchr.org/en/hr-bodies/upr/basic-facts' target='_blank'>**Universal Periodic Review (UPR)**</a> is a **State-led** mechanism to **evaluate each State’s 'human rights obligations and commitments.'** Reviews involve interactive discussions during which any UN Member State can make recommendations to the States under review, which can either 'support' or 'note' the recommendations."),
                            
                            
                            # --- Column 2: Clickable Image ---
@@ -243,9 +243,9 @@ The <a href='https://www.ohchr.org/en/hr-bodies/upr/basic-facts' target='_blank'
            nav_panel(title = "Classification of UPR recommendations",
                      card(
                        card_header("Methodology"),
-                       card_body(markdown("We conducted a comprehensive longitudinal analysis of all recommendations made during the first three cycles of the United Nations' Universal Periodic Review (UPR), spanning from 2008 to 2022. The full dataset of recommendations, including the recommending and receiving States and the receiving State’s response (“supported” or “noted”), was sourced from the Danish Institute for Human Rights’ “SDG-Human Rights Data Explorer”. Their database in turn relies partly on UPR Info’s “Database of Recommendations”. This dataset formed the basis for our classification and subsequent statistical modelling to assess the relationship between UPR engagement and health outcomes.  
-                                 
-To systematically analyze the recommendations, we developed a keyword-based classification system using R. This process involved a broad set of keywords derived from established right-to-health literature, including a foundational World Health Organization report on the UPR. Recommendations were categorized into non-exclusive thematic health areas (i.e. a single recommendation could fall into mutliple categories), such as health systems, communicable diseases, and environmental health. For this study's focus, we developed specific, detailed sub-classification definitions for themes related to Maternal, Newborn, and Child Health (MNCH) and Sexual and Reproductive Health and Rights (SRHR), with a particular focus on identifying recommendations pertaining to maternal health and family planning."))
+                       card_body(markdown("We conducted a comprehensive longitudinal analysis of all recommendations made during the first three cycles of the United Nations' Universal Periodic Review (UPR), spanning from 2008 to 2022. The full dataset of recommendations, including the State Under Review's response (“supported” or “noted”), was sourced from the Danish Institute for Human Rights’ “SDG-Human Rights Data Explorer”. Their database in turn relies partly on UPR Info’s “Database of Recommendations”. This dataset formed the basis for our classification and subsequent statistical modelling to assess the relationship between UPR engagement and health outcomes.  
+
+To systematically analyze the recommendations, we developed a keyword-based classification system using R. Recommendations were categorized into non-exclusive thematic health areas (i.e. a single recommendation could fall into mutliple categories), such as health systems, communicable diseases, and environmental health. For this study's focus, we developed specific, detailed sub-classification definitions for themes related to Maternal, Newborn, and Child Health (MNCH) and Sexual and Reproductive Health and Rights (SRHR), with a particular focus on identifying recommendations pertaining to maternal health and family planning."))
                      ))
            # nav_panel(title = "CeHDI",
            #           card(
@@ -615,6 +615,8 @@ server <- function(input, output, session) {
         )
       )
     
+    rec_max <- max(upr_rec_global$med_n_tot)
+    
     upr_rec_global |>
       ggplot(aes(x = cycle, y = med_n, fill = health_related)) +
       scale_fill_manual(values = c("Health-related" = "#E69F00", "Other" = "grey80")) +
@@ -625,20 +627,25 @@ server <- function(input, output, session) {
         fill = NULL,
         caption = "*Cycle 4 is currently underway"
       ) +
-      geom_text(aes(label = perc), position = position_stack(vjust = 0.5), size = 5) +
-      geom_text(aes(label = sprintf("%1.0f", med_n_tot), y = med_n_tot, vjust = -0.2), size = 5, fontface = "bold") +
+      geom_text(aes(label = perc), position = position_stack(vjust = 0.5)
+                # , size = 5
+                ) +
+      geom_text(aes(label = sprintf("%1.0f", med_n_tot), y = med_n_tot, vjust = -0.2), 
+                # size = 5, 
+                fontface = "bold") +
+      ylim(c(0,rec_max+20))+
       theme_bw() +
       theme(
         panel.grid = element_blank(),
-        axis.text.x = element_text(size = 12),
-        axis.text.y = element_text(size = 12),
+        # axis.text.x = element_text(size = 12),
+        # axis.text.y = element_text(size = 12),
         axis.title.x = element_blank(),
-        axis.title.y = element_text(size = 14),
-        strip.text = element_text(size = 18),
-        plot.caption = element_text(size = 14),
-        legend.position = c(0.01, 0.99),
+        # axis.title.y = element_text(size = 14),
+        # strip.text = element_text(size = 18),
+        # plot.caption = element_text(size = 14),
+        legend.position = c(0, 1),
         legend.justification = c("left", "top"),
-        legend.text = element_text(size = 18),
+        # legend.text = element_text(size = 18),
         legend.background = element_blank()
       )
   })
