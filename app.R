@@ -737,21 +737,21 @@ server <- function(input, output, session) {
         legend.position = c(0.99, 0.01),
         legend.justification = c("right", "bottom"),
         legend.frame = element_rect(color = "black"),
-        # legend.text = element_text(size = 12),
-        # legend.title = element_text(size = 15),
+        legend.text = element_text(size = 12),
+        legend.title = element_text(size = 15),
         legend.background = element_rect(fill = "transparent"),
         axis.text.y = element_text(
-          # size = 10, 
+          size = 10,
           face = "bold"),
-        # axis.text.x = element_text(size = 12),
+        axis.text.x = element_text(size = 12),
         plot.title = element_text(hjust = 0.5,
-                                  # size = 16, 
+                                  size = 16,
                                   face = "bold"),
         plot.title.position = "plot",
         # plot.caption = element_text(size = 14),
         strip.placement = "outside",
         strip.text.y.left = element_text(angle = 0, vjust = 1
-                                         # , size = 11
+                                         , size = 11
                                          ),
         strip.background = element_rect(fill = NA, linewidth = 1, color = "black", linetype = 1),
         panel.grid = element_blank()
