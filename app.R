@@ -623,9 +623,9 @@ server <- function(input, output, session) {
       geom_bar(stat = "identity") +
       labs(
         y = "Median number of recommendations", x = "UPR Cycle",
-        title = paste0("Median recommendations received by States*\n", input$selected_region),
-        fill = NULL,
-        caption = "*Cycle 4 is currently underway"
+        title = paste0("Median recommendations received by States\n", input$selected_region),
+        fill = NULL
+        # ,caption = "*Cycle 4 is currently underway"
       ) +
       geom_text(aes(label = perc), position = position_stack(vjust = 0.5)
                 # , size = 5
@@ -633,18 +633,22 @@ server <- function(input, output, session) {
       geom_text(aes(label = sprintf("%1.0f", med_n_tot), y = med_n_tot, vjust = -0.2), 
                 # size = 5, 
                 fontface = "bold") +
-      ylim(c(0,rec_max+20))+
+      scale_y_continuous(limits = c(0,rec_max+25),
+                         expand = expansion(mult = c(0, 0.05)))+
       theme_bw() +
       theme(
         panel.grid = element_blank(),
-        # axis.text.x = element_text(size = 12),
+        axis.text.x = element_text(angle = 30, hjust = 0.8,
+                                   # ,size = 12
+                                   ),
         # axis.text.y = element_text(size = 12),
         axis.title.x = element_blank(),
         # axis.title.y = element_text(size = 14),
         # strip.text = element_text(size = 18),
         # plot.caption = element_text(size = 14),
-        legend.position = c(0, 1),
-        legend.justification = c("left", "top"),
+        legend.position = "bottom",
+        # legend.position = c(0, 1),
+        # legend.justification = c("left", "top"),
         # legend.text = element_text(size = 18),
         legend.background = element_blank()
       )
@@ -705,6 +709,7 @@ server <- function(input, output, session) {
       arrange(fct_rev(cycle), -n_tot_theme) |>
       mutate(
         theme_label = case_when(is.na(theme_label) ~ theme, .default = theme_label),
+        theme_label = str_wrap(theme_label, width = 30),
         theme_label = fct_inorder(theme_label)
       )
     
@@ -713,8 +718,8 @@ server <- function(input, output, session) {
       ggplot(aes(x = perc, y = fct_rev(cycle))) +
       geom_col(aes(fill = response_upr)) +
       facet_grid(
-        rows = vars(theme_label), switch = "y",
-        labeller = labeller(theme_label = label_wrap_gen(50))
+        rows = vars(theme_label), switch = "y"
+        # ,labeller = labeller(theme_label = label_wrap_gen(50))
       ) +
       labs(
         x = "Proportion of all recommendations per UPR cycle (%)", y = NULL,
@@ -732,16 +737,22 @@ server <- function(input, output, session) {
         legend.position = c(0.99, 0.01),
         legend.justification = c("right", "bottom"),
         legend.frame = element_rect(color = "black"),
-        legend.text = element_text(size = 12),
-        legend.title = element_text(size = 15),
+        # legend.text = element_text(size = 12),
+        # legend.title = element_text(size = 15),
         legend.background = element_rect(fill = "transparent"),
-        axis.text.y = element_text(size = 10, face = "bold"),
-        axis.text.x = element_text(size = 12),
-        plot.title = element_text(hjust = 0.5, size = 16, face = "bold"),
+        axis.text.y = element_text(
+          # size = 10, 
+          face = "bold"),
+        # axis.text.x = element_text(size = 12),
+        plot.title = element_text(hjust = 0.5,
+                                  # size = 16, 
+                                  face = "bold"),
         plot.title.position = "plot",
-        plot.caption = element_text(size = 14),
+        # plot.caption = element_text(size = 14),
         strip.placement = "outside",
-        strip.text.y.left = element_text(angle = 0, vjust = 1, size = 11),
+        strip.text.y.left = element_text(angle = 0, vjust = 1
+                                         # , size = 11
+                                         ),
         strip.background = element_rect(fill = NA, linewidth = 1, color = "black", linetype = 1),
         panel.grid = element_blank()
       ) 
@@ -800,6 +811,7 @@ server <- function(input, output, session) {
       arrange(-n_tot_theme) |>
       mutate(
         theme_label = case_when(is.na(theme_label) ~ theme, .default = theme_label),
+        theme_label = str_wrap(theme_label, width = 30),
         theme_label = fct_inorder(theme_label)
       )
     
