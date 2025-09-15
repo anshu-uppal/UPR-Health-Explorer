@@ -131,32 +131,82 @@ Grouping by Fragile/Conflict-affected Situations (**FCS status**) was made accor
   # Each nav_panel is now a separate page accessible from the top navbar
   ### About page ------------------
   nav_menu(title = "About", icon = icon("info-circle"),
+           #            nav_panel(title = "Right to Health and the UPR",
+           #                      card(
+           #                        card_header("The Right to Health"),
+           #                        card_body(
+           #                          markdown("The Right to Health is central to the fulfillment of broader human rights obligations, serving as a powerful tool to advance well-being, equity, and dignity across all sectors of society. The Right to Health comprises the State's obligations to:  
+           # -  **Respect**: refrain from interfering directly or indirectly with the enjoyment of the right to health.  
+           # -  **Protect**: take measures that prevent third parties from interfering with the guarantees of the right to health.  
+           # -  **Fulfill**: adopt appropriate legislative, administrative, budgetary, judicial, promotional, and other measures toward the full realization of the right to health.")
+           #                        )
+           #                      ),
+           #                      card(
+           #                        card_header("The Universal Periodic Review (UPR)"),
+           #                        card_body(
+           #                          layout_columns(
+           #                            col_widths = c(10, 2),
+           #                            
+           #                            # --- Column 1: Text ---
+           #                            markdown(
+           #                              "The UPR is a **State-led**, periodic peer review mechanism to **evaluate each State’s “human rights obligations and commitments”**
+           #                   The Reviews are guided by three main pre-session reports:  
+           #                   -  **National Report** (prepared by State Under Review)
+           #                   -  **Stakeholders Report** (summary of contributions, prepared by OHCHR)
+           #                   -  **UN Compilation Report** (based on treaty bodies, special procedures, and reports from other UN entities)
+           #                   
+           #                   More than 90,000 recommendations were issued during the first three cycles of the UPR. There is a growing focus on the right to health."
+           #                            ),
+           #                            
+           #                            # --- Column 2: Clickable Image ---
+           #                            # Wrap the image in an actionLink to make it clickable
+           #                            actionLink(
+           #                              inputId = "upr_image_expand", # Give a unique ID to the link
+           #                              label = img(
+           #                                src = "WHO_UPR.png",
+           #                                style = "height: auto; width: 100%; object-fit: contain; cursor: pointer;" # Add cursor style for better UX
+           #                                , markdown("Source: <a href='https://iris.who.int/handle/10665/277114' target='_blank'>WHO</a>")
+           #                              )
+           #                            )
+           #                          )
+           #                        )
+           #                      ),
+           #                      card(
+           #                        card_header("Engagement with the UPR is associated with on-the-ground progress"),
+           #                        card_body(
+           #                          layout_columns(
+           #                            col_widths = c(10, 2),
+           #                          markdown("A **preliminary analysis** of recommendations related to maternal health suggests that higher engagement with the UPR process, in terms of the number of recommendations issued by reviewing states as well as support of recommendations by States Under Review, is associated with accelerated progress in reducing the maternal mortality ratio (MMR) over time:"),
+           #                          actionLink(
+           #                            inputId = "upr_analysis", # Give a unique ID to the link
+           #                            label = img(
+           #                              src = "full_plot.png",
+           #                              style = "height: auto; width: 100%; object-fit: contain; cursor: pointer;" # Add cursor style for better UX
+           #                              )
+           #                            )
+           #                          # ,padding = 0
+           #                        )
+           #                          )
+           #                        )
+           #            ),
            nav_panel(title = "Right to Health and the UPR",
                      card(
-                       card_header("The Right to Health"),
-                       card_body(
-                         markdown("The Right to Health is central to the fulfillment of broader human rights obligations, serving as a powerful tool to advance well-being, equity, and dignity across all sectors of society. The Right to Health comprises the State's obligations to:  
--  **Respect**: refrain from interfering directly or indirectly with the enjoyment of the right to health.  
--  **Protect**: take measures that prevent third parties from interfering with the guarantees of the right to health.  
--  **Fulfill**: adopt appropriate legislative, administrative, budgetary, judicial, promotional, and other measures toward the full realization of the right to health.")
-                       )
-                     ),
-                     card(
-                       card_header("The Universal Periodic Review (UPR)"),
+                       card_header("The Right to Health and the Universal Periodic Review"),
                        card_body(
                          layout_columns(
-                           col_widths = c(10, 2),
-                           
-                           # --- Column 1: Text ---
-                           markdown(
-                             "The UPR is a **State-led**, periodic peer review mechanism to **evaluate each State’s “human rights obligations and commitments”**
-                  The Reviews are guided by three main pre-session reports:  
-                  -  **National Report** (prepared by State Under Review)
-                  -  **Stakeholders Report** (summary of contributions, prepared by OHCHR)
-                  -  **UN Compilation Report** (based on treaty bodies, special procedures, and reports from other UN entities)
-                  
-                  More than 90,000 recommendations were issued during the first three cycles of the UPR. There is a growing focus on the right to health."
+                           col_widths = c(10,2),
+                           markdown("The <a href='https://www.ohchr.org/en/health' target='_blank'>**Right to Health**</a> is an inclusive right that 'extends not only to timely and appropriate health care but also to the underlying determinants of health.' As such, it is central to the fulfillment of broader human rights obligations, serving as a powerful tool to advance well-being, equity, and dignity across all sectors of society. The Right to Health comprises the State's obligations to:  
+-  **Respect**: refrain from interfering directly or indirectly with the enjoyment of the right to health.  
+-  **Protect**: take measures that prevent third parties from interfering with the guarantees of the right to health.  
+-  **Fulfill**: adopt appropriate legislative, administrative, budgetary, judicial, promotional, and other measures toward the full realization of the right to health.  
+
+The <a href='https://www.ohchr.org/en/hr-bodies/upr/basic-facts' target='_blank'>**Universal Periodic Review (UPR)**</a> is a **State-led** mechanism to **evaluate each State’s 'human rights obligations and commitments.'** The Reviews are guided by three main pre-session reports:  
+
+-  **National Report** (prepared by State Under Review)  
+-  **Stakeholders Report** (summary of contributions, prepared by OHCHR)  
+-  **UN Compilation Report** (based on treaty bodies, special procedures, and reports from other UN entities)"
                            ),
+                           
                            
                            # --- Column 2: Clickable Image ---
                            # Wrap the image in an actionLink to make it clickable
@@ -165,7 +215,8 @@ Grouping by Fragile/Conflict-affected Situations (**FCS status**) was made accor
                              label = img(
                                src = "WHO_UPR.png",
                                style = "height: auto; width: 100%; object-fit: contain; cursor: pointer;" # Add cursor style for better UX
-                               , markdown("Source: <a href='https://iris.who.int/handle/10665/277114' target='_blank'>WHO</a>")
+                               , markdown("<a href='https://iris.who.int/handle/10665/277114' target='_blank'>Image: WHO</a>  
+                                          More than 90,000 recommendations have been issued during the first three cycles of the UPR.")
                              )
                            )
                          )
@@ -176,27 +227,34 @@ Grouping by Fragile/Conflict-affected Situations (**FCS status**) was made accor
                        card_body(
                          layout_columns(
                            col_widths = c(10, 2),
-                         markdown("A **preliminary analysis** of recommendations related to maternal health suggests that higher engagement with the UPR process, in terms of the number of recommendations issued by reviewing states as well as support of recommendations by States Under Review, is associated with accelerated progress in reducing the maternal mortality ratio (MMR) over time:"),
-                         actionLink(
-                           inputId = "upr_analysis", # Give a unique ID to the link
-                           label = img(
-                             src = "full_plot.png",
-                             style = "height: auto; width: 100%; object-fit: contain; cursor: pointer;" # Add cursor style for better UX
+                           markdown("A **preliminary analysis** of recommendations related to maternal health suggests that higher engagement with the UPR process, in terms of the number of recommendations issued by reviewing states as well as support of recommendations by States Under Review, is associated with accelerated progress in reducing the maternal mortality ratio (MMR) over time:"),
+                           actionLink(
+                             inputId = "upr_analysis", # Give a unique ID to the link
+                             label = img(
+                               src = "full_plot.png",
+                               style = "height: auto; width: 100%; object-fit: contain; cursor: pointer;" # Add cursor style for better UX
                              )
                            )
-                         # ,padding = 0
-                       )
+                           # ,padding = 0
                          )
                        )
-           ),
-           nav_panel(title = "CeHDI",
-                     card(
-                       card_header("Global Center for Health Diplomacy and Inclusion (CeHDI)"),
-                       card_body(
-                         markdown("[CeHDI](https://www.cehdi.org/) has a mission of amplifying and facilitating the inclusion of  the priorities and voices of the Global South within the global health architecture and building robust partnerships for global health equity and the right to health.")
-                         )
                      )
-           )
+           ),
+           nav_panel(title = "Classification of UPR recommendations",
+                     card(
+                       card_header("Methodology"),
+                       card_body(markdown("We conducted a comprehensive longitudinal analysis of all recommendations made during the first three cycles of the United Nations' Universal Periodic Review (UPR), spanning from 2008 to 2022. The full dataset of recommendations, including the recommending and receiving States and the receiving State’s response (“supported” or “noted”), was sourced from the Danish Institute for Human Rights’ “SDG-Human Rights Data Explorer”. Their database in turn relies partly on UPR Info’s “Database of Recommendations”. This dataset formed the basis for our classification and subsequent statistical modelling to assess the relationship between UPR engagement and health outcomes.  
+                                 
+To systematically analyze the recommendations, we developed a keyword-based classification system using R. This process involved a broad set of keywords derived from established right-to-health literature, including a foundational World Health Organization report on the UPR. Recommendations were categorized into non-exclusive thematic health areas (i.e. a single recommendation could fall into mutliple categories), such as health systems, communicable diseases, and environmental health. For this study's focus, we developed specific, detailed sub-classification definitions for themes related to Maternal, Newborn, and Child Health (MNCH) and Sexual and Reproductive Health and Rights (SRHR), with a particular focus on identifying recommendations pertaining to maternal health and family planning."))
+                     ))
+           # nav_panel(title = "CeHDI",
+           #           card(
+           #             card_header("Global Center for Health Diplomacy and Inclusion (CeHDI)"),
+           #             card_body(
+           #               markdown("[CeHDI](https://www.cehdi.org/) has a mission of amplifying and facilitating the inclusion of  the priorities and voices of the Global South within the global health architecture and building robust partnerships for global health equity and the right to health.")
+           #               )
+           #           )
+           # )
            # , card(
            #   card_header("Preliminary results?"),
            #   card_body(img(src = "full_plot.png",
@@ -299,7 +357,7 @@ Grouping by Fragile/Conflict-affected Situations (**FCS status**) was made accor
               col_widths = c(6, 6),
               list(
                 card(full_screen = TRUE,card_header("Abortion Laws (June 2023)"), plotOutput("abortion_map_sur"), 
-                     markdown("Source: <a href='https://reproductiverights.org/maps/worlds-abortion-laws/' target='_blank'>Center for Reproductive Rights</a>")),
+                     markdown("Data: <a href='https://reproductiverights.org/maps/worlds-abortion-laws/' target='_blank'>Center for Reproductive Rights</a>")),
                 card(full_screen = TRUE,card_header("Met Need for Family Planning (%)"), plotOutput("family_planning"))
               ),
               list(
@@ -345,7 +403,7 @@ server <- function(input, output, session) {
   
   observeEvent(input$upr_analysis, {
     showModal(modalDialog(
-      title = "Preliminary analysis of MMR trajectories by engagement with UPR recommendations related to maternal health",
+      title = "Preliminary analysis of States MMR trajectories according to engagement with UPR recommendations related to maternal health",
       img(src = "full_plot.png", style = "width: 100%"),
       size = "l",           # Make the modal large
       easyClose = TRUE,     # Allow closing by clicking outside
