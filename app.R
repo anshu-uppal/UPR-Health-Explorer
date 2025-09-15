@@ -730,7 +730,7 @@ server <- function(input, output, session) {
       theme_classic() +
       scale_x_continuous(
         labels = function(x) paste0(x, "%"),
-        limits = c(0, max_a + 2),
+        limits = c(0, max_a),
         expand = expansion(mult = c(0, 0.05))
       ) +
       theme(
@@ -811,7 +811,7 @@ server <- function(input, output, session) {
       arrange(-n_tot_theme) |>
       mutate(
         theme_label = case_when(is.na(theme_label) ~ theme, .default = theme_label),
-        theme_label = str_wrap(theme_label, width = 30),
+        theme_label = str_wrap(theme_label, width = 40),
         theme_label = fct_inorder(theme_label)
       )
     
@@ -1099,6 +1099,7 @@ server <- function(input, output, session) {
         state_under_review, document_code, paragraph
       ) |>
       DT::datatable(
+        # extensions = "Responsive",
         filter = "top",
         options = list(
           pageLength = 100,
@@ -1108,8 +1109,8 @@ server <- function(input, output, session) {
           scroller = TRUE,
           autoWidth = TRUE,
           columnDefs = list(
-            list(width = '500px', targets = c(0)),
-            list(width = '200px', targets = c(1))
+            list(width = '500px', targets = c(0))
+            # list(width = '200px', targets = c(1))
           )
         ),
         rownames = FALSE,
