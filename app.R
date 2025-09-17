@@ -60,18 +60,29 @@ ui <- page_navbar(
   title = span(
     tags$a(
       href = "https://www.cehdi.org/", 
-      label = "Go to CeHDI homepage",
+      # label = "Go to CeHDI homepage",
       # target = "_blank",
       img(src = "logo_5.png"
           , height = "50px"
-          , style = "margin-right:10px;"
+          # , style = "margin-right:10px;"
       )
-    ),
-    actionLink(
-      inputId = "home_button",
-      label = "HaRO: Health & Rights Observatory",
-      style = "color: white; text-decoration: none; font-size: 1.125rem; background: none; border: none; padding: 0;"
     )
+    # , "Health"
+    # , <a href='https://www.ohchr.org/en/health' target='_blank'>**Right to Health**</a>
+    # ,tags$a(
+    #   href = "https://cehdi-haro.share.connect.posit.cloud/",
+    #   label = "Reload",
+    #   # target = "_blank",
+    #   img(src = "logo_5.png"
+    #       , height = "50px"
+    #       , style = "margin-right:10px;"
+    #   )
+    # )
+    # ,actionLink(
+    #   inputId = "home_button",
+    #   label = "HaRO: Health & Rights Observatory",
+    #   style = "color: white; text-decoration: none; font-size: 1.125rem; background: none; border: none; padding: 0;"
+    # )
   ),
   bg = "#1c164d",
   header = tags$head(
@@ -135,7 +146,7 @@ Grouping by Fragile/Conflict-affected Situations (**FCS status**) was made accor
   ## Main Content Pages ------------------------------------------------------
   # Each nav_panel is now a separate page accessible from the top navbar
   ### About page ------------------
-  nav_menu(title = "About", icon = icon("info-circle"),
+  nav_menu(title = "HaRO", icon = icon("info-circle"),
            #            nav_panel(title = "Right to Health and the UPR",
            #                      card(
            #                        card_header("The Right to Health"),
@@ -195,7 +206,7 @@ Grouping by Fragile/Conflict-affected Situations (**FCS status**) was made accor
            #                        )
            #            ),
            nav_panel(title = "HaRO",
-                     card_body(markdown(
+                     card_body(fillable = FALSE, markdown(
                        "Welcome to HaRO, the Health and Rights Observatory. This platform has been designed and created by CeHDI, the Global Center for Health Diplomacy and Inclusion, to empower health diplomats, decision-makers, and emerging leaders to actively engage in the Human Rights Council's Universal Periodic Review (UPR) mechanism.  
                        
                        On these pages you will find data and tools to review the ways in which countries have featured health in their UPR reporting cycles and how their engagement has correlated with national health outcomes, especially in women's and maternal health. We encourage you to browse the country profiles and we invite you to contact the CeHDI team at info@cehdi.org for more information."
@@ -426,13 +437,13 @@ server <- function(input, output, session) {
   
   ## About page options ------------------------
   
-  observeEvent(input$home_button, {
-    updateNavbarPage(
-      session = session,
-      inputId = "main_navbar",
-      selected = "HiHRO" # The title of the first nav_panel
-    )
-  })
+  # observeEvent(input$home_button, {
+  #   updateNavbarPage(
+  #     session = session,
+  #     inputId = "main_navbar",
+  #     selected = "HaRO" # The title of the first nav_panel
+  #   )
+  # })
   
   observeEvent(input$upr_image_expand, {
     showModal(modalDialog(
@@ -446,7 +457,7 @@ server <- function(input, output, session) {
   
   observeEvent(input$upr_analysis, {
     showModal(modalDialog(
-      title = "Preliminary analysis of States MMR trajectories according to engagement with UPR recommendations related to maternal health",
+      title = "Preliminary analysis of States' MMR trajectories according to engagement with UPR recommendations related to maternal health",
       img(src = "full_plot.png", style = "width: 100%"),
       size = "l",           # Make the modal large
       easyClose = TRUE,     # Allow closing by clicking outside
