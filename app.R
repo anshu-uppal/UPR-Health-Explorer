@@ -207,9 +207,9 @@ Grouping by Fragile/Conflict-affected Situations (**FCS status**) was made accor
            #            ),
            nav_panel(title = "HaRO",
                      card_body(fillable = FALSE, markdown(
-                       "Welcome to HaRO, the Health and Rights Observatory. This platform has been designed and created by CeHDI, the Global Center for Health Diplomacy and Inclusion, to empower health diplomats, decision-makers, and emerging leaders to actively engage in the Human Rights Council's Universal Periodic Review (UPR) mechanism.  
+                       "Welcome to HaRO, the **Health and Rights Observatory**. This platform has been designed and created by CeHDI, the Global Center for Health Diplomacy and Inclusion, to empower health diplomats, decision-makers, and emerging leaders to actively engage with the Human Rights Council's Universal Periodic Review (UPR) mechanism.  
                        
-                       On these pages you will find data and tools to review the ways in which countries have featured health in their UPR reporting cycles and how their engagement has correlated with national health outcomes, especially in women's and maternal health. We encourage you to browse the country profiles and we invite you to contact the CeHDI team at info@cehdi.org for more information."
+                       On these pages you will find data and tools to review the ways in which countries have featured health in their UPR reporting cycles and show trends in national health outcomes, particularly in the areas of maternal health and family planning. We encourage you to browse the country profiles and we invite you to contact the CeHDI team at info@cehdi.org for more information or to give feedback."
                      ))),
            nav_panel(title = "Right to Health and the UPR",
                      card(
