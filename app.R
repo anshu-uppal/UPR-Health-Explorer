@@ -853,14 +853,14 @@ server <- function(input, output, session) {
       labs(
         x = "Proportion of all recommendations (%)", y = NULL,
         fill = "State's response",
-        title = paste0("Health-related recommendations of the UPR, up to the fourth cycle\n", input$selected_region),
+        title = paste0("Health-related recommendations of the UPR\n", input$selected_region),
         caption = "*Numbers after the bars indicate N (% supported)"
       ) +
       theme_classic() +
       scale_x_continuous(
         labels = function(x) paste0(x, "%"),
         # limits = c(0, max_a + 2),
-        expand = expansion(mult = c(0, 0.45))
+        expand = expansion(mult = c(0, 0.5))
       ) +
       theme(
         legend.position = c(0.99, 0.01),
