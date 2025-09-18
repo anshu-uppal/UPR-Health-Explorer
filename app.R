@@ -251,7 +251,7 @@ To systematically analyze the recommendations, we developed a keyword-based clas
                                    label = "Download as PNG"
                                  )
                                )
-                               )),
+                          )),
                 nav_panel("Per UPR Cycle", card(
                   card_body(plotOutput("upr_themes_cycle_global")))
                 )
@@ -284,15 +284,15 @@ To systematically analyze the recommendations, we developed a keyword-based clas
                 # title = "SUR Recommendation Details",
                 nav_panel("All Recommendations", 
                           card(fill = FALSE,
-                            card_body(plotOutput("upr_themes_all", 
-                                                 width = paste0(upr_width,"px"), 
-                                                 height =  paste0(upr_height,"px"))),
-                          card_footer(
-                            downloadButton(
-                              outputId = "download_upr_themes_all",
-                              label = "Download as PNG"
-                            )
-                          ))
+                               card_body(plotOutput("upr_themes_all", 
+                                                    width = paste0(upr_width,"px"), 
+                                                    height =  paste0(upr_height,"px"))),
+                               card_footer(
+                                 downloadButton(
+                                   outputId = "download_upr_themes_all",
+                                   label = "Download as PNG"
+                                 )
+                               ))
                 ),
                 nav_panel("Per UPR Cycle", 
                           card(
@@ -367,11 +367,11 @@ To systematically analyze the recommendations, we developed a keyword-based clas
   ### Abortion ------------------------
   nav_panel(title = "Abortion", icon = icon("house-medical"),
             layout_column_wrap(
-              card(
-                full_screen = TRUE,
-                card_header("Abortion Laws (June 2023)"),
-                plotOutput("abortion_map_sur"),
-                markdown("Data: <a href='https://reproductiverights.org/maps/worlds-abortion-laws/' target='_blank'>Center for Reproductive Rights</a>")
+              card(fill = FALSE,
+                   full_screen = TRUE,
+                   card_header("Abortion Laws (June 2023)"),
+                   plotOutput("abortion_map_sur"),
+                   markdown("Data: <a href='https://reproductiverights.org/maps/worlds-abortion-laws/' target='_blank'>Center for Reproductive Rights</a>")
               ),
               layout_column_wrap(
                 width = 1,
@@ -1272,8 +1272,10 @@ server <- function(input, output, session) {
         axis.text = element_blank(), axis.ticks = element_blank(),
         legend.position = "right",
         legend.background = element_blank(),
+        legend.text = element_text(size = 12),
+        legend.key.size = unit(25, "pt"),
         plot.title = ggtext::element_textbox_simple(
-          width=grid::unit(1.5,"npc"),
+          width=grid::unit(1,"npc"),
           halign=0.5,
           margin = margin(t = 5, b = 10, r=0, l=0, unit = "pt")
         )
@@ -1340,6 +1342,8 @@ server <- function(input, output, session) {
         axis.text = element_blank(), axis.ticks = element_blank(),
         legend.position = "right",
         legend.background = element_blank(),
+        legend.text = element_text(size = 12),
+        legend.key.size = unit(25, "pt"),
         plot.title = ggtext::element_textbox_simple(
           width=grid::unit(1,"npc"),
           halign=0.5,
@@ -1401,19 +1405,34 @@ server <- function(input, output, session) {
         nearest_neighbors_list[, input$selected_SUR][1:5]
       )) |>
       filter(year >= ymd(paste0(start_year, "-01-01"))) |>
-      mutate(country_name = fct_relevel(country_name, input$selected_SUR)) |>
-      mutate(IndicatorName = str_wrap(IndicatorName,50)) |> 
-      ggplot(aes(x=year, y = NumericValue, color = IndicatorName, shape = IndicatorName))+
-      geom_point()+
-      geom_line(linewidth=1)+
+      mutate(country_name = str_wrap(country_name, 19)) |> 
+      mutate(country_name = fct_relevel(country_name, str_wrap(input$selected_SUR,19))) |>
+      mutate(IndicatorName = str_wrap(IndicatorName,40))|> 
+      ggplot(aes(x=YEAR, y = NumericValue, color = IndicatorName, shape = IndicatorName))+
+      geom_point(size = 3)+
+      geom_line(linewidth=1.5)+
       labs(y = "Index value",
            x = NULL,
            title = "UHC Service Coverage", color = NULL, shape = NULL)+
-      facet_wrap(.~country_name, ncol=num_cols)+
+      # facet_wrap(.~country_name, ncol=num_cols)+
+      ggh4x::facet_wrap2(~country_name, ncol = num_cols
+                         ,strip = ggh4x::strip_themed(
+                           text_x = list(element_text(color="white", face = "bold"),
+                                         NULL, NULL, NULL, NULL, NULL),
+                           background_x = list(element_rect(fill = "grey30"), 
+                                               NULL, NULL, NULL, NULL, NULL)
+                         )
+      )+
       theme_bw()+
+      scale_x_continuous(breaks = c(2005, 2020))+
       theme(
+        legend.text = element_text(size = 12),
+        legend.title = element_text(size = 11),
+        legend.background = element_rect(fill = "transparent"),
         legend.position = "bottom",
-        axis.text.x = element_text(angle=30),
+        strip.text = element_text(size = 12),
+        axis.text = element_text(angle=30, size = 10, hjust=0.5),
+        axis.title = element_text(size = 12),
         panel.grid.minor = element_blank()
       )+
       # scale_y_continuous(sec.axis = dup_axis(name = NULL))+
@@ -1631,11 +1650,12 @@ server <- function(input, output, session) {
   
   output$abortion_map_sur <- renderPlot({
     p1 <- abortion_map_base() +
-      labs(title = "Abortion laws by State (current as of June 2023)", fill = "Category") +
+      labs(title = "Abortion laws by State (current as of June 2023)", fill = NULL) +
       theme(
         legend.position = "right",
-        legend.key.size = unit(0.5, "cm"),
-        legend.text = element_text(size = 14)
+        legend.key.size = unit(15, "pt"),
+        # legend.key.height = unit(1,"cm"),
+        legend.text = element_text(size = 11)
       ) +
       coord_sf(
         xlim = c(max(-180, bbox_selected_SUR()[[1]] - 20), min(180, bbox_selected_SUR()[[3]] + 20)),
@@ -1686,6 +1706,8 @@ server <- function(input, output, session) {
         panel.grid = element_blank(),
         axis.text = element_blank(), axis.ticks = element_blank(),
         legend.position = "right",
+        legend.text = element_text(size=12),
+        legend.key.size = unit(20, "pt"),
         legend.background = element_blank(),
         axis.title = element_blank()
       ) +
@@ -1746,6 +1768,9 @@ server <- function(input, output, session) {
         panel.grid = element_blank(),
         axis.text = element_blank(), axis.ticks = element_blank(),
         legend.position = "right",
+        # legend.key.height = unit(1,"cm"),
+        legend.key.size = unit(20, "pt"),
+        legend.text = element_text(size=12),
         legend.background = element_blank(),
         axis.title = element_blank()
       ) +
@@ -1809,6 +1834,8 @@ server <- function(input, output, session) {
         panel.grid = element_blank(),
         axis.text = element_blank(), axis.ticks = element_blank(),
         legend.position = "right",
+        legend.text = element_text(size=12),
+        legend.key.size = unit(25,"pt"),
         legend.background = element_blank(),
         axis.title = element_blank(),
         plot.title = ggtext::element_textbox_simple(
