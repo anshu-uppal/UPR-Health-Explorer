@@ -194,7 +194,7 @@ The <a href='https://www.ohchr.org/en/hr-bodies/upr/basic-facts' target='_blank'
                        card_header("Engagement with the UPR is associated with on-the-ground progress"),
                        card_body(
                          layout_columns(
-                           col_widths = c(9, 3),
+                           col_widths = c(8, 4),
                            markdown("A **preliminary analysis** of recommendations related to maternal health suggests that higher engagement with the UPR process, in terms of the number of recommendations issued by reviewing states as well as support of recommendations by States Under Review, is associated with accelerated progress in reducing the maternal mortality ratio (MMR) over time:"),
                            actionLink(
                              inputId = "upr_analysis", # Give a unique ID to the link
