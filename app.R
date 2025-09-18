@@ -40,7 +40,7 @@ for (file_name in list.files(path = here("data", "API_data"), pattern = "\\.rds$
   assign(object_name, readRDS(here("data", "API_data", file_name)))
 }
 
-upr_dpi <- 150
+upr_dpi <- 110
 upr_width <- 550
 upr_height <- 450
 
