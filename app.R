@@ -111,7 +111,7 @@ ui <- page_navbar(
                             # "OACPS Membership", "OACPS Member regions", 
                             # "COMESA Membership", 
                             "Fragile and Conflict-affected States (2026)"
-                            ),
+                ),
                 selected = "Global"),
     
     selectInput("selected_region", "Select Region:",
@@ -160,12 +160,12 @@ Grouping by Fragile/Conflict-affected Situations (**FCS status**) was made accor
                      # card(
                      #   fill = FALSE,
                      #   card_body(
-                         markdown(
-                         "Welcome to the **Health & Rights Observatory**. This platform has been designed and created by the **Global Center for Health Diplomacy and Inclusion (CeHDI)**, to empower health diplomats, decision-makers, and emerging leaders to actively engage with the Human Rights Council's Universal Periodic Review (UPR) mechanism.  
+                     markdown(
+                       "Welcome to the **Health & Rights Observatory**. This platform has been designed and created by the **Global Center for Health Diplomacy and Inclusion (CeHDI)**, to empower health diplomats, decision-makers, and emerging leaders to actively engage with the Human Rights Council's Universal Periodic Review (UPR) mechanism.  
                        
                        On these pages you will find data and tools to review the ways in which countries have featured health in their UPR reporting cycles and show trends in national health outcomes, particularly in the areas of maternal health and family planning. We encourage you to browse the country profiles and we invite you to contact the CeHDI team at info@cehdi.org for more information or to give feedback."
                        # ))
-           ),
+                     ),
                      card(
                        fill = FALSE,
                        card_header("The Right to Health and the Universal Periodic Review"),
@@ -200,7 +200,7 @@ The <a href='https://www.ohchr.org/en/hr-bodies/upr/basic-facts' target='_blank'
                           card_header("Methodology"),
                           card_body(markdown("We conducted a comprehensive longitudinal analysis of all recommendations made during the first three cycles of the United Nations' Universal Periodic Review (UPR), spanning from 2008 to 2022. The full dataset of recommendations, including the State Under Review's response (“supported” or “noted”), was sourced from the Danish Institute for Human Rights’ “SDG-Human Rights Data Explorer”. Their database in turn relies partly on UPR Info’s “Database of Recommendations”. This dataset formed the basis for our classification and subsequent statistical modelling to assess the relationship between UPR engagement and health outcomes.  
 
-To systematically analyze the recommendations, we developed a keyword-based classification system using R. Recommendations were categorized into non-exclusive thematic health areas (i.e. a single recommendation could fall into mutliple categories), such as health systems, communicable diseases, and environmental health. For this study's focus, we developed specific, detailed sub-classification definitions for themes related to Maternal, Newborn, and Child Health (MNCH) and Sexual and Reproductive Health and Rights (SRHR), with a particular focus on identifying recommendations pertaining to maternal health and family planning."))
+To systematically analyze the recommendations, we developed a keyword-based classification system using R. Drawing inspiration from <a href='https://iris.who.int/handle/10665/277114' target='_blank'>a recent WHO report on health-related recommendation under the first two cycles of the UPR</a>, recommendations were categorized into non-exclusive thematic health areas (i.e. a single recommendation could fall into mutliple categories), such as health systems, communicable diseases, and environmental health. For this study's focus, we developed specific, detailed sub-classification definitions for themes related to Maternal, Newborn, and Child Health (MNCH) and Sexual and Reproductive Health and Rights (SRHR), with a particular focus on identifying recommendations pertaining to maternal health and family planning."))
                      ))
            # nav_panel(title = "CeHDI",
            #           card(
@@ -238,86 +238,95 @@ To systematically analyze the recommendations, we developed a keyword-based clas
                 )
               )
             )
-            ),
+  ),
   ### UPR recommendations ----------------
   nav_menu(title = "UPR recommendations", icon = icon("people-arrows"),
-  #### UPR: Regional -----------------------
-  nav_panel(title = "By Region", icon = icon("globe-africa"),
-            "UPR Recommendations by Region",
-            layout_column_wrap(
-              style = css(grid_template_columns = "2fr 1fr"),
-              navset_card_tab(
-                full_screen = TRUE,
-                # title = "Regional Recommendation Themes",
-                nav_panel("All Recommendations", 
-                          card(fill = FALSE,
-                               card_body(
-                                 plotOutput("upr_themes_all_global", 
-                                            width = paste0(upr_width,"px"), 
-                                            height =  paste0(upr_height,"px"))),
-                               card_footer(
-                                 downloadButton(
-                                   outputId = "download_upr_themes_all_global",
-                                   label = "Download as PNG"
-                                 )
-                               )
-                          )),
-                nav_panel("Per UPR Cycle", card(
-                  card_body(plotOutput("upr_themes_cycle_global")))
-                )
-              ),
-              layout_column_wrap(
-                width=1,
-                # This sets a 3:2 height ratio
-                style = css(grid_template_rows = "3fr 2fr"),
-                card(
-                  full_screen = TRUE,
-                  card_header("Health-Related Recommendations"),
-                  card_body(plotOutput("global_plot"))
-                ),
-                card(
-                  full_screen = TRUE,
-                  card_header("Regional map"),
-                  card_body(plotOutput("regional_map"))
-                )
-              )
-            )
-  ),
-  
-  #### UPR: SuR -------------------------------
-  nav_panel(title = "By State", icon = icon("flag"),
-            "UPR Recommendations by State",
-            layout_column_wrap(
-              style = css(grid_template_columns = "2fr 1fr"),
-              navset_card_tab(
-                full_screen = TRUE,
-                # title = "SUR Recommendation Details",
-                nav_panel("All Recommendations", 
-                          card(fill = FALSE,
-                               card_body(plotOutput("upr_themes_all", 
-                                                    width = paste0(upr_width,"px"), 
-                                                    height =  paste0(upr_height,"px"))),
-                               card_footer(
-                                 downloadButton(
-                                   outputId = "download_upr_themes_all",
-                                   label = "Download as PNG"
-                                 )
-                               ))
-                ),
-                nav_panel("Per UPR Cycle", 
-                          card(
-                            card_body(plotOutput("upr_themes_cycle"))
-                          )
-                ),
-                nav_panel("Data Table", DTOutput("DT_table"))
-              ),
-              card(
-                full_screen = TRUE,
-                card_header("Health-Related Recommendations"),
-                card_body(plotOutput("plot", height = "700px"))
-              )
-            )
-  )
+           #### UPR: Regional -----------------------
+           nav_panel(title = "By Region", icon = icon("globe-africa"),
+                     "UPR Recommendations by Region",
+                     layout_column_wrap(
+                       style = css(grid_template_columns = "2fr 1fr"),
+                       navset_card_tab(
+                         full_screen = TRUE,
+                         # title = "Regional Recommendation Themes",
+                         nav_panel("All Recommendations", 
+                                   card(fill = FALSE,
+                                        card_body(
+                                          plotOutput("upr_themes_all_global", 
+                                                     width = paste0(upr_width,"px"),
+                                                     height =  paste0(upr_height,"px")
+                                          )),
+                                        card_footer(
+                                          downloadButton(
+                                            outputId = "download_upr_themes_all_global",
+                                            label = "Download as PNG"
+                                          )
+                                        )
+                                   )),
+                         nav_panel("Per UPR Cycle", 
+                                   card(fill=FALSE,
+                                     card_body(plotOutput("upr_themes_cycle_global", 
+                                                          width = paste0(upr_width*0.8,"px"),
+                                                          height =  paste0(upr_height*1.6,"px")
+                                     ))
+                                   )
+                         )
+                       ),
+                       layout_column_wrap(
+                         width=1,
+                         # This sets a 3:2 height ratio
+                         style = css(grid_template_rows = "3fr 2fr"),
+                         card(
+                           full_screen = TRUE,
+                           card_header("Health-Related Recommendations"),
+                           card_body(plotOutput("global_plot"))
+                         ),
+                         card(
+                           full_screen = TRUE,
+                           card_header("Regional map"),
+                           card_body(plotOutput("regional_map"))
+                         )
+                       )
+                     )
+           ),
+           
+           #### UPR: SuR -------------------------------
+           nav_panel(title = "By State", icon = icon("flag"),
+                     "UPR Recommendations by State",
+                     layout_column_wrap(
+                       style = css(grid_template_columns = "2fr 1fr"),
+                       navset_card_tab(
+                         full_screen = TRUE,
+                         # title = "SUR Recommendation Details",
+                         nav_panel("All Recommendations", 
+                                   card(fill = FALSE,
+                                        card_body(plotOutput("upr_themes_all", 
+                                                             width = paste0(upr_width,"px"), 
+                                                             height =  paste0(upr_height,"px"))),
+                                        card_footer(
+                                          downloadButton(
+                                            outputId = "download_upr_themes_all",
+                                            label = "Download as PNG"
+                                          )
+                                        ))
+                         ),
+                         nav_panel("Per UPR Cycle", 
+                                   card(fill = FALSE,
+                                     card_body(plotOutput("upr_themes_cycle",
+                                                          width = paste0(upr_width*0.8,"px"),
+                                                          height =  paste0(upr_height*1.6,"px")
+                                                          ))
+                                   )
+                         ),
+                         nav_panel("Data Table", DTOutput("DT_table"))
+                       ),
+                       card(
+                         full_screen = TRUE,
+                         card_header("Health-Related Recommendations"),
+                         card_body(plotOutput("plot", height = "700px"))
+                       )
+                     )
+           )
   ),
   
   ### UHC ---------------------
@@ -816,8 +825,9 @@ server <- function(input, output, session) {
         plot.title.position = "plot",
         # plot.caption = element_text(size = 14),
         strip.placement = "outside",
-        strip.text.y.left = element_text(angle = 0, vjust = 1
-                                         , size = 11
+        strip.text.y.left = element_text(angle = 0, 
+                                         # vjust = 1
+                                         , size = 12
         ),
         strip.background = element_rect(fill = NA, linewidth = 1, color = "black", linetype = 1),
         panel.grid = element_blank()
@@ -1098,7 +1108,9 @@ server <- function(input, output, session) {
         plot.title = element_text(hjust = 0.5, size = 16, face = "bold"),
         plot.title.position = "plot",
         strip.placement = "outside",
-        strip.text.y.left = element_text(angle = 0, vjust = 1, size = 11),
+        strip.text.y.left = element_text(angle = 0, 
+                                         # vjust = 1, 
+                                         size = 12),
         strip.background = element_rect(fill = NA, linewidth = 1, color = "black", linetype = 1),
         panel.grid = element_blank()
       ) 
