@@ -118,7 +118,7 @@ ui <- page_navbar(
                 choices = c("Global"),
                 selected = "Global"),
     
-    selectInput("selected_SUR", "Select State Under Review:",
+    selectInput("selected_SUR", "Select State:",
                 choices = sort(unique(state_geo$country)),
                 multiple = FALSE),
     
@@ -157,13 +157,15 @@ Grouping by Fragile/Conflict-affected Situations (**FCS status**) was made accor
   ### About page ------------------
   nav_menu(title = "Health & Rights Observatory", icon = icon("info-circle"),
            nav_panel(title = "About", icon = icon("info-circle"),
-                     card(
-                       fill = FALSE,
-                       card_body(markdown(
+                     # card(
+                     #   fill = FALSE,
+                     #   card_body(
+                         markdown(
                          "Welcome to the **Health & Rights Observatory**. This platform has been designed and created by the **Global Center for Health Diplomacy and Inclusion (CeHDI)**, to empower health diplomats, decision-makers, and emerging leaders to actively engage with the Human Rights Council's Universal Periodic Review (UPR) mechanism.  
                        
                        On these pages you will find data and tools to review the ways in which countries have featured health in their UPR reporting cycles and show trends in national health outcomes, particularly in the areas of maternal health and family planning. We encourage you to browse the country profiles and we invite you to contact the CeHDI team at info@cehdi.org for more information or to give feedback."
-                       ))),
+                       # ))
+           ),
                      card(
                        fill = FALSE,
                        card_header("The Right to Health and the Universal Periodic Review"),
@@ -191,24 +193,6 @@ The <a href='https://www.ohchr.org/en/hr-bodies/upr/basic-facts' target='_blank'
                            )
                          )
                        )
-                     ),
-                     card(
-                       fill=FALSE,
-                       card_header("Engagement with the UPR is associated with on-the-ground progress"),
-                       card_body(
-                         layout_columns(
-                           col_widths = c(8, 4),
-                           markdown("A **preliminary analysis** of recommendations related to maternal health suggests that higher engagement with the UPR process, in terms of the number of recommendations issued by reviewing states as well as support of recommendations by States Under Review, is associated with accelerated progress in reducing the maternal mortality ratio (MMR) over time:"),
-                           actionLink(
-                             inputId = "upr_analysis", # Give a unique ID to the link
-                             label = img(
-                               src = "full_plot.png",
-                               style = "height: auto; width: 100%; object-fit: contain; cursor: pointer;" # Add cursor style for better UX
-                             )
-                           )
-                           # ,padding = 0
-                         )
-                       )
                      )
            ),
            nav_panel(title = "Classification of UPR recommendations", icon=icon("book"),
@@ -234,9 +218,32 @@ To systematically analyze the recommendations, we developed a keyword-based clas
            # )
   ),
   
-  ### UPR: Regional -----------------------
-  nav_panel(title = "UPR: Region", icon = icon("globe-africa"),
-            "UPR Recommendations: Regional View",
+  ### UPR impact ----------------------------
+  nav_panel(title = "UPR impact", icon = icon("square-poll-vertical"),
+            card(
+              fill=FALSE,
+              card_header("Engagement with the UPR is associated with on-the-ground progress"),
+              card_body(
+                layout_columns(
+                  col_widths = c(7, 5),
+                  markdown("A **preliminary analysis** of recommendations related to maternal health suggests that higher engagement with the UPR process, in terms of the number of recommendations issued by reviewing states as well as support of recommendations by States Under Review, is associated with accelerated progress in reducing the maternal mortality ratio (MMR) over time."),
+                  actionLink(
+                    inputId = "upr_analysis", # Give a unique ID to the link
+                    label = img(
+                      src = "full_plot.png",
+                      style = "height: auto; width: 100%; object-fit: contain; cursor: pointer;" # Add cursor style for better UX
+                    )
+                  )
+                  # ,padding = 0
+                )
+              )
+            )
+            ),
+  ### UPR recommendations ----------------
+  nav_menu(title = "UPR recommendations", icon = icon("people-arrows"),
+  #### UPR: Regional -----------------------
+  nav_panel(title = "By Region", icon = icon("globe-africa"),
+            "UPR Recommendations by Region",
             layout_column_wrap(
               style = css(grid_template_columns = "2fr 1fr"),
               navset_card_tab(
@@ -277,9 +284,9 @@ To systematically analyze the recommendations, we developed a keyword-based clas
             )
   ),
   
-  ### UPR: SuR -------------------------------
-  nav_panel(title = "UPR: State Under Review", icon = icon("flag"),
-            "UPR Recommendations: State Under Review",
+  #### UPR: SuR -------------------------------
+  nav_panel(title = "By State", icon = icon("flag"),
+            "UPR Recommendations by State",
             layout_column_wrap(
               style = css(grid_template_columns = "2fr 1fr"),
               navset_card_tab(
@@ -310,11 +317,12 @@ To systematically analyze the recommendations, we developed a keyword-based clas
                 card_body(plotOutput("plot", height = "700px"))
               )
             )
+  )
   ),
   
   ### UHC ---------------------
   nav_panel(title = "UHC", icon = icon("umbrella"),
-            "Universal Health Coverage",
+            markdown("UHC: Universal Health Coverage<br>RMNCH: Reproductive, Maternal, Newborn and Child Health"),
             layout_column_wrap(
               layout_column_wrap(
                 width=1,
@@ -1070,7 +1078,7 @@ server <- function(input, output, session) {
       theme_classic() +
       scale_x_continuous(
         labels = function(x) paste0(x, "%"),
-        limits = c(0, max_a + 2),
+        # limits = c(0, max_a + 2),
         expand = expansion(mult = c(0, 0.05))
       ) +
       # geom_text(
