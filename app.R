@@ -26,6 +26,35 @@ relabel_na <- function(x) {
   factor(x)
 }
 
+map_insetting <- function(p1, p_title_text="Update this text"){
+  p2<-p1+geom_rect(
+    aes(
+      xmin = bbox_selected_SUR()["xmin"]-0.2,
+      xmax = bbox_selected_SUR()["xmax"]+0.2,
+      ymin = bbox_selected_SUR()["ymin"]-0.2,
+      ymax = bbox_selected_SUR()["ymax"]+0.2
+    ),
+    fill = "transparent",      # Make the rectangle hollow
+    color = "red",             # Set the border color
+    linewidth = 0.5            # Set the border thickness
+  )
+  
+  p3<-p1+
+    scale_linewidth_manual(values = c(0.2, 0.1))+
+    coord_sf(
+      xlim = c(bbox_selected_SUR()[[1]], bbox_selected_SUR()[[3]]), 
+      ylim = c(bbox_selected_SUR()[[2]], bbox_selected_SUR()[[4]]))+guides(fill = "none")+labs(title = NULL, caption=NULL)
+  
+  p_title <-  plot_annotation(
+    title=p_title_text, 
+    theme = theme(plot.title = element_textbox_simple(
+      size=14, 
+      margin = margin(t = 17, b = 17, r=0, l=0, unit = "pt"))
+    )
+  )
+  if(sur_area() > 10^11){p2+p_title} else{p2+p3+p_title}
+}
+
 source(here("code", "external_data_GBD.R"))
 
 # Read in pre-processed datasets
@@ -1901,7 +1930,7 @@ server <- function(input, output, session) {
     country_year <- family_planning_dat |> 
       filter(country == input$selected_SUR) |> 
       pull(YEAR)
-      
+    
     p1 <- family_planning_dat |> 
       ggplot(aes(geometry = polygon, fill = NumericValue, color = selected_sur, lwd = selected_sur)) +
       geom_sf() +
@@ -1940,6 +1969,8 @@ server <- function(input, output, session) {
         # xlim = c(max(-180, bbox_selected_SUR()[[1]] - 20), min(180, bbox_selected_SUR()[[3]] + 20)),
         # ylim = c(max(-55.67295, bbox_selected_SUR()[[2]] - 20), min(83.6341, bbox_selected_SUR()[[4]] + 20))
       )
+    
+    # map_insetting(p1)
     p2<-p1+geom_rect(
       aes(
         xmin = bbox_selected_SUR()["xmin"]-0.2,
@@ -1951,16 +1982,16 @@ server <- function(input, output, session) {
       color = "red",             # Set the border color
       linewidth = 0.5            # Set the border thickness
     )
-    
+
     p3<-p1+
       scale_linewidth_manual(values = c(0.2, 0.1))+
       coord_sf(
-        xlim = c(bbox_selected_SUR()[[1]], bbox_selected_SUR()[[3]]), 
+        xlim = c(bbox_selected_SUR()[[1]], bbox_selected_SUR()[[3]]),
         ylim = c(bbox_selected_SUR()[[2]], bbox_selected_SUR()[[4]]))+guides(fill = "none")+labs(title = NULL, caption=NULL)
-    
+
     p_title <-  plot_annotation(
-      title="Women of reproductive age (aged 15-49 years) who have their need for family planning satisfied with modern methods (%), latest year", 
-      theme = theme(plot.title = element_textbox_simple(size=14, 
+      title="Women of reproductive age (aged 15-49 years) who have their need for family planning satisfied with modern methods (%), latest year",
+      theme = theme(plot.title = element_textbox_simple(size=14,
                                                         margin = margin(t = 17, b = 17, r=0, l=0, unit = "pt")))
     )
     if(sur_area() > 10^11){p2+p_title} else{p2+p3+p_title}
