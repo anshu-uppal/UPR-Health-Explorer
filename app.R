@@ -243,7 +243,7 @@ To systematically analyze the recommendations, we developed a keyword-based clas
   nav_menu(title = "UPR recommendations", icon = icon("people-arrows"),
            #### UPR: Regional -----------------------
            nav_panel(title = "By Region", icon = icon("globe-africa"),
-                     "UPR Recommendations by Region",
+                     markdown("UPR Recommendations **by Region**"),
                      layout_column_wrap(
                        style = css(grid_template_columns = "2fr 1fr"),
                        navset_card_tab(
@@ -266,7 +266,7 @@ To systematically analyze the recommendations, we developed a keyword-based clas
                          nav_panel("Per UPR Cycle", 
                                    card(fill=FALSE,
                                      card_body(plotOutput("upr_themes_cycle_global", 
-                                                          width = paste0(upr_width,"px"),
+                                                          width = paste0(upr_width*1.05,"px"),
                                                           height =  paste0(upr_height*1.6,"px")
                                      ))
                                    )
@@ -292,7 +292,7 @@ To systematically analyze the recommendations, we developed a keyword-based clas
            
            #### UPR: SuR -------------------------------
            nav_panel(title = "By State", icon = icon("flag"),
-                     "UPR Recommendations by State",
+                     markdown("UPR Recommendations **by State**"),
                      layout_column_wrap(
                        style = css(grid_template_columns = "2fr 1fr"),
                        navset_card_tab(
@@ -313,7 +313,7 @@ To systematically analyze the recommendations, we developed a keyword-based clas
                          nav_panel("Per UPR Cycle", 
                                    card(fill = FALSE,
                                      card_body(plotOutput("upr_themes_cycle",
-                                                          width = paste0(upr_width,"px"),
+                                                          width = paste0(upr_width*1.05,"px"),
                                                           height =  paste0(upr_height*1.6,"px")
                                                           ))
                                    )
@@ -799,8 +799,7 @@ server <- function(input, output, session) {
       labs(
         x = "Proportion of all recommendations per UPR cycle (%)", y = NULL,
         fill = "State's response",
-        title = paste0("Health-related recommendations in each cycle of the UPR\n", input$selected_region),
-        caption = "*Numbers after the bars indicate N (% supported)"
+        title = paste0("Health-related recommendations in each cycle of the UPR\n", input$selected_region)
       ) +
       theme_classic() +
       scale_x_continuous(
@@ -818,9 +817,10 @@ server <- function(input, output, session) {
         axis.text.y = element_text(
           size = 10,
           face = "bold"),
-        axis.text.x = element_text(size = 12),
+        axis.text.x = element_text(size = 14),
+        axis.title.x = element_text(size = 14),
         plot.title = element_text(hjust = 0.5,
-                                  size = 16,
+                                  # size = 16,
                                   face = "bold"),
         plot.title.position = "plot",
         # plot.caption = element_text(size = 14),
@@ -901,7 +901,7 @@ server <- function(input, output, session) {
       labs(
         x = "Proportion of all recommendations (%)", y = NULL,
         fill = "State's response",
-        title = paste0("Health-related recommendations of the UPR\n", input$selected_region),
+        title = paste0("All health-related recommendations of the UPR\n", input$selected_region),
         caption = "*Numbers after the bars indicate N (% supported)"
       ) +
       theme_classic() +
@@ -921,7 +921,7 @@ server <- function(input, output, session) {
         legend.background = element_rect(fill = "transparent"),
         axis.text.y = element_text(size = 9),
         axis.text.x = element_text(size = 10),
-        plot.title = element_text(hjust = 0.5),
+        plot.title = element_text(hjust = 0.5,face = "bold"),
         plot.caption = element_text(size = 11),
         axis.title.y = element_blank(),
         plot.title.position = "plot",
@@ -930,7 +930,9 @@ server <- function(input, output, session) {
       geom_text(
         data = a |> filter(response_upr == "Supported"),
         aes(label = paste0(n_tot_theme, " ", n_sup), x = perc_theme),
-        hjust = -0.15, size = 3, vjust = 0.25
+        hjust = -0.05,
+        size = 3, 
+        # vjust = 0.25
       )
   })
   #### Plot output ----------------------------
@@ -1082,8 +1084,7 @@ server <- function(input, output, session) {
       labs(
         x = "Proportion of all recommendations per UPR cycle (%)", y = NULL,
         fill = "State's response",
-        title = paste("Health-related recommendations in each cycle of the UPR\n", input$selected_SUR),
-        caption = "*Numbers after the bars indicate N (% supported)"
+        title = paste("Health-related recommendations in each cycle of the UPR\n", input$selected_SUR)
       ) +
       theme_classic() +
       scale_x_continuous(
@@ -1104,8 +1105,11 @@ server <- function(input, output, session) {
         legend.title = element_text(size = 15),
         legend.background = element_rect(fill = "transparent"),
         axis.text.y = element_text(size = 10, face = "bold"),
-        axis.text.x = element_text(size = 12),
-        plot.title = element_text(hjust = 0.5, size = 16, face = "bold"),
+        axis.text.x = element_text(size = 14),
+        axis.title.x = element_text(size = 14),
+        plot.title = element_text(hjust = 0.5, 
+                                  # size = 16, 
+                                  face = "bold"),
         plot.title.position = "plot",
         strip.placement = "outside",
         strip.text.y.left = element_text(angle = 0, 
@@ -1177,7 +1181,7 @@ server <- function(input, output, session) {
       labs(
         x = "Proportion of all recommendations per UPR cycle (%)", y = NULL,
         fill = "State's response",
-        title = paste("Health-related recommendations in each cycle of the UPR\n", input$selected_SUR),
+        title = paste("All health-related recommendations of the UPR\n", input$selected_SUR),
         caption = "*Numbers after the bars indicate N (% supported)"
       ) +
       theme_classic() +
@@ -1197,7 +1201,7 @@ server <- function(input, output, session) {
         legend.background = element_rect(fill = "transparent"),
         axis.text.y = element_text(size = 9),
         axis.text.x = element_text(size = 10),
-        plot.title = element_text(hjust = 0.5),
+        plot.title = element_text(hjust = 0.5, face = "bold"),
         axis.title.y = element_blank(),
         plot.title.position = "plot",
         panel.grid = element_blank()
