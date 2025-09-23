@@ -104,11 +104,14 @@ ui <- page_navbar(
     # title = "Controls & Map", # Give the sidebar a title
     
     selectInput("selected_regional_grouping", "Select Regional Grouping:",
-                choices = c("Global", "Sub-regions", "World Bank regions", "WHO regions", 
-                            "ECSA-HC Membership", 
-                            "CARICOM Membership", "South Centre Membership", 
-                            "OACPS Membership", "OACPS Member regions", 
-                            "COMESA Membership", "FCS status"),
+                choices = c("Global", "WHO regions", "World Bank regions", 
+                            # "Sub-regions",
+                            # "ECSA-HC Membership", 
+                            # "CARICOM Membership", "South Centre Membership", 
+                            # "OACPS Membership", "OACPS Member regions", 
+                            # "COMESA Membership", 
+                            "Fragile and Conflict-affected States (2026)"
+                            ),
                 selected = "Global"),
     
     selectInput("selected_region", "Select Region:",
@@ -394,6 +397,7 @@ To systematically analyze the recommendations, we developed a keyword-based clas
             layout_column_wrap(
               full_screen = TRUE,
               card(
+                fill = FALSE,
                 full_screen = TRUE,
                 card_header("Met Need for Family Planning (%)"),
                 plotOutput("family_planning")
@@ -465,7 +469,7 @@ server <- function(input, output, session) {
       state_geo |> mutate(region_dashboard = WHO_region)
     }else if (input$selected_regional_grouping == "ECSA-HC Membership") {
       state_geo |> mutate(region_dashboard = ECSA_status)
-    } else if (input$selected_regional_grouping == "FCS status") {
+    } else if (input$selected_regional_grouping == "Fragile and Conflict-affected States (2026)") {
       state_geo |> mutate(region_dashboard = FCS_status)
     } else if (input$selected_regional_grouping == "CARICOM Membership") {
       state_geo |> mutate(region_dashboard = CARICOM_status)
@@ -1849,8 +1853,10 @@ server <- function(input, output, session) {
       ) +
       guides(color = "none", lwd = "none", label = "none") +
       coord_sf(
-        xlim = c(max(-180, bbox_selected_SUR()[[1]] - 20), min(180, bbox_selected_SUR()[[3]] + 20)),
-        ylim = c(max(-55.67295, bbox_selected_SUR()[[2]] - 20), min(83.6341, bbox_selected_SUR()[[4]] + 20))
+        xlim = c(bbox_SUR_region()[[1]],bbox_SUR_region()[[3]]),
+        ylim = c(bbox_SUR_region()[[2]], bbox_SUR_region()[[4]])
+        # xlim = c(max(-180, bbox_selected_SUR()[[1]] - 20), min(180, bbox_selected_SUR()[[3]] + 20)),
+        # ylim = c(max(-55.67295, bbox_selected_SUR()[[2]] - 20), min(83.6341, bbox_selected_SUR()[[4]] + 20))
       )
     if(sur_area() > 10^11){p2<-p1} else{p2<-p1+geom_rect(
       aes(
