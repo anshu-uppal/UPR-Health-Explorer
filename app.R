@@ -339,15 +339,15 @@ To systematically analyze the recommendations, we developed a keyword-based clas
                        layout_column_wrap(
                          width=1,
                          # This sets a 3:2 height ratio
-                         style = css(grid_template_rows = "3fr 2fr"),
+                         style = css(grid_template_rows = "2fr 1fr"),
                          card(
                            full_screen = TRUE,
                            card_header("Health-Related Recommendations"),
                            card_body(plotOutput("global_plot"))
-                         ),
-                         card(
+                         )
+                         ,card(
                            full_screen = TRUE,
-                           card_header("Regional map"),
+                           # card_header("Regional map"),
                            card_body(plotOutput("regional_map"))
                          )
                        )
@@ -743,9 +743,9 @@ server <- function(input, output, session) {
                                    levels = c(input$selected_SUR,"Region", "Other"))) |>
       ggplot(aes(geometry = polygon, color = selected_sur, fill = selected_sur, lwd = selected_sur)) +
       geom_sf() +
-      scale_color_manual(values = c("green4", "grey50", "grey80")) +
+      scale_color_manual(values = c("tomato2", "grey60", "grey85")) +
       scale_linewidth_manual(values = c(0.8,0.3, 0.3)) +
-      scale_fill_manual(values = c("green4","grey60", "grey90")) +
+      scale_fill_manual(values = c("tomato2","grey70", "grey95")) +
       scale_alpha_manual(values = c(1,1,0.3))+
       theme_bw() +
       theme(
@@ -766,13 +766,13 @@ server <- function(input, output, session) {
     } else {
       p2 <- p1 + geom_rect(
         aes(
-          xmin = bbox_selected_SUR()["xmin"] - 1,
-          xmax = bbox_selected_SUR()["xmax"] + 1,
-          ymin = bbox_selected_SUR()["ymin"] - 1,
-          ymax = bbox_selected_SUR()["ymax"] + 1
+          xmin = bbox_selected_SUR()["xmin"] - 2,
+          xmax = bbox_selected_SUR()["xmax"] + 2,
+          ymin = bbox_selected_SUR()["ymin"] - 2,
+          ymax = bbox_selected_SUR()["ymax"] + 2
         ),
         fill = "transparent",
-        color = "green4",
+        color = "tomato2",
         linewidth = 0.5
       )
     }
