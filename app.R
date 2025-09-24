@@ -339,7 +339,7 @@ To systematically analyze the recommendations, we developed a keyword-based clas
                        layout_column_wrap(
                          width=1,
                          # This sets a 3:2 height ratio
-                         style = css(grid_template_rows = "2fr 1fr"),
+                         style = css(grid_template_rows = "3fr 1fr"),
                          card(
                            full_screen = TRUE,
                            card_header("Health-Related Recommendations"),
