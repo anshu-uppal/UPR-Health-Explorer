@@ -100,7 +100,8 @@ map_insetting <- function(
 source(here("code", "external_data_GBD.R"))
 
 # Read in pre-processed datasets
-sdg_data <- readRDS(here("data", "SDG_data_enhanced.rds")) |> droplevels()
+sdg_data <- readRDS(here("data", "SDG_data_enhanced.rds")) |> droplevels() |> 
+  mutate(response_upr = fct_recode(response_upr, "Noted" = "Noted/Other"))
 state_geo <- readRDS(here("output", "state_geo_enhanced.rds"))
 nearest_neighbors_list <- readRDS(here("output", "nearest_neighbors_list.rds"))
 theme_labels <- source(here("code", "theme_labels.R"))$value
@@ -901,7 +902,7 @@ server <- function(input, output, session) {
       group_by(cycle, response_upr) |>
       summarise(across(c(health_related:maternal_health), ~ sum(.x != "Other"))) |>
       ungroup() |>
-      filter(response_upr %in% c("Supported", "Noted/Other")) |>
+      filter(response_upr %in% c("Supported", "Noted")) |>
       pivot_longer(
         cols = health_related:maternal_health,
         names_to = "theme",
@@ -913,7 +914,7 @@ server <- function(input, output, session) {
       group_by(cycle, response_upr) |>
       summarise(across(c(health_related:maternal_health), ~ sum(.x == "Other"))) |>
       ungroup() |>
-      filter(response_upr %in% c("Supported", "Noted/Other")) |>
+      filter(response_upr %in% c("Supported", "Noted")) |>
       pivot_longer(
         cols = health_related:maternal_health,
         names_to = "theme",
@@ -1014,7 +1015,7 @@ server <- function(input, output, session) {
       group_by(response_upr) |>
       summarise(across(c(health_related:maternal_health), ~ sum(.x != "Other"))) |>
       ungroup() |>
-      filter(response_upr %in% c("Supported", "Noted/Other")) |>
+      filter(response_upr %in% c("Supported", "Noted")) |>
       pivot_longer(
         cols = health_related:maternal_health,
         names_to = "theme",
@@ -1026,7 +1027,7 @@ server <- function(input, output, session) {
       group_by(response_upr) |>
       summarise(across(c(health_related:maternal_health), ~ sum(.x == "Other"))) |>
       ungroup() |>
-      filter(response_upr %in% c("Supported", "Noted/Other")) |>
+      filter(response_upr %in% c("Supported", "Noted")) |>
       pivot_longer(
         cols = health_related:maternal_health,
         names_to = "theme",
@@ -1187,7 +1188,7 @@ server <- function(input, output, session) {
       group_by(cycle, response_upr) |>
       summarise(across(c(health_related:maternal_health), ~ sum(.x != "Other"))) |>
       ungroup() |>
-      filter(response_upr %in% c("Supported", "Noted/Other")) |>
+      filter(response_upr %in% c("Supported", "Noted")) |>
       pivot_longer(
         cols = health_related:maternal_health,
         names_to = "theme",
@@ -1199,7 +1200,7 @@ server <- function(input, output, session) {
       group_by(cycle, response_upr) |>
       summarise(across(c(health_related:maternal_health), ~ sum(.x == "Other"))) |>
       ungroup() |>
-      filter(response_upr %in% c("Supported", "Noted/Other")) |>
+      filter(response_upr %in% c("Supported", "Noted")) |>
       pivot_longer(
         cols = health_related:maternal_health,
         names_to = "theme",
@@ -1295,7 +1296,7 @@ server <- function(input, output, session) {
       group_by(response_upr) |>
       summarise(across(c(health_related:maternal_health), ~ sum(.x != "Other"))) |>
       ungroup() |>
-      filter(response_upr %in% c("Supported", "Noted/Other")) |>
+      filter(response_upr %in% c("Supported", "Noted")) |>
       pivot_longer(
         cols = health_related:maternal_health,
         names_to = "theme",
@@ -1307,7 +1308,7 @@ server <- function(input, output, session) {
       group_by(response_upr) |>
       summarise(across(c(health_related:maternal_health), ~ sum(.x == "Other"))) |>
       ungroup() |>
-      filter(response_upr %in% c("Supported", "Noted/Other")) |>
+      filter(response_upr %in% c("Supported", "Noted")) |>
       pivot_longer(
         cols = health_related:maternal_health,
         names_to = "theme",
