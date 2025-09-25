@@ -209,8 +209,9 @@ state_geo <- left_join(state_geo_prep, UN_official, join_by(country == english_s
   left_join(FCS_countries) |> 
   left_join(who_regions) |> 
   arrange(region, WHO_region, subregion) |> 
-  mutate(subregion = fct_inorder(subregion),
-         across(c(region, wbregion), ~ factor(.x))) |> 
+  mutate(subregion = fct_inorder(subregion)) |> 
+  arrange(WHO_region) |> 
+  mutate(across(c(region, wbregion), ~ fct_inorder(.x))) |> 
   left_join(ecsa_states) |> #mutate(ECSA_status = fct_na_value_to_level(ECSA_status, "Other")) |> 
   left_join(CARICOM, join_by(iso3==iso3_code)) |> #mutate(CARICOM_status = fct_na_value_to_level(CARICOM_status, "Other")) |> 
   left_join(South_Centre, join_by(iso3==iso3_code)) |> #mutate(SC_status = fct_na_value_to_level(SC_status, "Other")) |> 
