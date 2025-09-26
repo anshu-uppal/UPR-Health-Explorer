@@ -328,13 +328,16 @@ The platform is intended to empower diplomats, policymakers, decision-makers acr
               fill=FALSE,
               card_header("Does engagement with the UPR translate to real-world progress?"),
               layout_column_wrap(
-                style = css(grid_template_columns = "2fr 1fr"),
-                card(fill = FALSE, 
-                     card_body(
+                style = css(grid_template_columns = "9fr 3fr"),
+                # card(fill = FALSE, 
+                #      card_body(
                        # layout_column_wrap(
                        # width=1,
                        # style = css(grid_template_columns = "2fr 1fr"),
-                       markdown("A **preliminary analysis** of recommendations related to maternal health suggests that higher engagement with the UPR process, in terms of the number of recommendations issued by reviewing states as well as support of recommendations by States Under Review, is associated with accelerated progress in reducing the maternal mortality ratio (MMR) over time."))),
+                       markdown("A **preliminary analysis** of recommendations related to maternal health suggests that higher engagement with the UPR process, in terms of the number of recommendations issued by reviewing states as well as support of recommendations by States Under Review, is associated with accelerated progress in reducing the maternal mortality ratio (MMR) over time."
+                       #          )
+                       # )
+              ),
                 actionLink(
                   inputId = "upr_analysis", # Give a unique ID to the link
                   label = img(
@@ -1505,10 +1508,10 @@ server <- function(input, output, session) {
       ))
     
     p1 <- uhc_estimate_data |> 
-      ggplot(aes(geometry = polygon, fill = NumericValue, color = selected_sur, lwd = selected_sur)) +
-      geom_sf()+
-      scale_linewidth_manual(values = c(0.8, 0.3)) +
-      scale_color_manual(values = c("blue3", "grey90")) +
+      ggplot(aes(geometry = polygon, fill = NumericValue)) +
+      geom_sf(color="transparent")+
+      # scale_linewidth_manual(values = c(0.8, 0.3)) +
+      # scale_color_manual(values = c("blue3", "grey90")) +
       scale_fill_stepsn(n.breaks = 10, na.value = "grey80", 
                         colors = hcl.colors(n = 10, palette = "RdYlBu"))+
       theme_bw() +
@@ -1562,10 +1565,10 @@ server <- function(input, output, session) {
       ))
     
     p1 <- uhc_rmnch_data |> 
-      ggplot(aes(geometry = polygon, fill = NumericValue, color = selected_sur, lwd = selected_sur)) +
-      geom_sf()+
-      scale_linewidth_manual(values = c(0.8, 0.3)) +
-      scale_color_manual(values = c("blue3", "grey90")) +
+      ggplot(aes(geometry = polygon, fill = NumericValue)) +
+      geom_sf(color="transparent")+
+      # scale_linewidth_manual(values = c(0.8, 0.3)) +
+      # scale_color_manual(values = c("blue3", "grey90")) +
       scale_fill_stepsn(n.breaks = 10, na.value = "grey80", 
                         colors = hcl.colors(n = 10, palette = "RdYlBu"))+
       theme_bw() +
@@ -1877,10 +1880,10 @@ server <- function(input, output, session) {
       pull(YEAR)
     
     p1<-skilled_birth_dat |> 
-      ggplot(aes(geometry = polygon, fill = NumericValue, color = selected_sur, lwd = selected_sur)) +
-      geom_sf() +
-      scale_linewidth_manual(values = c(0.8, 0.3)) +
-      scale_color_manual(values = c("blue3", "grey90")) +
+      ggplot(aes(geometry = polygon, fill = NumericValue)) +
+      geom_sf(color="transparent") +
+      # scale_linewidth_manual(values = c(0.8, 0.3)) +
+      # scale_color_manual(values = c("blue3", "grey90")) +
       scale_fill_fermenter(
         n.breaks = 10,
         palette = "RdYlBu", direction = 1,
@@ -1994,10 +1997,10 @@ server <- function(input, output, session) {
       pull(YEAR)
     
     p1<-institutional_birth_dat |> 
-      ggplot(aes(geometry = polygon, fill = NumericValue, color = selected_sur, lwd = selected_sur)) +
-      geom_sf() +
-      scale_linewidth_manual(values = c(0.8, 0.3)) +
-      scale_color_manual(values = c("blue3", "grey90")) +
+      ggplot(aes(geometry = polygon, fill = NumericValue)) +
+      geom_sf(color="transparent") +
+      # scale_linewidth_manual(values = c(0.8, 0.3)) +
+      # scale_color_manual(values = c("blue3", "grey90")) +
       scale_fill_fermenter(
         n.breaks = 10,
         palette = "RdYlBu", direction = 1,
@@ -2102,10 +2105,10 @@ server <- function(input, output, session) {
       ))
     
     p1<-world_abortion_laws_data |> 
-      ggplot(aes(geometry = polygon, fill = category, color = selected_sur, lwd = selected_sur)) +
-      geom_sf() +
-      scale_linewidth_manual(values = c(0.8, 0.3)) +
-      scale_color_manual(values = c("blue3", "grey90")) +
+      ggplot(aes(geometry = polygon, fill = category)) +
+      geom_sf(color="transparent") +
+      # scale_linewidth_manual(values = c(0.8, 0.3)) +
+      # scale_color_manual(values = c("blue3", "grey90")) +
       scale_fill_manual(
         values = c("chartreuse4", "cyan3", "gold", "chocolate1", "red3", "purple"),
         na.value = "grey90", labels = relabel_na
@@ -2152,10 +2155,10 @@ server <- function(input, output, session) {
       pull(Value)
     
     p1<- abortion_rate_data |> 
-      ggplot(aes(geometry = polygon, fill = NumericValue, color = selected_sur, lwd = selected_sur)) +
-      geom_sf() +
-      scale_linewidth_manual(values = c(0.8, 0.3)) +
-      scale_color_manual(values = c("blue3", "grey90")) +
+      ggplot(aes(geometry = polygon, fill = NumericValue)) +
+      geom_sf(color="transparent") +
+      # scale_linewidth_manual(values = c(0.8, 0.3)) +
+      # scale_color_manual(values = c("blue3", "grey90")) +
       scale_fill_stepsn(
         n.breaks = 8, na.value = "grey80",
         colors = hcl.colors(n = 8, palette = "RdYlBu", rev = TRUE)
@@ -2205,10 +2208,10 @@ server <- function(input, output, session) {
       pull(Value)
     
     p1<- unintended_pregnancy_data |> 
-      ggplot(aes(geometry = polygon, fill = NumericValue, color = selected_sur, lwd = selected_sur)) +
-      geom_sf() +
-      scale_linewidth_manual(values = c(0.8, 0.3)) +
-      scale_color_manual(values = c("blue3", "grey90")) +
+      ggplot(aes(geometry = polygon, fill = NumericValue)) +
+      geom_sf(color="transparent") +
+      # scale_linewidth_manual(values = c(0.8, 0.3)) +
+      # scale_color_manual(values = c("blue3", "grey90")) +
       scale_fill_fermenter(
         n.breaks = 10,
         palette = "RdYlBu", direction = -1,
