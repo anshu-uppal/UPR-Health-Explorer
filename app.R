@@ -76,8 +76,8 @@ map_insetting <- function(
     # scale_linewidth_manual(values = c(0.2, 0.1)) +
     coord_sf(
       expand=FALSE,
-      xlim = c(bbox_sur[[1]]-.011, bbox_sur[[3]]+.011),
-      ylim = c(bbox_sur[[2]]-.011, bbox_sur[[4]]+.011)
+      xlim = c(bbox_sur[[1]]-.022, bbox_sur[[3]]+.022),
+      ylim = c(bbox_sur[[2]]-.022, bbox_sur[[4]]+.022)
     ) +
     theme_void()+
     theme(
@@ -86,10 +86,10 @@ map_insetting <- function(
     )+
     geom_rect(
       aes(
-        xmin = bbox_sur["xmin"]-.01,
-        xmax = bbox_sur["xmax"]+.01,
-        ymin = bbox_sur["ymin"]-.01,
-        ymax = bbox_sur["ymax"]+.01
+        xmin = bbox_sur["xmin"]-.02,
+        xmax = bbox_sur["xmax"]+.02,
+        ymin = bbox_sur["ymin"]-.02,
+        ymax = bbox_sur["ymax"]+.02
       ),
       fill = "transparent",
       color = "red",
