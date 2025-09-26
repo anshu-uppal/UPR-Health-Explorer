@@ -46,7 +46,7 @@ map_insetting <- function(
     caption_size=14
 ) {
   p2 <- p1 + 
-    geom_sf(color="grey80", fill="transparent")+
+    geom_sf(data=plot_dat, color="grey80", fill="transparent")+
     coord_sf(
       # expand = FALSE,
       xlim = c(bbox_SUR_region_dynamic[[1]],bbox_SUR_region_dynamic[[3]]),
@@ -119,8 +119,10 @@ map_insetting <- function(
   b<-ggplot_build(p3)
   multiplier_a <- abs(a$layout$coord$limits$x[1]-a$layout$coord$limits$x[2])/abs(a$layout$coord$limits$y[1]-a$layout$coord$limits$y[2])
   multiplier_b <- abs(b$layout$coord$limits$x[1]-b$layout$coord$limits$x[2])/abs(b$layout$coord$limits$y[1]-b$layout$coord$limits$y[2])
-  inset_dimensions <- c(0,0,0.2,0.2*multiplier_a/multiplier_b)
   
+  key_dim <- 0.3/(multiplier_a/multiplier_b)
+  inset_dimensions <- if(multiplier_b<=3){c(0,0,key_dim,key_dim*multiplier_a/multiplier_b)}else{c(0,0,key_dim*multiplier_a/multiplier_b, 0.3)}
+
   if (sur_area > 11^11) {
     p2 + p_title
   } else {
@@ -2085,16 +2087,18 @@ server <- function(input, output, session) {
   
   ### Abortion Outputs -------------------------------------------------
   
-  # Reactive for base abortion map to avoid code duplication
-  abortion_map_base <- reactive({
-    world_abortion_laws |>
+  output$abortion_map_sur <- renderPlot({
+    
+    world_abortion_laws_data <- world_abortion_laws |>
       right_join(state_geo_reactive()) |>
       mutate(selected_sur = factor(case_when(
         country == input$selected_SUR ~ input$selected_SUR,
         .default = "Other"
       ),
       levels = c(input$selected_SUR, "Other")
-      )) |>
+      ))
+    
+    p1<-world_abortion_laws_data |> 
       ggplot(aes(geometry = polygon, fill = category, color = selected_sur, lwd = selected_sur)) +
       geom_sf() +
       scale_linewidth_manual(values = c(0.8, 0.3)) +
@@ -2103,29 +2107,23 @@ server <- function(input, output, session) {
         values = c("chartreuse4", "cyan3", "gold", "chocolate1", "red3", "purple"),
         na.value = "grey90", labels = relabel_na
       ) +
+      labs(
+        # title = "Abortion laws by State (current as of June 2023)", 
+        fill = NULL) +
       theme_bw() +
       theme(
         panel.grid = element_blank(),
         axis.text = element_blank(), axis.ticks = element_blank(),
-        axis.title = element_blank()
-      ) +
-      guides(color = "none", lwd = "none", label = "none")
-  })
-  
-  output$abortion_map_sur <- renderPlot({
-    p1 <- abortion_map_base() +
-      labs(
-        # title = "Abortion laws by State (current as of June 2023)", 
-        fill = NULL) +
-      theme(
+        axis.title = element_blank(),
         legend.position = "right",
         legend.key.size = unit(15, "pt"),
         # legend.key.height = unit(1,"cm"),
         legend.text = element_text(size = 11)
-      )
+      ) +
+      guides(color = "none", lwd = "none", label = "none")
     
     map_insetting(
-      p1, 
+      p1, plot_dat = world_abortion_laws_data,
       p_caption_text = paste0(input$selected_SUR),
       p_title_text = "Abortion laws by State (current as of June 2023)",
       bbox_SUR_region_dynamic = bbox_SUR_region_dynamic(), 
