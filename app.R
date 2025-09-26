@@ -10,6 +10,7 @@ pacman::p_load(
   bslib, # Modern UI for Shiny dashboard
   here,
   dplyr, forcats, ggplot2, magrittr, readr, readxl, stringr, tibble, tidyr, lubridate,
+  ggnewscale,
   ggtext, # allow dynamically wrapped plot titles
   janitor,
   DT, # interactive tables
