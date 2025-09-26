@@ -38,14 +38,17 @@ relabel_na <- function(x) {
 }
 
 map_insetting <- function(
-    p1, bbox_SUR_region_dynamic, bbox_sur, sur_area, 
+    p1, plot_dat,
+    bbox_SUR_region_dynamic, bbox_sur, sur_area, 
     p_title_text="Update this text", 
     p_caption_text = "Update this text",
     title_size=14, title_margin=17,
     caption_size=14
 ) {
   p2 <- p1 + 
+    geom_sf(color="grey80", fill="transparent")+
     coord_sf(
+      # expand = FALSE,
       xlim = c(bbox_SUR_region_dynamic[[1]],bbox_SUR_region_dynamic[[3]]),
       ylim = c(bbox_SUR_region_dynamic[[2]], bbox_SUR_region_dynamic[[4]])
       
@@ -65,12 +68,33 @@ map_insetting <- function(
       linewidth = 0.5
     )
   
-  p3 <- p1 +
-    scale_linewidth_manual(values = c(0.2, 0.1)) +
+  p3 <- p1 + guides(fill="none")+
+    ggnewscale::new_scale_fill()+ 
+    geom_sf(data=plot_dat, aes(geometry=polygon, fill = selected_sur),
+            color = "transparent")+ 
+    scale_fill_manual(values=c("transparent", "white"))+
+    # scale_linewidth_manual(values = c(0.2, 0.1)) +
     coord_sf(
-      xlim = c(bbox_sur[[1]], bbox_sur[[3]]),
-      ylim = c(bbox_sur[[2]], bbox_sur[[4]])
+      expand=FALSE,
+      xlim = c(bbox_sur[[1]]-.011, bbox_sur[[3]]+.011),
+      ylim = c(bbox_sur[[2]]-.011, bbox_sur[[4]]+.011)
     ) +
+    theme_void()+
+    theme(
+      panel.background = element_rect(fill="white"), 
+      panel.border = element_rect(color = "red")
+    )+
+    geom_rect(
+      aes(
+        xmin = bbox_sur["xmin"]-.01,
+        xmax = bbox_sur["xmax"]+.01,
+        ymin = bbox_sur["ymin"]-.01,
+        ymax = bbox_sur["ymax"]+.01
+      ),
+      fill = "transparent",
+      color = "red",
+      linewidth = 0.5
+    )+
     guides(fill = "none") +
     labs(
       # subtitle = "(map zoom)", 
@@ -90,10 +114,17 @@ map_insetting <- function(
     )
   )
   
+  # Calculate Inset dimensions for lower left
+  a<-ggplot_build(p2)
+  b<-ggplot_build(p3)
+  multiplier_a <- abs(a$layout$coord$limits$x[1]-a$layout$coord$limits$x[2])/abs(a$layout$coord$limits$y[1]-a$layout$coord$limits$y[2])
+  multiplier_b <- abs(b$layout$coord$limits$x[1]-b$layout$coord$limits$x[2])/abs(b$layout$coord$limits$y[1]-b$layout$coord$limits$y[2])
+  inset_dimensions <- c(0,0,0.2,0.2*multiplier_a/multiplier_b)
+  
   if (sur_area > 11^11) {
     p2 + p_title
   } else {
-    p2 + p3 + p_title
+    p2 + inset_element(p3, inset_dimensions[1], inset_dimensions[2],inset_dimensions[3],inset_dimensions[4]) + p_title
   }
 }
 
@@ -273,13 +304,13 @@ The platform is intended to empower diplomats, policymakers, decision-makers acr
                        )
                      )
            ),
-#            nav_panel(title = "Classification of UPR recommendations", icon=icon("book"),
-#                      card(fill = FALSE,
-#                           card_header("Methodology"),
-#                           card_body(markdown("We conducted a comprehensive longitudinal analysis of all recommendations made during the first three cycles of the United Nations' Universal Periodic Review (UPR), spanning from 2008 to 2022. The full dataset of recommendations, including the State Under Review's response (“supported” or “noted”), was sourced from the Danish Institute for Human Rights’ “SDG-Human Rights Data Explorer”. Their database in turn relies partly on UPR Info’s “Database of Recommendations”. This dataset formed the basis for our classification and subsequent statistical modelling to assess the relationship between UPR engagement and health outcomes.  
-# 
-# To systematically analyze the recommendations, we developed a keyword-based classification system using R. Drawing inspiration from <a href='https://iris.who.int/handle/10665/277114' target='_blank'>a recent WHO report on health-related recommendation under the first two cycles of the UPR</a>, recommendations were categorized into non-exclusive thematic health areas (i.e. a single recommendation could fall into mutliple categories), such as health systems, communicable diseases, and environmental health. For this study's focus, we developed specific, detailed sub-classification definitions for themes related to Maternal, Newborn, and Child Health (MNCH) and Sexual and Reproductive Health and Rights (SRHR), with a particular focus on identifying recommendations pertaining to maternal health and family planning."))
-#                      ))
+           #            nav_panel(title = "Classification of UPR recommendations", icon=icon("book"),
+           #                      card(fill = FALSE,
+           #                           card_header("Methodology"),
+           #                           card_body(markdown("We conducted a comprehensive longitudinal analysis of all recommendations made during the first three cycles of the United Nations' Universal Periodic Review (UPR), spanning from 2008 to 2022. The full dataset of recommendations, including the State Under Review's response (“supported” or “noted”), was sourced from the Danish Institute for Human Rights’ “SDG-Human Rights Data Explorer”. Their database in turn relies partly on UPR Info’s “Database of Recommendations”. This dataset formed the basis for our classification and subsequent statistical modelling to assess the relationship between UPR engagement and health outcomes.  
+           # 
+           # To systematically analyze the recommendations, we developed a keyword-based classification system using R. Drawing inspiration from <a href='https://iris.who.int/handle/10665/277114' target='_blank'>a recent WHO report on health-related recommendation under the first two cycles of the UPR</a>, recommendations were categorized into non-exclusive thematic health areas (i.e. a single recommendation could fall into mutliple categories), such as health systems, communicable diseases, and environmental health. For this study's focus, we developed specific, detailed sub-classification definitions for themes related to Maternal, Newborn, and Child Health (MNCH) and Sexual and Reproductive Health and Rights (SRHR), with a particular focus on identifying recommendations pertaining to maternal health and family planning."))
+           #                      ))
   ),
   
   ### UPR impact ----------------------------
@@ -290,22 +321,22 @@ The platform is intended to empower diplomats, policymakers, decision-makers acr
               layout_column_wrap(
                 style = css(grid_template_columns = "2fr 1fr"),
                 card(fill = FALSE, 
-              card_body(
-                # layout_column_wrap(
-                  # width=1,
-                  # style = css(grid_template_columns = "2fr 1fr"),
-                  markdown("A **preliminary analysis** of recommendations related to maternal health suggests that higher engagement with the UPR process, in terms of the number of recommendations issued by reviewing states as well as support of recommendations by States Under Review, is associated with accelerated progress in reducing the maternal mortality ratio (MMR) over time."))),
-                  actionLink(
-                    inputId = "upr_analysis", # Give a unique ID to the link
-                    label = img(
-                      src = "full_plot.png",
-                      style = "height: auto; width: 100%; object-fit: contain; cursor: pointer;" # Add cursor style for better UX
-                    )
+                     card_body(
+                       # layout_column_wrap(
+                       # width=1,
+                       # style = css(grid_template_columns = "2fr 1fr"),
+                       markdown("A **preliminary analysis** of recommendations related to maternal health suggests that higher engagement with the UPR process, in terms of the number of recommendations issued by reviewing states as well as support of recommendations by States Under Review, is associated with accelerated progress in reducing the maternal mortality ratio (MMR) over time."))),
+                actionLink(
+                  inputId = "upr_analysis", # Give a unique ID to the link
+                  label = img(
+                    src = "full_plot.png",
+                    style = "height: auto; width: 100%; object-fit: contain; cursor: pointer;" # Add cursor style for better UX
                   )
-                  # ,padding = 0
                 )
+                # ,padding = 0
               )
-            ),
+            )
+  ),
   ### UPR recommendations ----------------
   nav_menu(title = "UPR recommendations", icon = icon("people-arrows"),
            #### UPR: Regional -----------------------
@@ -1442,7 +1473,7 @@ server <- function(input, output, session) {
       pull(NumericValue) |>
       round(0)
     
-    p1<-UHC_all |> 
+    uhc_estimate_data <- UHC_all |> 
       filter(YEAR == 2021) |> 
       # group_by(country_name, IndicatorCode) |> slice_max(order_by = YEAR, n=1) |> ungroup() |> 
       filter(SpatialDimType == "COUNTRY") |> 
@@ -1453,7 +1484,9 @@ server <- function(input, output, session) {
         .default = "Other"
       ),
       levels = c(input$selected_SUR, "Other")
-      )) |> 
+      ))
+    
+    p1 <- uhc_estimate_data |> 
       ggplot(aes(geometry = polygon, fill = NumericValue, color = selected_sur, lwd = selected_sur)) +
       geom_sf()+
       scale_linewidth_manual(values = c(0.8, 0.3)) +
@@ -1481,7 +1514,7 @@ server <- function(input, output, session) {
       guides(color = "none", lwd = "none")
     
     map_insetting(
-      p1, 
+      p1, plot_dat = uhc_estimate_data,
       p_caption_text = paste0(input$selected_SUR, ": ", UHC_estimate_2021),
       p_title_text = "UHC Service Coverage Index (2021)",
       bbox_SUR_region_dynamic = bbox_SUR_region_dynamic(), 
@@ -1497,7 +1530,7 @@ server <- function(input, output, session) {
       pull(NumericValue) |>
       round(0)
     
-    p1<-UHC_all |> 
+    uhc_rmnch_data <- UHC_all |> 
       filter(YEAR == 2021) |> 
       # group_by(country_name, IndicatorCode) |> slice_max(order_by = YEAR, n=1) |> ungroup() |> 
       filter(SpatialDimType == "COUNTRY") |> 
@@ -1508,7 +1541,9 @@ server <- function(input, output, session) {
         .default = "Other"
       ),
       levels = c(input$selected_SUR, "Other")
-      )) |> 
+      ))
+    
+    p1 <- uhc_rmnch_data |> 
       ggplot(aes(geometry = polygon, fill = NumericValue, color = selected_sur, lwd = selected_sur)) +
       geom_sf()+
       scale_linewidth_manual(values = c(0.8, 0.3)) +
@@ -1537,7 +1572,7 @@ server <- function(input, output, session) {
       guides(color = "none", lwd = "none")
     
     map_insetting(
-      p1, 
+      p1, plot_dat = uhc_rmnch_data,
       p_caption_text = paste0(input$selected_SUR, ": ", UHC_estimate_2021),
       p_title_text = "UHC sub-index on reproductive, maternal, newborn, and child health (2021)",
       bbox_SUR_region_dynamic = bbox_SUR_region_dynamic(), 
@@ -1612,7 +1647,8 @@ server <- function(input, output, session) {
       filter(country_name == input$selected_SUR, YEAR == "2023") |>
       pull(NumericValue) |>
       round(0)
-    p1 <- MMR |>
+    
+    mmr_dat <- MMR |>
       mutate(selected_sur = factor(case_when(
         country_name == input$selected_SUR ~ input$selected_SUR,
         .default = "Other"
@@ -1622,7 +1658,9 @@ server <- function(input, output, session) {
       filter(TimeDimensionValue == 2023, !is.na(country_name)) |>
       right_join(state_geo_reactive(), 
                  by = c("COUNTRY" = "iso3")) |>
-      filter(!is.na(selected_sur)) |>
+      filter(!is.na(selected_sur))
+    
+    p1<-mmr_dat |> 
       ggplot(aes(geometry = polygon, fill = mmr_cat, color = selected_sur, lwd = selected_sur)) +
       geom_sf() +
       scale_linewidth_manual(values = c(0.8, 0.3)) +
@@ -1647,7 +1685,7 @@ server <- function(input, output, session) {
     # )
     
     map_insetting(
-      p1, 
+      p1, plot_dat = mmr_dat,
       p_caption_text = paste0(input$selected_SUR, ": ", mmr_estimate_2023, " per 100,000 live births"),
       p_title_text = "Maternal mortality ratio (MMR) estimates in 2023",
       bbox_SUR_region_dynamic = bbox_SUR_region_dynamic(), 
@@ -1851,7 +1889,7 @@ server <- function(input, output, session) {
       )+guides(color="none", lwd="none")
     
     map_insetting(
-      p1,
+      p1,plot_dat = skilled_birth_dat,
       p_caption_text = if(is.na(country_estimate)){paste0(input$selected_SUR, ": No available data")} 
       else{paste0(input$selected_SUR, ": ",country_estimate, "% in ", country_year)},
       p_title_text = "Births attended by skilled health personnel (%), latest year",
@@ -1968,7 +2006,7 @@ server <- function(input, output, session) {
       )+guides(color="none", lwd="none")
     
     map_insetting(
-      p1,
+      p1, plot_dat = institutional_birth_dat,
       p_caption_text = if(is.na(country_estimate)){paste0(input$selected_SUR, ": No available data")} 
       else{paste0(input$selected_SUR, ": ",country_estimate, "% in ", country_year)},
       p_title_text = "Proportion of births delivered in a health facility (%), latest year",
@@ -2127,9 +2165,9 @@ server <- function(input, output, session) {
       guides(color = "none", lwd = "none", label = "none")
     
     map_insetting(
-      p1, 
+      p1, plot_dat = abortion_rate_data,
       p_caption_text = paste0(input$selected_SUR, if(is.na(country_estimate)){": No available data"} 
-      else{paste0(": ",country_estimate, " per 1,000")}),
+                              else{paste0(": ",country_estimate, " per 1,000")}),
       p_title_text = "Abortion rate (model-estimated), 2015-2019",
       bbox_SUR_region_dynamic = bbox_SUR_region_dynamic(), 
       bbox_sur = bbox_selected_SUR(), 
@@ -2183,7 +2221,7 @@ server <- function(input, output, session) {
       guides(color = "none", lwd = "none", label = "none")
     
     map_insetting(
-      p1, 
+      p1, plot_dat = unintended_pregnancy_data,
       p_caption_text = paste0(input$selected_SUR, if(is.na(country_estimate)){": No available data"} 
                               else{paste0(": ",country_estimate, " per 1,000")}),
       p_title_text = "Unintended pregnancy (model-estimated), 2015-2019",
@@ -2216,16 +2254,17 @@ server <- function(input, output, session) {
       pull(YEAR)
     
     p1 <- family_planning_dat |> 
-      ggplot(aes(geometry = polygon, fill = NumericValue, color = selected_sur, lwd = selected_sur)) +
-      geom_sf() +
-      scale_linewidth_manual(values = c(0.8, 0.3)) +
-      scale_color_manual(values = c("blue3", "grey90")) +
+      ggplot(aes(geometry = polygon, fill = NumericValue)) +
+      geom_sf(color = "transparent") +
+      # scale_linewidth_manual(values = c(0.8, 0.3)) +
+      # scale_color_manual(values = c("blue3", "grey90")) +
       scale_fill_fermenter(
         n.breaks = 10,
         palette = "RdYlBu", direction = 1,
         na.value = "grey80",
         labels = relabel_na
       ) +
+      # theme_void()+
       theme_bw() +
       theme(
         panel.grid = element_blank(),
@@ -2234,7 +2273,7 @@ server <- function(input, output, session) {
         legend.text = element_text(size=12),
         legend.key.size = unit(25,"pt"),
         legend.background = element_blank(),
-        axis.title = element_blank(), 
+        axis.title = element_blank(),
         plot.caption = element_text(size=16),
         plot.title = ggtext::element_textbox_simple(
           margin = margin(t = 5, b = 10, r=0, l=0, unit = "pt")
@@ -2249,7 +2288,7 @@ server <- function(input, output, session) {
       guides(color = "none", lwd = "none", label = "none")
     
     map_insetting(
-      p1, 
+      p1, plot_dat=family_planning_dat,
       p_caption_text = if(is.na(country_estimate)){paste0(input$selected_SUR, ": No available data")} 
       else{paste0(input$selected_SUR, ": ",country_estimate, "% in ", country_year)},
       p_title_text = "Women of reproductive age (aged 15-49 years) who have their need for family planning satisfied with modern methods (%), latest year",
