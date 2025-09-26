@@ -161,6 +161,8 @@ mmr_WHO_wide <- mmr_WHO |>
 mmr_data_WHO <- mmr_WHO |> left_join(maternal_deaths) |> left_join(live_births) |> 
   mutate(mmr_calc = maternal_deaths/(livebirths/100))
 
+
+
 # GHO ####
 ## API queries ####
 gho_api <- ODataQuery::ODataQuery$new("https://ghoapi.azureedge.net/api")
@@ -191,11 +193,17 @@ WB_income_codes <- gho_api$path("Dimension", "WORLDBANKINCOMEGROUP", "DimensionV
 
 
 ## Search GHO codes ####
-search_term <- "reproductive"
+search_term <- "adolescent"
+# search_term <- "(?=.*cause)(?=.*death)"
 search_term_results <- gho_indicators |> filter(str_detect(IndicatorName, regex(search_term, ignore_case = TRUE))|
                            str_detect(IndicatorCode, regex(search_term, ignore_case = TRUE)))
 
 ## Indicators ####
+
+### GHE ####
+# GHECAUSES <- gho_api$path("Dimension", "GHECAUSES", "DimensionValues")$retrieve()$value |>  tibble()
+# GHECAUSE <- gho_api$path("Dimension", "GHECAUSE", "DimensionValues")$retrieve()$value |>  tibble()
+
 
 ### UHC ####
 #### Get datasets ####
@@ -413,6 +421,22 @@ abortion_rate <- gho_api$path("SRH_ABORTION_RATE")$retrieve()$value |> tibble() 
   )
 
 ### Adolescent birth rate ####
+adolescent_birth_rate <- gho_api$path("MDG_0000000003")$retrieve()$value |> tibble() |> 
+  mutate(
+    COUNTRY = case_when(SpatialDimType == "COUNTRY" ~ SpatialDim),
+    REGION = case_when(SpatialDimType %in% c("REGION", "GLOBAL")~SpatialDim),
+    UNREGION = case_when(SpatialDimType %in% c("UNREGION", "GLOBAL")~SpatialDim)
+  ) |> 
+  left_join(gho_indicators) |> 
+  left_join(country_codes) |> 
+  left_join(region_codes) |> 
+  left_join(UN_region_codes) |> 
+  rename(YEAR = TimeDim) |> 
+  mutate(
+    # NumericValue = as.numeric(NumericValue),
+    across(c(NumericValue), ~ as.numeric(.x)),
+    year = ymd(paste0(YEAR, "-01-01"))
+  )
 
 ### Own informed decisions ####
 informed_decisions <- gho_api$path("SG_DMK_SRCR_FN_ZS")$retrieve()$value |> tibble() |> 
