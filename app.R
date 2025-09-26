@@ -1802,7 +1802,7 @@ server <- function(input, output, session) {
       geom_col(position = position_dodge()) +
       geom_errorbar(aes(xmin = lower, xmax = upper), width = 0.5, position = position_dodge(width = 0.9)) +
       labs(
-        y = "Maternal cause of death", x = "Age-standardized rate (per 100,000)\nin 2023", fill = NULL
+        y = "Maternal cause of death", x = "Age-standardized rate, 2023\n(per 100,000)", fill = NULL
         # , title = "Distribution of causes of maternal deaths (2021)"
       ) +
       scale_x_continuous(
@@ -1841,7 +1841,7 @@ server <- function(input, output, session) {
       ) +
       labs(
         x = NULL, y = NULL,
-        lwd = "Rate", color = NULL,
+        lwd = "Rate\n(per 100,000)", color = NULL,
         title = "Longitudinal trends in the causes of maternal deaths\n(Caution: y-axes are variable)"
       ) +
       theme_bw() +
