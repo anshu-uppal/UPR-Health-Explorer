@@ -17,9 +17,9 @@ pacman::p_load(
   )
 ```
 
-## Health-Related UPR Recommendations
+## Health-Related UPR Recommendations  
 
-**Report for:** {r params$country_name}
+**Report for:** `params$country_name`  
 
 This plot shows all health-related recommendations received by the selected state across all UPR cycles.
 ```{r}
