@@ -380,11 +380,12 @@ The platform is intended to empower diplomats, policymakers, decision-makers acr
                          full_screen = TRUE,
                          # title = "Regional Recommendation Themes",
                          nav_panel("All Recommendations", 
-                                   card(fill = FALSE,
+                                   card(
+                                     fill = FALSE,
                                         card_body(
-                                          plotOutput("upr_themes_all_global", 
-                                                     width = paste0(upr_width,"px"),
-                                                     height =  paste0(upr_height,"px")
+                                          plotOutput("upr_themes_all_global"
+                                                     ,width = paste0(upr_width,"px")
+                                                     ,height =  paste0(upr_height,"px")
                                           )),
                                         card_footer(
                                           downloadButton(
@@ -394,7 +395,8 @@ The platform is intended to empower diplomats, policymakers, decision-makers acr
                                         )
                                    )),
                          nav_panel("Per UPR Cycle", 
-                                   card(fill=FALSE,
+                                   card(
+                                     fill=FALSE,
                                         card_body(plotOutput("upr_themes_cycle_global", 
                                                              width = paste0(upr_width*1.05,"px"),
                                                              height =  paste0(upr_height*1.6,"px")
@@ -830,7 +832,7 @@ server <- function(input, output, session) {
   ## PDF Country profile -------------------------------------------------------
   output$download_report <- downloadHandler(
     filename = function() {
-      paste0("UPR-Profile-", input$selected_SUR, "-", Sys.Date(), ".pdf")
+      paste0("CeHDI-Profile-", input$selected_SUR, ".pdf")
     },
     
     content = function(file) {
@@ -853,7 +855,7 @@ server <- function(input, output, session) {
         output_file = "report.pdf",
         params = list(
           country_name = input$selected_SUR,
-          plot_object = upr_themes_all_object()
+          upr_all = upr_themes_all_object()
         ),
         envir = new.env(parent = globalenv())
       )

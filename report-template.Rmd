@@ -2,7 +2,7 @@
 title: "UPR Health Profile"
 params:
   country_name: "Default Country"
-  plot_object: NULL
+  upr_all: NULL
 output: pdf_document
 date: "2025-09-30"
 ---
@@ -22,15 +22,17 @@ pacman::p_load(
 **Report for:** `r params$country_name`  
 
 This plot shows all health-related recommendations received by the selected state across all UPR cycles.
-```{r}
-# This chunk prints the plot object that is passed from the Shiny app
-  penguins |> 
-  ggplot(aes(x=island, y = body_mass, fill = species))+
-  geom_jitter(
-    aes(color = species),
-    position = position_jitterdodge(
-      jitter.width = 0.3,  # How much to spread the points horizontally
-      dodge.width = 0.9    # Must match the violin's dodge width
-    ))+
-  geom_violin(quantile.linetype = 2, position = position_dodge(width = 0.9), alpha=0.5)
+```{r, fig.width=6, fig.height=5, out.width="30%"}
+# # This chunk prints the plot object that is passed from the Shiny app
+#   penguins |> 
+#   ggplot(aes(x=island, y = body_mass, fill = species))+
+#   geom_jitter(
+#     aes(color = species),
+#     position = position_jitterdodge(
+#       jitter.width = 0.3,  # How much to spread the points horizontally
+#       dodge.width = 0.9    # Must match the violin's dodge width
+#     ))+
+#   geom_violin(quantile.linetype = 2, position = position_dodge(width = 0.9), alpha=0.5)
+
+print(params$upr_all+theme(axis.title.x = element_text(color = "red")))
 ```
