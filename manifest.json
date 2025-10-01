@@ -5828,7 +5828,7 @@
   },
   "files": {
     "app.R": {
-      "checksum": "a5c6769cb8d0203115c0d40d713fe35f"
+      "checksum": "4f40436a03a54fab5720a8cc757e33db"
     },
     "code/.gitkeep": {
       "checksum": "81051bcc2cf1bedf378224b0a93e2877"
@@ -5854,11 +5854,17 @@
     "code/MLM_alt.R": {
       "checksum": "34a5d24ea48ee998644d5e0af93f8147"
     },
+    "code/profile_pdf_plots_to delete.R": {
+      "checksum": "9f174e9609a0838d54b38d65146d84e1"
+    },
     "code/tables.R": {
       "checksum": "2026bb14d182cb7703e4409904bbe59c"
     },
     "code/theme_labels.R": {
       "checksum": "978328eaecf9c92c0aaf0a32d3429bc5"
+    },
+    "code/uhri_prep_to delete.R": {
+      "checksum": "819bdff2e8b8a41b94ad1f057c3bb03c"
     },
     "data/.gitkeep": {
       "checksum": "81051bcc2cf1bedf378224b0a93e2877"
@@ -6058,6 +6064,18 @@
     "full_plot.png": {
       "checksum": "70504245c917340cd27172fb8cd0e995"
     },
+    "ggjgj.pdf": {
+      "checksum": "56de2ffb7c1b1d53e3707397451131dd"
+    },
+    "Jamaica.png": {
+      "checksum": "b90da6d203a65c4624faaafbd995174e"
+    },
+    "Liberia.png": {
+      "checksum": "9762ea7b4c1b7dc0257f79f76b28b059"
+    },
+    "malawi.png": {
+      "checksum": "ef4cfedb61c787740fb002bace208124"
+    },
     "mozambique.png": {
       "checksum": "1cfdb75f56552acb30a50cb5fa3b31ca"
     },
@@ -6083,13 +6101,19 @@
       "checksum": "17aebe0c4de1aa1626e5bcce1b9d0af9"
     },
     "report-template.pdf": {
-      "checksum": "5fde9ea711ca1f5e6858e3204c5ac9d5"
+      "checksum": "2f30ab5254796d5c31d75a1d644cac09"
     },
     "report-template.qmd": {
       "checksum": "37e4d66fe96cb6bdaeb8cf9596cd38d5"
     },
+    "report-template.Rmd": {
+      "checksum": "dcfdc45ff0b1184e935b9f4716347cee"
+    },
     "report.pdf": {
-      "checksum": "1383a42449f8f9786e9953e44f077877"
+      "checksum": "77df25a12c75f8b1712314c7629cbffa"
+    },
+    "report_qmd.pdf": {
+      "checksum": "b7849a5840cdc384985338f101f35dbe"
     },
     "upr_cols.csv": {
       "checksum": "64a02b52049db9228904ccfdec2d2bee"
