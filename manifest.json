@@ -5828,7 +5828,7 @@
   },
   "files": {
     "app.R": {
-      "checksum": "4f40436a03a54fab5720a8cc757e33db"
+      "checksum": "78d3dab29b17337ae1f45140e343a97a"
     },
     "code/.gitkeep": {
       "checksum": "81051bcc2cf1bedf378224b0a93e2877"
@@ -5843,7 +5843,7 @@
       "checksum": "8952ddc95bdef9346124d5d4d53f6a37"
     },
     "code/external_data_OData.R": {
-      "checksum": "1b157d6c0cb62f4539dae557bcc31cda"
+      "checksum": "bfa0cb68927a7c89c4f9c9bf3b1ecac4"
     },
     "code/geo_code.R": {
       "checksum": "7a14f483c6c9d71360b98938203eee72"
@@ -5855,7 +5855,7 @@
       "checksum": "34a5d24ea48ee998644d5e0af93f8147"
     },
     "code/profile_pdf_plots_to delete.R": {
-      "checksum": "9f174e9609a0838d54b38d65146d84e1"
+      "checksum": "89f5a07dc628e9101ceee4b3dd1fd7ef"
     },
     "code/tables.R": {
       "checksum": "2026bb14d182cb7703e4409904bbe59c"
@@ -6061,6 +6061,759 @@
     "data/world_abortion_laws.xlsx": {
       "checksum": "8ef034657d6d462896629aa0def80bd8"
     },
+    "fhgh.pdf": {
+      "checksum": "0f5172b33098807f81b47567e3df8c11"
+    },
+    "flags/ad.png": {
+      "checksum": "5074501fe7dee5dcdd6e1fb6cf4e46f2"
+    },
+    "flags/ae.png": {
+      "checksum": "da17202c77a55b8984146fc9ad591489"
+    },
+    "flags/af.png": {
+      "checksum": "ab02210a94743b4ad1cab5a1c6d4bd37"
+    },
+    "flags/ag.png": {
+      "checksum": "a0f70dfd89c1e6389638e9e89c4e3408"
+    },
+    "flags/ai.png": {
+      "checksum": "71d8cdc83bb1ad4f30573b089ae2f3ad"
+    },
+    "flags/al.png": {
+      "checksum": "8cf98d6083a23dfa1e259b828baa7fc6"
+    },
+    "flags/am.png": {
+      "checksum": "6ffed30a633310c5defde3a8bf78b454"
+    },
+    "flags/ao.png": {
+      "checksum": "661b8c7a0a84bccefc5ecc875cc00198"
+    },
+    "flags/aq.png": {
+      "checksum": "d604cbc5679e10d93a9c42f4929e9959"
+    },
+    "flags/ar.png": {
+      "checksum": "8b9588d3eff63c6e80d843194a6e9738"
+    },
+    "flags/as.png": {
+      "checksum": "7928e0d9410fe684c3399269fb630eab"
+    },
+    "flags/at.png": {
+      "checksum": "5e8996d05a0d108dbf8795917c7f78e2"
+    },
+    "flags/au.png": {
+      "checksum": "bb5d2d9f6bca60d015c5267fd37440fb"
+    },
+    "flags/aw.png": {
+      "checksum": "83ef8b9972e5f1c8b24d67a3fd810206"
+    },
+    "flags/ax.png": {
+      "checksum": "14b8d3381d1e5b5cac98338ead9bab11"
+    },
+    "flags/az.png": {
+      "checksum": "42535bbc135de78f4eb2686023446c55"
+    },
+    "flags/ba.png": {
+      "checksum": "724657859ca92c491e8dc7045a6e19f4"
+    },
+    "flags/bb.png": {
+      "checksum": "d96642db9d6fc7430fb7525f7dc7d522"
+    },
+    "flags/bd.png": {
+      "checksum": "09c7d709ff193b26087f2f9479582170"
+    },
+    "flags/be.png": {
+      "checksum": "2178f7fbe7fd21c95648069b01a5aa16"
+    },
+    "flags/bf.png": {
+      "checksum": "7b9e71398ebe4dffdf07b09dd5f8fd71"
+    },
+    "flags/bg.png": {
+      "checksum": "b4733dac39cfd40b7c21201b719ee31c"
+    },
+    "flags/bh.png": {
+      "checksum": "eb3c687d7ab5ffe358eaf455f8a48a91"
+    },
+    "flags/bi.png": {
+      "checksum": "3941f6a96c848b198ce539cdedcda471"
+    },
+    "flags/bj.png": {
+      "checksum": "a90a17140a07312bc0903257fd7dd098"
+    },
+    "flags/bl.png": {
+      "checksum": "d768cf62468eb436227ebcdca75758e6"
+    },
+    "flags/bm.png": {
+      "checksum": "771731ec947b4cbd8128420ec0a0a3b2"
+    },
+    "flags/bn.png": {
+      "checksum": "8d33b8398185fda6a8ad6a7f1e6b6f43"
+    },
+    "flags/bo.png": {
+      "checksum": "d3d97c4ca674e1147dff4650ea8e7eee"
+    },
+    "flags/bq.png": {
+      "checksum": "89e329bcf19d8381f35381f9e63b36cd"
+    },
+    "flags/br.png": {
+      "checksum": "ae12dc799804a50cfb00f8560abf679c"
+    },
+    "flags/bs.png": {
+      "checksum": "ec32d03b173a0151e67191ae3b2e929b"
+    },
+    "flags/bt.png": {
+      "checksum": "a351bc9a3e2912900336c2b5cf5a362d"
+    },
+    "flags/bv.png": {
+      "checksum": "695f6a3a2a52bc3cf4e4e5cac9b6504c"
+    },
+    "flags/bw.png": {
+      "checksum": "609b7fbda08e2490188c6f158e820522"
+    },
+    "flags/by.png": {
+      "checksum": "f1ba9c049cc77b49e494c82495d2de52"
+    },
+    "flags/bz.png": {
+      "checksum": "f62074fbaacb05062e7bd7d65c6b0f68"
+    },
+    "flags/ca.png": {
+      "checksum": "13295ee8aa89b25b10b5fac2bb5d236d"
+    },
+    "flags/cc.png": {
+      "checksum": "96233f8dae61510e24b118f2e7c1faa9"
+    },
+    "flags/cd.png": {
+      "checksum": "d8ff232e00dbe954a7600dbf086089c5"
+    },
+    "flags/cf.png": {
+      "checksum": "3d2f25b6027d8bda0e59e90ce45369bc"
+    },
+    "flags/cg.png": {
+      "checksum": "f8dbdb8a061be74b8889071b57adf486"
+    },
+    "flags/ch.png": {
+      "checksum": "55c6210b6b320b5788235a6ed99be646"
+    },
+    "flags/ci.png": {
+      "checksum": "e8eb5d5d16882ce93466772abd2aac18"
+    },
+    "flags/ck.png": {
+      "checksum": "a06c2b6e64e834a2d01f44e46dc626b1"
+    },
+    "flags/cl.png": {
+      "checksum": "6ed1cb5fa7aec37ad0e9459002219ca1"
+    },
+    "flags/cm.png": {
+      "checksum": "658212beb6cca2583d0a4ec0428a6244"
+    },
+    "flags/cn.png": {
+      "checksum": "e3ae0a23c7d1b3fa263e5a5a56564ae8"
+    },
+    "flags/co.png": {
+      "checksum": "4163a1e313fe310d3e4b4f92f975767e"
+    },
+    "flags/cr.png": {
+      "checksum": "319fe23a3c3617cb3d7b100631e8e16b"
+    },
+    "flags/cu.png": {
+      "checksum": "3d497fabb233b36c3c2206b4b3939900"
+    },
+    "flags/cv.png": {
+      "checksum": "9b7b3d8d3d5c1157d186143f43c30c8f"
+    },
+    "flags/cw.png": {
+      "checksum": "50ac3b68e086e6bc0a65f6489af0a3b2"
+    },
+    "flags/cx.png": {
+      "checksum": "bc866761b150722bdd97f350fd5e2b81"
+    },
+    "flags/cy.png": {
+      "checksum": "10f6d578e52162805715d5bf69812f8c"
+    },
+    "flags/cz.png": {
+      "checksum": "2d47c34da3941e63fbd8d081c43495ad"
+    },
+    "flags/de.png": {
+      "checksum": "8d041b67698d8dd2afd791cf9a95eca5"
+    },
+    "flags/dj.png": {
+      "checksum": "f287ac9ef78319ae211ca49fb4f3f52e"
+    },
+    "flags/dk.png": {
+      "checksum": "36f72e211fe929a3ae50a70419e41d74"
+    },
+    "flags/dm.png": {
+      "checksum": "f270bb6d6ff901b9aa056a276833e23d"
+    },
+    "flags/do.png": {
+      "checksum": "d6e295a1753f37102e22c169f1d33d9d"
+    },
+    "flags/dz.png": {
+      "checksum": "126e36b005b16a8f8a653259e4eb9c59"
+    },
+    "flags/ec.png": {
+      "checksum": "d1f5821dd5c14b8a8ff5e943b1a2ee04"
+    },
+    "flags/ee.png": {
+      "checksum": "ff527d9d3cc0e843ba42e195a0eef4d2"
+    },
+    "flags/eg.png": {
+      "checksum": "92898c5846224e6554e4729c3680940a"
+    },
+    "flags/eh.png": {
+      "checksum": "bad830db821015f65cf1f42e9b17babd"
+    },
+    "flags/er.png": {
+      "checksum": "bfbfc9cb4e93ff8bc499f81908fb3258"
+    },
+    "flags/es.png": {
+      "checksum": "27146b3ebe6a2e0dd73c2c69de2e0846"
+    },
+    "flags/et.png": {
+      "checksum": "3c4ccbde233e335ee1335f034231bdda"
+    },
+    "flags/fi.png": {
+      "checksum": "3a930eef402cfc13dc928e17dcb6f019"
+    },
+    "flags/fj.png": {
+      "checksum": "67b95355d5a5ec7df68dec524d721e38"
+    },
+    "flags/fk.png": {
+      "checksum": "3c1ed746cfb45b602f2f5275e98d1a97"
+    },
+    "flags/fm.png": {
+      "checksum": "54a09fc9d6b79eb63d39c61a95f92149"
+    },
+    "flags/fo.png": {
+      "checksum": "0b1726579259907345b0b6676df32384"
+    },
+    "flags/fr.png": {
+      "checksum": "d768cf62468eb436227ebcdca75758e6"
+    },
+    "flags/ga.png": {
+      "checksum": "9e2289798eebb5383b0550ccc32f9d72"
+    },
+    "flags/gb.png": {
+      "checksum": "2e2ef39bbfd1eab9197fac7e07df6262"
+    },
+    "flags/gd.png": {
+      "checksum": "79330ba96349ab0cc410a2be0f85210b"
+    },
+    "flags/ge.png": {
+      "checksum": "2762ab2c915105913127b3739a250d43"
+    },
+    "flags/gf.png": {
+      "checksum": "d768cf62468eb436227ebcdca75758e6"
+    },
+    "flags/gg.png": {
+      "checksum": "6b1c2a3121bdcaa784a48cf3662cc0df"
+    },
+    "flags/gh.png": {
+      "checksum": "50a37017f5630cd9ea1c1f7fcd9a33ca"
+    },
+    "flags/gi.png": {
+      "checksum": "6f98e3df47a53c5a50ddb452bc102a38"
+    },
+    "flags/gl.png": {
+      "checksum": "7c9b1d58fdd9e8315957cb2d91ff466f"
+    },
+    "flags/gm.png": {
+      "checksum": "cd5c855d954985fde41d3bf1ff7415e1"
+    },
+    "flags/gn.png": {
+      "checksum": "cca56c1fa786ed1d164ac8b44ee05b03"
+    },
+    "flags/gp.png": {
+      "checksum": "d768cf62468eb436227ebcdca75758e6"
+    },
+    "flags/gq.png": {
+      "checksum": "3e83d7b9007b0a154c5dbc8f704509f9"
+    },
+    "flags/gr.png": {
+      "checksum": "fde351e0bbd4725c6853955ab2f21f24"
+    },
+    "flags/gs.png": {
+      "checksum": "f42e81b8e0087e798b156b559db70687"
+    },
+    "flags/gt.png": {
+      "checksum": "c6d6c0263920113db92155531e6de305"
+    },
+    "flags/gu.png": {
+      "checksum": "c02d6f5b7ccedbb8e89d1291704f45b1"
+    },
+    "flags/gw.png": {
+      "checksum": "744af1d197c6f3f10889020f054cdcf1"
+    },
+    "flags/gy.png": {
+      "checksum": "78b903c031d0875db4d20892a7361d7f"
+    },
+    "flags/hk.png": {
+      "checksum": "39660473eae1480cc2805def85b92786"
+    },
+    "flags/hm.png": {
+      "checksum": "bb5d2d9f6bca60d015c5267fd37440fb"
+    },
+    "flags/hn.png": {
+      "checksum": "4aa6879c3fd5a9df8861d484d56a0cba"
+    },
+    "flags/hr.png": {
+      "checksum": "aaa373fca5d029cc33dd5945612961de"
+    },
+    "flags/ht.png": {
+      "checksum": "d747dd2192d92012063f991f5934b8aa"
+    },
+    "flags/hu.png": {
+      "checksum": "853cf2791451f4d9ce9b442fa8bf7164"
+    },
+    "flags/id.png": {
+      "checksum": "16a27d6943e6b90d03c4ffa65a232916"
+    },
+    "flags/ie.png": {
+      "checksum": "e539143c7239a21a2c94471bcc91df90"
+    },
+    "flags/il.png": {
+      "checksum": "90d2a9f9d6a7b91489f00074baf712aa"
+    },
+    "flags/im.png": {
+      "checksum": "1df63f367dce18ef0e5a114a238c4ddd"
+    },
+    "flags/in.png": {
+      "checksum": "905cdb61b7152e6aa87db29532c04019"
+    },
+    "flags/io.png": {
+      "checksum": "6f9079ca4d0a6b95779fc026e1d9af3e"
+    },
+    "flags/iq.png": {
+      "checksum": "cf9e208ec76022c24616e91670aafb9a"
+    },
+    "flags/ir.png": {
+      "checksum": "e264cae62ad1a57e14e9f0c9d2f22b5e"
+    },
+    "flags/is.png": {
+      "checksum": "3fd658165aea78e1896cedd564475a6a"
+    },
+    "flags/it.png": {
+      "checksum": "b58a9f74d1058a64383574117a45f7ec"
+    },
+    "flags/je.png": {
+      "checksum": "83c24e237d6774351bf53a19bb8bdde9"
+    },
+    "flags/jm.png": {
+      "checksum": "1e209936b399be77464d981833856dcb"
+    },
+    "flags/jo.png": {
+      "checksum": "9ce5244e77ad7f7fff65daf456efe6b6"
+    },
+    "flags/jp.png": {
+      "checksum": "532a66e214c487b593cdf1e0d0acb0b2"
+    },
+    "flags/ke.png": {
+      "checksum": "dc23b5e5e2cfd8cb4530ce8ff85b1082"
+    },
+    "flags/kg.png": {
+      "checksum": "0a4cfc9380faa61c6488675da2a4abca"
+    },
+    "flags/kh.png": {
+      "checksum": "38a1b46e174f59236b7ac14f9796b889"
+    },
+    "flags/ki.png": {
+      "checksum": "ec033388dc647d049552ab0bf67a6ed4"
+    },
+    "flags/km.png": {
+      "checksum": "ab395ae2f9df4c42a13762fa6791f138"
+    },
+    "flags/kn.png": {
+      "checksum": "e16801fcfe6c036028fded40812e61e9"
+    },
+    "flags/kp.png": {
+      "checksum": "2d3c6ee33375db6dd8254fd8b14bace4"
+    },
+    "flags/kr.png": {
+      "checksum": "84dac24857231066fe02e8426136a55e"
+    },
+    "flags/kw.png": {
+      "checksum": "c09c0aaded4775b202393a2cd9d98fbc"
+    },
+    "flags/ky.png": {
+      "checksum": "e70680a55c42d4bb78c1ffa2db01dbad"
+    },
+    "flags/kz.png": {
+      "checksum": "77a6b3cab3067f689b8e5fabc762ab07"
+    },
+    "flags/la.png": {
+      "checksum": "8d09e4d81de4f152e8f9489a0d4e4d83"
+    },
+    "flags/lb.png": {
+      "checksum": "1ef7779d25f4367d347cb53a1e5aa26a"
+    },
+    "flags/lc.png": {
+      "checksum": "ec0ac797c4519199fac4d98a3be947e6"
+    },
+    "flags/li.png": {
+      "checksum": "6ea7b9b1d84f499a145030d74518d98a"
+    },
+    "flags/lk.png": {
+      "checksum": "f314cbbccf51b71e2cce8ff9e4adcd19"
+    },
+    "flags/lr.png": {
+      "checksum": "21c9b378fe4d2013b376bb617c5de296"
+    },
+    "flags/ls.png": {
+      "checksum": "cbe67d98cf9b1a4ba0903ce495cba7f6"
+    },
+    "flags/lt.png": {
+      "checksum": "026e25d3a26d5775e5a68c875139682b"
+    },
+    "flags/lu.png": {
+      "checksum": "fe9d3d51d7e9cb9b3f134d8d892db825"
+    },
+    "flags/lv.png": {
+      "checksum": "084face065000e3af401a65143130bdb"
+    },
+    "flags/ly.png": {
+      "checksum": "fdbc09008377633b71e880d606d52640"
+    },
+    "flags/ma.png": {
+      "checksum": "21f0f585de475c2781acce2e8e1377e2"
+    },
+    "flags/mc.png": {
+      "checksum": "be82bd6f39c3a43e2c0ca391a6ea560a"
+    },
+    "flags/md.png": {
+      "checksum": "f398fb6c0fd08d7caec1db2b6f82c6af"
+    },
+    "flags/me.png": {
+      "checksum": "bb54b602597bb1946819a4b15e9c2f2d"
+    },
+    "flags/mf.png": {
+      "checksum": "d768cf62468eb436227ebcdca75758e6"
+    },
+    "flags/mg.png": {
+      "checksum": "229a0ab8d968afe9a8af66e6596bc84f"
+    },
+    "flags/mh.png": {
+      "checksum": "aa9388bd511a4ed6bb0c2a47c73e1458"
+    },
+    "flags/mk.png": {
+      "checksum": "29a5d2fb5639f08c995a81491e689d26"
+    },
+    "flags/ml.png": {
+      "checksum": "724b71cd4fc6b72838bd729030949db2"
+    },
+    "flags/mm.png": {
+      "checksum": "cff7d752931826fe14d4f69511693378"
+    },
+    "flags/mn.png": {
+      "checksum": "9bf3ca5f7d324aafabc0a6ab00636ca5"
+    },
+    "flags/mo.png": {
+      "checksum": "5aaf0336ae5914b01ea1e50522770b76"
+    },
+    "flags/mp.png": {
+      "checksum": "9ef221219b29a9f97ce22e32deadfcff"
+    },
+    "flags/mq.png": {
+      "checksum": "78d96cf473e7bec4f29a62e3f8d545d7"
+    },
+    "flags/mr.png": {
+      "checksum": "3ccde67103a812d5dc01663b420d3800"
+    },
+    "flags/ms.png": {
+      "checksum": "564f7846431dbd0c7359af5768cd1cd3"
+    },
+    "flags/mt.png": {
+      "checksum": "696bdb1af9f558815161947e4d841e59"
+    },
+    "flags/mu.png": {
+      "checksum": "9cb73f551f259dc7c1be3953de80fbe3"
+    },
+    "flags/mv.png": {
+      "checksum": "2504335501d26a2410cd90f442ff6b99"
+    },
+    "flags/mw.png": {
+      "checksum": "d5974719f12350030813bbe391d5eba5"
+    },
+    "flags/mx.png": {
+      "checksum": "a48e0d9f18c2aa8981e5c0c58ee92f7b"
+    },
+    "flags/my.png": {
+      "checksum": "a35c995799b70a7336b2aaca10ba46c2"
+    },
+    "flags/mz.png": {
+      "checksum": "fc72697169bdac8ca8901fac46f05c1c"
+    },
+    "flags/na.png": {
+      "checksum": "3eaaed72defbe2d824685df8e630b29d"
+    },
+    "flags/nc.png": {
+      "checksum": "b56a3741f6788f1771e7c38cf8b86f70"
+    },
+    "flags/ne.png": {
+      "checksum": "c63529ee44229623e9551504c69c0769"
+    },
+    "flags/nf.png": {
+      "checksum": "b11be00976123cf9567befbe97b73c1b"
+    },
+    "flags/ng.png": {
+      "checksum": "d8337fbee03f2e5a4c8bf3036015d57e"
+    },
+    "flags/ni.png": {
+      "checksum": "4639b3ff09f7f32303bb30bfe53e0757"
+    },
+    "flags/nl.png": {
+      "checksum": "89e329bcf19d8381f35381f9e63b36cd"
+    },
+    "flags/no.png": {
+      "checksum": "65df19856471578275acbcafa35cd02f"
+    },
+    "flags/np.png": {
+      "checksum": "d69e89e8912faa7a36bc4c92ceeb5a88"
+    },
+    "flags/nr.png": {
+      "checksum": "5b0dfedff795b02df739aa7404bf527f"
+    },
+    "flags/nu.png": {
+      "checksum": "cdb6262b75c53064a0a167b0caf1efc7"
+    },
+    "flags/nz.png": {
+      "checksum": "7c919c0debcf9df2212db83fb623e276"
+    },
+    "flags/om.png": {
+      "checksum": "0ee28d317792a8f744454bba7d99e902"
+    },
+    "flags/pa.png": {
+      "checksum": "a18a581fc2246ec42c451bfb36cc3f8b"
+    },
+    "flags/pe.png": {
+      "checksum": "b8c5951351c73323069c90831824533e"
+    },
+    "flags/pf.png": {
+      "checksum": "7d7ad48326873c99e287bd8c50a736f1"
+    },
+    "flags/pg.png": {
+      "checksum": "aaf6ad15e6b903431706e57190a4a712"
+    },
+    "flags/ph.png": {
+      "checksum": "6b986779aa45f5c1283a8ddcabd2b511"
+    },
+    "flags/pk.png": {
+      "checksum": "b282c681692412e83b4aa405573a2986"
+    },
+    "flags/pl.png": {
+      "checksum": "c08cfa27e6894a658702bc92cdf54ed2"
+    },
+    "flags/pm.png": {
+      "checksum": "d768cf62468eb436227ebcdca75758e6"
+    },
+    "flags/pn.png": {
+      "checksum": "ec3be8ebadf2709108ce6300a6374a79"
+    },
+    "flags/pr.png": {
+      "checksum": "05e5fbb26c23031087abe035bf4869d8"
+    },
+    "flags/ps.png": {
+      "checksum": "6dad1039efe585570f3c6375c102d544"
+    },
+    "flags/pt.png": {
+      "checksum": "63795e268a63e1a00263a601ba0c2884"
+    },
+    "flags/pw.png": {
+      "checksum": "c4ceb6cb120dcdbf33a64d5f94984940"
+    },
+    "flags/py.png": {
+      "checksum": "f2908073752c06f68f97090d38d47deb"
+    },
+    "flags/qa.png": {
+      "checksum": "2d3d9a4aa01eaf6fbef8e388aa85baca"
+    },
+    "flags/re.png": {
+      "checksum": "d768cf62468eb436227ebcdca75758e6"
+    },
+    "flags/ro.png": {
+      "checksum": "224e9fc8e84ad2d87bc28383762b31fd"
+    },
+    "flags/rs.png": {
+      "checksum": "b4ff813f9cd1f38993378bd270c481da"
+    },
+    "flags/ru.png": {
+      "checksum": "6ffea93a4ebeb4b222d26088c7550cb0"
+    },
+    "flags/rw.png": {
+      "checksum": "a457a203863c1aa6d68b352854624c88"
+    },
+    "flags/sa.png": {
+      "checksum": "58fd122b72ffbc11474b6b6c7e554d49"
+    },
+    "flags/sb.png": {
+      "checksum": "9d49db02541093934913b394eca47164"
+    },
+    "flags/sc.png": {
+      "checksum": "15857281bdaeea9216e1e1aeb4ac3c3e"
+    },
+    "flags/sd.png": {
+      "checksum": "0997f21fd7207159e25840f87eac156a"
+    },
+    "flags/se.png": {
+      "checksum": "387f2ad57869322201647d8b835e8d9d"
+    },
+    "flags/sg.png": {
+      "checksum": "814fe1a50de6f0c6a75435a963f00bed"
+    },
+    "flags/sh.png": {
+      "checksum": "2e2ef39bbfd1eab9197fac7e07df6262"
+    },
+    "flags/si.png": {
+      "checksum": "0b44c160862bc2acdb3edcd84255eb02"
+    },
+    "flags/sj.png": {
+      "checksum": "8c25645d939136c32ac1e1c19511f34a"
+    },
+    "flags/sk.png": {
+      "checksum": "99caacd63c9c67ace957bca1e0b661f2"
+    },
+    "flags/sl.png": {
+      "checksum": "fd7f0f0e456ff9589a2f93f19c829447"
+    },
+    "flags/sm.png": {
+      "checksum": "0a0ecd28d165f6d8fc5698b40e53609c"
+    },
+    "flags/sn.png": {
+      "checksum": "413dae0555826cb6d2292a45ac4a670d"
+    },
+    "flags/so.png": {
+      "checksum": "32d05962fd1ac1f4268f53ebe5ce31a5"
+    },
+    "flags/sr.png": {
+      "checksum": "1adf442999418d82f21bb5f1d0ac4c6f"
+    },
+    "flags/ss.png": {
+      "checksum": "086dd916aa3b98d3085f41c6e6c3b05d"
+    },
+    "flags/st.png": {
+      "checksum": "906bc340385c4f653d85c82d97af604b"
+    },
+    "flags/sv.png": {
+      "checksum": "5c46cfa845340a31827b6e9b597e718e"
+    },
+    "flags/sx.png": {
+      "checksum": "462ece762a9eeff8c9f616abb493f1c0"
+    },
+    "flags/sy.png": {
+      "checksum": "f983f4b9abfbb2dd99e8566058fe5904"
+    },
+    "flags/sz.png": {
+      "checksum": "ad4c154ed0e46a1bda8089df23c5837d"
+    },
+    "flags/tc.png": {
+      "checksum": "12d175ec15fc760f31ef891cdc7c9fc0"
+    },
+    "flags/td.png": {
+      "checksum": "6d79ce529824094c39b8ad4895842a95"
+    },
+    "flags/tf.png": {
+      "checksum": "3e241c17646b4d6b19c4fef719929995"
+    },
+    "flags/tg.png": {
+      "checksum": "43f138520fc98ba1064e94931be6683e"
+    },
+    "flags/th.png": {
+      "checksum": "40acee8c5cf1e2954c0972be6248d933"
+    },
+    "flags/tj.png": {
+      "checksum": "d89596d2a30ac7346be6e52f31c65377"
+    },
+    "flags/tk.png": {
+      "checksum": "f2afd8e7d65a72b89760306020da0232"
+    },
+    "flags/tl.png": {
+      "checksum": "c62105fbdf219ab2596efacb3e93f6ce"
+    },
+    "flags/tm.png": {
+      "checksum": "68617e5af6a2731f1b2247e1f1f98482"
+    },
+    "flags/tn.png": {
+      "checksum": "1dae40fb76824efa0c6ae1ef478ad1e4"
+    },
+    "flags/to.png": {
+      "checksum": "a3b1d2ded7fe5af8dce0c8614c0b0c1e"
+    },
+    "flags/tr.png": {
+      "checksum": "dedf7eae7468aaab0b9d5a2ed636b90a"
+    },
+    "flags/tt.png": {
+      "checksum": "d0680cb74096a6303981d93ec80a4d00"
+    },
+    "flags/tv.png": {
+      "checksum": "5832cca4e4de5f25523ad3e6e213a1ee"
+    },
+    "flags/tw.png": {
+      "checksum": "3171756cc20014207db7ba8f380eb910"
+    },
+    "flags/tz.png": {
+      "checksum": "fd841cf3ef9fae4c75a88cbce53646cd"
+    },
+    "flags/ua.png": {
+      "checksum": "90e61d922972ba99834308c07254fc2f"
+    },
+    "flags/ug.png": {
+      "checksum": "1958a9d55fa54cefcf6b1d07785d4e09"
+    },
+    "flags/um.png": {
+      "checksum": "4951ddf0f803a69872df1372b8df66ff"
+    },
+    "flags/us.png": {
+      "checksum": "4951ddf0f803a69872df1372b8df66ff"
+    },
+    "flags/uy.png": {
+      "checksum": "9cfd0e084f29862f35f29ce594f52ceb"
+    },
+    "flags/uz.png": {
+      "checksum": "81152d341b7bc027d130dc58abcc0caa"
+    },
+    "flags/va.png": {
+      "checksum": "3bf4d7ceef62bc6f22305bc76674b26c"
+    },
+    "flags/vc.png": {
+      "checksum": "ee4b5476484cff619074e3529d55e2f1"
+    },
+    "flags/ve.png": {
+      "checksum": "e218dfdb2ac8a64c4fe86b08913a0326"
+    },
+    "flags/vg.png": {
+      "checksum": "76e463fdb75cf91573685d9b54b6b57f"
+    },
+    "flags/vi.png": {
+      "checksum": "9d8d8d5aaaa7d9dd5b74644797629104"
+    },
+    "flags/vn.png": {
+      "checksum": "96c33c853bbb0be1854020932e48fdc3"
+    },
+    "flags/vu.png": {
+      "checksum": "ef78a5b503bc5ea28e804f1e93fe88f3"
+    },
+    "flags/wf.png": {
+      "checksum": "d768cf62468eb436227ebcdca75758e6"
+    },
+    "flags/ws.png": {
+      "checksum": "c3ff3b44b14b6d39519619df1f11ad36"
+    },
+    "flags/xk.png": {
+      "checksum": "bc4fa44790ac52cbb5536015053a6569"
+    },
+    "flags/ye.png": {
+      "checksum": "f8031f0577b31fc3910f1e400b5601e0"
+    },
+    "flags/yt.png": {
+      "checksum": "d768cf62468eb436227ebcdca75758e6"
+    },
+    "flags/za.png": {
+      "checksum": "b11b366ecf57f5c96d5fca9aff33fb19"
+    },
+    "flags/zm.png": {
+      "checksum": "3954ffa4b3c11486fa8cbcd0900d3593"
+    },
+    "flags/zw.png": {
+      "checksum": "ada2b312e1377be4b749c4aa47ae491d"
+    },
     "full_plot.png": {
       "checksum": "70504245c917340cd27172fb8cd0e995"
     },
@@ -6068,12 +6821,21 @@
       "checksum": "56de2ffb7c1b1d53e3707397451131dd"
     },
     "Jamaica.png": {
-      "checksum": "b90da6d203a65c4624faaafbd995174e"
+      "checksum": "5204f7d670ac8e0d0639851a68e7c6a6"
+    },
+    "Kenya.png": {
+      "checksum": "9a877939c6fada11e9fb4263c679bbe7"
     },
     "Liberia.png": {
       "checksum": "9762ea7b4c1b7dc0257f79f76b28b059"
     },
-    "malawi.png": {
+    "logo.png": {
+      "checksum": "ff8f04ba9185dde3ba807f748c32bd57"
+    },
+    "logos/logo.png": {
+      "checksum": "ff8f04ba9185dde3ba807f748c32bd57"
+    },
+    "MALALALA.png": {
       "checksum": "ef4cfedb61c787740fb002bace208124"
     },
     "mozambique.png": {
@@ -6097,20 +6859,56 @@
     "output/state_geo_enhanced.rds": {
       "checksum": "c4c046b4f14371a367f05e44603e2563"
     },
+    "preamble-alt.tex": {
+      "checksum": "922802b3ade5816f4e0abf764256588f"
+    },
+    "preamble-b.log": {
+      "checksum": "9c9a2d7250f0829f3531a28f4be6d10d"
+    },
+    "preamble-b.tex": {
+      "checksum": "4044faa8d40467ac3d656f1c32289195"
+    },
+    "preamble.log": {
+      "checksum": "37cdf1fafb60a596aad74c8f2ca230ad"
+    },
+    "preamble.tex": {
+      "checksum": "ff5c3275c9f9aed540c18cf9a4b8695d"
+    },
     "README.md": {
       "checksum": "17aebe0c4de1aa1626e5bcce1b9d0af9"
     },
+    "report-template-alt.log": {
+      "checksum": "911a0ee159dbeecf61f5d09f89b3f3df"
+    },
+    "report-template-alt.pdf": {
+      "checksum": "c41e7eaedc4ed7aeb8271ab7cd0d358f"
+    },
+    "report-template-alt.Rmd": {
+      "checksum": "43d68d67f12e49dbd0e32699dbc1416c"
+    },
+    "report-template.log": {
+      "checksum": "c9cd813f2ba016d5f21271ab2d4e3b35"
+    },
     "report-template.pdf": {
-      "checksum": "2f30ab5254796d5c31d75a1d644cac09"
+      "checksum": "e6c1b8bbb3a422a0ffdb753c7eaf0f70"
     },
     "report-template.qmd": {
-      "checksum": "37e4d66fe96cb6bdaeb8cf9596cd38d5"
+      "checksum": "fb9654ca7b1999b56cc038974caacb9b"
     },
     "report-template.Rmd": {
-      "checksum": "dcfdc45ff0b1184e935b9f4716347cee"
+      "checksum": "3d131cf43d7ef42f0d0be9d09c998c1a"
+    },
+    "report-template.tex": {
+      "checksum": "d22ce045656e75f01a8311c36980fb55"
+    },
+    "report-template_files/figure-latex/unnamed-chunk-2-1.pdf": {
+      "checksum": "6551381c3b5b2e8bd76cc8bdd35c0b10"
+    },
+    "report-template_files/figure-latex/unnamed-chunk-3-1.pdf": {
+      "checksum": "b631922761f9a9f1661594c43cf70124"
     },
     "report.pdf": {
-      "checksum": "77df25a12c75f8b1712314c7629cbffa"
+      "checksum": "029dab313e00edf99ed703af5b9adfc6"
     },
     "report_qmd.pdf": {
       "checksum": "b7849a5840cdc384985338f101f35dbe"
