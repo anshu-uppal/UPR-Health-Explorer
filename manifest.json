@@ -5828,7 +5828,7 @@
   },
   "files": {
     "app.R": {
-      "checksum": "99e703beda107859bfe377b71180e6a9"
+      "checksum": "cbb874e9e215d348ea98933f82e1fba2"
     },
     "code/.gitkeep": {
       "checksum": "81051bcc2cf1bedf378224b0a93e2877"
@@ -5855,7 +5855,7 @@
       "checksum": "34a5d24ea48ee998644d5e0af93f8147"
     },
     "code/profile_pdf_plots_to delete.R": {
-      "checksum": "89f5a07dc628e9101ceee4b3dd1fd7ef"
+      "checksum": "8f77c9f12fabfe01bd912fd34f2b126c"
     },
     "code/tables.R": {
       "checksum": "2026bb14d182cb7703e4409904bbe59c"
@@ -5865,6 +5865,9 @@
     },
     "code/uhri_prep_to delete.R": {
       "checksum": "819bdff2e8b8a41b94ad1f057c3bb03c"
+    },
+    "countryflag.png": {
+      "checksum": "55c6210b6b320b5788235a6ed99be646"
     },
     "data/.gitkeep": {
       "checksum": "81051bcc2cf1bedf378224b0a93e2877"
@@ -6875,7 +6878,7 @@
       "checksum": "d756b95ab3724f96a40e8577dababcec"
     },
     "preamble-b.tex": {
-      "checksum": "cfd423a29ff74c48b1df9556983d9e33"
+      "checksum": "fd6758d193f38a5cc771e0cef8bf9b25"
     },
     "preamble.log": {
       "checksum": "37cdf1fafb60a596aad74c8f2ca230ad"
@@ -6898,23 +6901,26 @@
     "report-template.html": {
       "checksum": "599131b8a4d86395831267572f6b61a6"
     },
+    "report-template.log": {
+      "checksum": "5c45016ae2b1c25f6ccaf7cbdcc3f5ac"
+    },
     "report-template.pdf": {
-      "checksum": "a9610b80a19cdefa3b5c5da4fd8ae96a"
+      "checksum": "a254144ce8b642598dd0242f67e8de50"
     },
     "report-template.qmd": {
       "checksum": "fb9654ca7b1999b56cc038974caacb9b"
     },
     "report-template.Rmd": {
-      "checksum": "595147fc414d3f50c10d1adf9efa99ec"
+      "checksum": "9678ed38c996bcf0e92303338dc0be55"
     },
     "report-template.tex": {
-      "checksum": "8f55f4ff5d85e64d81e7770e9e4dd3a0"
+      "checksum": "e6d56088d66539117df224339a22de6f"
     },
     "report-template_f1.pdf": {
       "checksum": "a540072c76e808470f865d402596f77e"
     },
     "report-template_files/figure-latex/unnamed-chunk-1-1.pdf": {
-      "checksum": "504cb1d1319ffc007fe929645af04e44"
+      "checksum": "4478ba4ded134c56e0a6e0ab58b3243c"
     },
     "report-template_files/figure-latex/unnamed-chunk-10-1.pdf": {
       "checksum": "53c6508e28d98402223de07df70191c7"
@@ -6923,25 +6929,25 @@
       "checksum": "ebe73da48915b9f70cb35de8bf43b6cb"
     },
     "report-template_files/figure-latex/unnamed-chunk-2-1.pdf": {
-      "checksum": "917b61513efb054d9d34f38edfb880ab"
+      "checksum": "11a8ced5d04ae2dd0607c5a4ec61a7ba"
     },
     "report-template_files/figure-latex/unnamed-chunk-3-1.pdf": {
-      "checksum": "21d5164d06f9f298b83322147b35d5a8"
+      "checksum": "8455b1178efdbaaee61a83f3b0b5932f"
     },
     "report-template_files/figure-latex/unnamed-chunk-4-1.pdf": {
-      "checksum": "b708d1133e3b267634c9400e3b0efde8"
+      "checksum": "0535ebe34115b1438ca243b89258205f"
     },
     "report-template_files/figure-latex/unnamed-chunk-5-1.pdf": {
-      "checksum": "e99ca9d39a1d2bffb71bc6d59e7565cd"
+      "checksum": "26ae9e0b51e9d5412c1d8b693e5b1fc3"
     },
     "report-template_files/figure-latex/unnamed-chunk-6-1.pdf": {
-      "checksum": "7d7792963d7308d1036087a941b98338"
+      "checksum": "cba94f52de5d4085c9c4f0dd3c9193bf"
     },
     "report-template_files/figure-latex/unnamed-chunk-7-1.pdf": {
-      "checksum": "9b7503baa23bbf701a30238bd1554cf6"
+      "checksum": "9f5c2eab0994024d94fa82861f9b8b83"
     },
     "report-template_files/figure-latex/unnamed-chunk-8-1.pdf": {
-      "checksum": "34995e29ef8da86708f38130e601f947"
+      "checksum": "25f2ab127397fdac0ee7ee0c22fd728d"
     },
     "report-template_files/figure-latex/unnamed-chunk-9-1.pdf": {
       "checksum": "9b7503baa23bbf701a30238bd1554cf6"
