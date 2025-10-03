@@ -1373,6 +1373,7 @@ server <- function(input, output, session) {
             legend.position = c(0, 1),
             legend.justification = c("left", "top"), 
             legend.text = element_text(size = 11,colour = "white"),
+            legend.key.size = unit(15,"pt"),
             # plot.background = element_blank(),
             plot.background = element_rect(color = "white", fill = NA),
             panel.border = element_rect(color = "white"),
@@ -1385,8 +1386,8 @@ server <- function(input, output, session) {
             plot.title = element_blank()
           )
           ,
-        width = 4.7,
-        height = 3.1,
+        width = 5,
+        height = 3.3,
         dpi = 300,
         # units = "in", 
         bg="transparent"
