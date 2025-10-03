@@ -170,7 +170,15 @@ upr_cycle_height <- 700
 # The theme definition remains the same
 app_theme <- bs_theme(
   version = 5,
-  bg = "#ffffff",
+  bg = "#F9F9F6",
+  fg = "#1c164d",
+  primary = "#1c164d",
+  base_font = font_google("Lato", local = FALSE)
+)
+
+bs_theme(
+  version = 5,
+  bg = "#F9F9F6",
   fg = "#1c164d",
   primary = "#1c164d",
   base_font = font_google("Lato", local = FALSE)
@@ -963,6 +971,8 @@ server <- function(input, output, session) {
       scale_fill_manual(values = c("green4", "grey90")) +
       theme_bw() +
       theme(
+        plot.background = element_rect(fill="transparent", color = NA), 
+        panel.background = element_blank(),
         panel.grid = element_blank(),
         axis.text = element_blank(), axis.ticks = element_blank()
       ) +
