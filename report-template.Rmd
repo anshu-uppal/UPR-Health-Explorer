@@ -25,16 +25,44 @@ date: "2025-09-30"
 # This chunk loads the necessary packages for the report
 knitr::opts_chunk$set(echo = FALSE, warning = FALSE, message = FALSE, fig.align='center', out.width="100%")
 pacman::p_load(
+  here,
+  dplyr,
   ggplot2, 
   ggtext, 
   patchwork
 )
+
+nearest_neighbors_list <- readRDS(here("output", "nearest_neighbors_list.rds"))
+
+# Loop through API-generated files
+for (file_name in list.files(path = here("data", "API_data"), pattern = "\\.rds$")) {
+  object_name <- gsub("\\.rds$", "", file_name)
+  assign(object_name, readRDS(here("data", "API_data", file_name)))
+}
+```
+
+```{r}
+UHC_estimate_2021 = UHC_all |>
+      filter(country_name == params$country_name, YEAR == 2021, 
+             IndicatorCode == "UHC_INDEX_REPORTED") |>
+      pull(NumericValue) |>
+      round(0)
 ```
 
 \maketitle
 # `r params$country_name`  
 
 Some brief text here, for context, that runs the \textcolor{CeHDIRed}{entire width of the page}. Indicator results, tables, and figures can go into the columns below.
+
+```{r, out.width="30%"}
+p1<-UHC_all |> 
+  filter(country_name == params$country_name, 
+             IndicatorCode == "UHC_INDEX_REPORTED") |>
+  ggplot(aes(x = YEAR, y= NumericValue))+geom_line()+
+  theme_void()
+```
+
+UHC 2021: `r UHC_estimate_2021`
 
 <!-- \textcolor{fgcolor}{\hlCeHDIBlue{colortest}} -->
 <!-- \textcolor{fgcolor}{\textbf{\hlCeHDIBlue{colortest}}} -->
@@ -44,6 +72,8 @@ Some brief text here, for context, that runs the \textcolor{CeHDIRed}{entire wid
 \redrule
 ```{=latex}
 \begin{multicols}{2}
+\raggedcolumns     %new code
+\interlinepenalty=10000
 ```
 
 This plot shows all health-related recommendations received by the selected state across all UPR cycles.
@@ -88,15 +118,16 @@ print(
 )
 ```
 
-```{r,fig.height=7}
+```{r, fig.width=6}
 print(
-  params$mmr_map_plot+theme(
-    plot.background = element_blank()
-  )&
-    plot_annotation(theme = theme(
-      plot.background = element_rect(color = "#1c164d", fill=NA)
-      )
-      )
+  params$mmr_map_plot
+  # params$mmr_map_plot+theme(
+  #   plot.background = element_blank()
+  # )&
+    # plot_annotation(theme = theme(
+    #   plot.background = element_rect(color = "#1c164d", fill=NA)
+    #   )
+    #   )
 )
 ```
 
