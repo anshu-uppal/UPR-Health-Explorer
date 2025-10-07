@@ -1827,6 +1827,7 @@ server <- function(input, output, session) {
   ## Maternal health outputs --------------------------------
   
   ### MMR Outputs -------------------------------------------------------------
+  #### Map ----------------------------------
   output$mmr_map <- renderPlot({
     mmr_map_object()
   })
@@ -1902,6 +1903,7 @@ server <- function(input, output, session) {
     # if(sur_area() > 10^11){p2} else{p2+p3}
   })
   
+  #### Neighbors comparison over time -------------------------
   output$mmr_time_plot_neighbors <- renderPlot({
     
     # Set a default number of columns
@@ -1956,6 +1958,8 @@ server <- function(input, output, session) {
       theme_bw()
   })
   
+  #### Causes --------------------------------
+  ##### 2023 -------------------------
   output$mmr_causes <- renderPlot({
     maternal_disorders_deaths |>
       filter(country %in% c("Global", input$selected_SUR)) |>
@@ -1988,6 +1992,7 @@ server <- function(input, output, session) {
       )
   })
   
+  ##### Over time --------------------------
   output$mmr_causes_longitudinal <- renderPlot({
     maternal_disorders_deaths_longitudinal |>
       filter(country %in% c("Global", input$selected_SUR)) |>
@@ -2013,11 +2018,13 @@ server <- function(input, output, session) {
         title = "Longitudinal trends in the causes of maternal deaths\n(Caution: y-axes are variable)"
       ) +
       theme_bw() +
+      scale_x_continuous(breaks = c(2005, 2020))+
       theme(
         strip.placement = "outside",
         strip.text.y.left = element_text(angle = 0, vjust = 1, size = 11),
         strip.background = element_rect(fill = NA, linewidth = 1, color = "black", linetype = 1),
         panel.grid = element_blank(),
+        plot.title.position = "plot",
         axis.text.y = element_blank(),
         axis.ticks.y = element_blank()
       )
