@@ -75,8 +75,7 @@ UHC_estimate <- UHC_all |>
          )
 
 life_expectancy_C <- life_expectancy |> 
-  filter(iso3 == iso3_SUR,
-         year==max(year))
+  filter(iso3 == iso3_SUR)
 
 pop_C <- pop_wpp |> 
   filter(iso3==iso3_SUR)
@@ -85,7 +84,7 @@ pop_C <- pop_wpp |>
 \maketitle
 # `r params$country_name`  
 
-Some brief text here, for context, that runs the \textcolor{CeHDIRed}{entire width of the page}. Indicator results, tables, and figures can go into the columns below.
+<!-- Some brief text here, for context, that runs the \textcolor{CeHDIRed}{entire width of the page}. Indicator results, tables, and figures can go into the columns below. -->
 
 ```{r, out.width="30%", warning=FALSE}
 p1<-UHC_all |> 
@@ -96,7 +95,10 @@ p1<-UHC_all |>
 
 HPV_coverage_C <- HPV_coverage |> filter(SpatialDim==iso3_SUR)
 adolescent_birth_rate_C <- adolescent_birth_rate |> filter(SpatialDim==iso3_SUR) |> filter(YEAR == max(YEAR))
-contraceptive_prevalence_C <- contraceptive_prevalence |> filter(SpatialDim==iso3_SUR) |> filter(YEAR==max(YEAR))
+contraceptive_prevalence_C <- contraceptive_prevalence |> 
+  filter(Dim1Type == "AGEGROUP") |> 
+  filter(SpatialDim==iso3_SUR) |> 
+  filter(YEAR==max(YEAR))
 ```
 
 \textcolor{fgcolor}{\textbf{\hlCeHDIRed{At a glance:}}}  
@@ -106,12 +108,15 @@ contraceptive_prevalence_C <- contraceptive_prevalence |> filter(SpatialDim==iso
 ***Key Health Indicators***  
 <!-- Maternal Mortality Ratio:   -->
 <!-- Under-Five Mortality Rate   -->
-Adolescent Birth Rate (aged 10-14):  `r adolescent_birth_rate_C |> filter(Dim2=="AGEGROUP_YEARS10-14") |> pull(Value)` per 1,000 women  
-Adolescent Birth Rate (aged 15-19):  `r adolescent_birth_rate_C |> filter(Dim2=="AGEGROUP_YEARS15-19") |> pull(Value)` per 1,000 women  
-Contraceptive Prevalence Rate:  `r contraceptive_prevalence_C |> pull(Value)`  
+Adolescent Birth Rate (aged 10-14):  `r adolescent_birth_rate_C |> filter(Dim2=="AGEGROUP_YEARS10-14") |> pull(Value)` per 1,000 women in `r adolescent_birth_rate_C |> filter(Dim2=="AGEGROUP_YEARS10-14") |> pull(YEAR)`  
+Adolescent Birth Rate (aged 15-19):  `r adolescent_birth_rate_C |> filter(Dim2=="AGEGROUP_YEARS15-19") |> pull(Value)` per 1,000 women in `r adolescent_birth_rate_C |> filter(Dim2=="AGEGROUP_YEARS15-19") |> pull(YEAR)`  
+
+Contraceptive Prevalence (aged 15-19):  `r round(contraceptive_prevalence_C |> filter(Dim1=="AGEGROUP_YEARS15-19") |> pull(NumericValue),1)`% in `r contraceptive_prevalence_C |> filter(Dim1=="AGEGROUP_YEARS15-19") |> pull(YEAR)`  
+Contraceptive Prevalence (aged 20-49):  `r round(contraceptive_prevalence_C |> filter(Dim1=="AGEGROUP_YEARS20-49") |> pull(NumericValue),1)`% in `r contraceptive_prevalence_C |> filter(Dim1=="AGEGROUP_YEARS20-49") |> pull(YEAR)`  
+
 HPV Immunization Coverage (9-14 year old girls):  `r HPV_coverage_C |> filter(YEAR == max(YEAR)) |> pull(NumericValue)`% in `r HPV_coverage_C |> filter(YEAR == max(YEAR)) |> pull(YEAR)`  
-\textcolor{fgcolor}{\hlCeHDIBlue{UHC service coverage index:}} `r UHC_estimate |> pull(NumericValue)` in `r UHC_estimate |> pull(YEAR)`  
-\textcolor{fgcolor}{\hlCeHDIBlue{Life expectancy at birth:}} `r life_expectancy_C |> pull(e0B) |> round(1)` years in `r life_expectancy_C |> pull(year)`
+\textcolor{fgcolor}{\hlCeHDIBlue{UHC service coverage index:}} `r UHC_estimate |> pull(Value)` in `r UHC_estimate |> pull(YEAR)`  
+\textcolor{fgcolor}{\hlCeHDIBlue{Life expectancy at birth:}} `r life_expectancy_C |> filter(year==max(year)) |>  pull(e0B) |> round(1)` years in `r life_expectancy_C |> filter(year==max(year)) |> pull(year)` (`r life_expectancy_C |> filter(year==min(year)) |>  pull(e0B) |> round(1)` years in `r life_expectancy_C |> filter(year==min(year)) |> pull(year)`)
 
 <!-- \textcolor{fgcolor}{\hlCeHDIBlue{colortest}} -->
 <!-- \textcolor{fgcolor}{\textbf{\hlCeHDIBlue{colortest}}} -->
