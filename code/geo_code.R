@@ -11,6 +11,14 @@ pacman::p_load(
 # !!!!! consider upgrading to using the GISCO map data:
 # world1 <- giscoR::gisco_get_countries()
 
+# WPP Locations
+
+httr::GET("https://population.un.org/wpp/assets/Excel%20Files/4_Metadata/WPP2024_F01_LOCATIONS.xlsx", httr::write_disk(tf <- tempfile(fileext = ".xlsx")))
+locations <-  read_xlsx(tf, sheet = "DB") |>
+  janitor::clean_names() |> 
+  filter(!is.na(iso3_code)) |> 
+  select(loc_id, iso3_code);unlink(tf);rm(tf)
+
 state_geo_prep <- necountries::ne_countries |> 
   # filter(type == "main"|country == "Alaska") #|>
   filter(status == "member"|status == "observer"|country == "Alaska"|country == "Greenland"|country=="Somaliland"|country == "Western Sahara") |> 
@@ -216,7 +224,8 @@ state_geo <- left_join(state_geo_prep, UN_official, join_by(country == english_s
   left_join(CARICOM, join_by(iso3==iso3_code)) |> #mutate(CARICOM_status = fct_na_value_to_level(CARICOM_status, "Other")) |> 
   left_join(South_Centre, join_by(iso3==iso3_code)) |> #mutate(SC_status = fct_na_value_to_level(SC_status, "Other")) |> 
   left_join(OACPS, join_by(iso3==iso3_code)) |> #mutate(OACPS_status = fct_na_value_to_level(OACPS_status, "Other")) |> 
-  left_join(COMESA, join_by(iso3==iso3_code))  #|> mutate(COMESA_status = fct_na_value_to_level(COMESA_status, "Other"))
+  left_join(COMESA, join_by(iso3==iso3_code)) |>   #|> mutate(COMESA_status = fct_na_value_to_level(COMESA_status, "Other"))
+  left_join(locations, join_by(iso3==iso3_code))
 
 greenland_row <- state_geo$country == "Greenland"
 # Identify the columns to change

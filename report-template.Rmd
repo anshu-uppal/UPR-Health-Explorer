@@ -29,10 +29,36 @@ pacman::p_load(
   dplyr,
   ggplot2, 
   ggtext, 
-  patchwork
+  patchwork,
+  sf
 )
 
+# Load or install packages from GitHub:
+pacman::p_load_gh(
+  "PPgp/wpp2024"
+)
+
+state_geo <- readRDS(here("output", "state_geo_enhanced.rds"))
 nearest_neighbors_list <- readRDS(here("output", "nearest_neighbors_list.rds"))
+iso3_SUR <- state_geo |> filter(country==params$country_name) |> pull(iso3)
+
+# Life expectancy
+data(e01dt);data(pop1dt)
+life_expectancy <- e01dt |> 
+  left_join(state_geo |> sf::st_drop_geometry() |> select(iso3,iso2, loc_id),
+            join_by(country_code==loc_id)) |> 
+  filter(
+    !is.na(iso3),
+    year>=2005
+  );rm(e01dt)
+
+pop_wpp <- pop1dt |> 
+  left_join(state_geo |> sf::st_drop_geometry() |> select(iso3,iso2, loc_id),
+            join_by(country_code==loc_id)) |> 
+  filter(
+    !is.na(iso3),
+    year>=2005
+  );rm(pop1dt)
 
 # Loop through API-generated files
 for (file_name in list.files(path = here("data", "API_data"), pattern = "\\.rds$")) {
@@ -42,11 +68,18 @@ for (file_name in list.files(path = here("data", "API_data"), pattern = "\\.rds$
 ```
 
 ```{r}
-UHC_estimate_2021 = UHC_all |>
-      filter(country_name == params$country_name, YEAR == 2021, 
-             IndicatorCode == "UHC_INDEX_REPORTED") |>
-      pull(NumericValue) |>
-      round(0)
+UHC_estimate <- UHC_all |>
+  filter(IndicatorCode == "UHC_INDEX_REPORTED",
+         country_name == params$country_name,
+         YEAR == max(YEAR)
+         )
+
+life_expectancy_C <- life_expectancy |> 
+  filter(iso3 == iso3_SUR,
+         year==max(year))
+
+pop_C <- pop_wpp |> 
+  filter(iso3==iso3_SUR)
 ```
 
 \maketitle
@@ -54,15 +87,31 @@ UHC_estimate_2021 = UHC_all |>
 
 Some brief text here, for context, that runs the \textcolor{CeHDIRed}{entire width of the page}. Indicator results, tables, and figures can go into the columns below.
 
-```{r, out.width="30%"}
+```{r, out.width="30%", warning=FALSE}
 p1<-UHC_all |> 
   filter(country_name == params$country_name, 
-             IndicatorCode == "UHC_INDEX_REPORTED") |>
+         IndicatorCode == "UHC_INDEX_REPORTED") |>
   ggplot(aes(x = YEAR, y= NumericValue))+geom_line()+
   theme_void()
+
+HPV_coverage_C <- HPV_coverage |> filter(SpatialDim==iso3_SUR)
+adolescent_birth_rate_C <- adolescent_birth_rate |> filter(SpatialDim==iso3_SUR) |> filter(YEAR == max(YEAR))
+contraceptive_prevalence_C <- contraceptive_prevalence |> filter(SpatialDim==iso3_SUR) |> filter(YEAR==max(YEAR))
 ```
 
-UHC 2021: `r UHC_estimate_2021`
+\textcolor{fgcolor}{\textbf{\hlCeHDIRed{At a glance:}}}  
+
+***Population***: `r round(pop_C |> filter(year==max(year)) |> pull(pop)/1000,1)`  million in `r pop_C |> filter(year==max(year)) |> pull(year)` (`r (round(pop_C |> filter(year==max(year)) |> pull(pop)/pop_C |> filter(year==min(year)) |> pull(pop),1)-1)*100`% growth since `r pop_C |> filter(year==min(year)) |> pull(year)`)
+
+***Key Health Indicators***  
+<!-- Maternal Mortality Ratio:   -->
+<!-- Under-Five Mortality Rate   -->
+Adolescent Birth Rate (aged 10-14):  `r adolescent_birth_rate_C |> filter(Dim2=="AGEGROUP_YEARS10-14") |> pull(Value)` per 1,000 women  
+Adolescent Birth Rate (aged 15-19):  `r adolescent_birth_rate_C |> filter(Dim2=="AGEGROUP_YEARS15-19") |> pull(Value)` per 1,000 women  
+Contraceptive Prevalence Rate:  `r contraceptive_prevalence_C |> pull(Value)`  
+HPV Immunization Coverage (9-14 year old girls):  `r HPV_coverage_C |> filter(YEAR == max(YEAR)) |> pull(NumericValue)`% in `r HPV_coverage_C |> filter(YEAR == max(YEAR)) |> pull(YEAR)`  
+\textcolor{fgcolor}{\hlCeHDIBlue{UHC service coverage index:}} `r UHC_estimate |> pull(NumericValue)` in `r UHC_estimate |> pull(YEAR)`  
+\textcolor{fgcolor}{\hlCeHDIBlue{Life expectancy at birth:}} `r life_expectancy_C |> pull(e0B) |> round(1)` years in `r life_expectancy_C |> pull(year)`
 
 <!-- \textcolor{fgcolor}{\hlCeHDIBlue{colortest}} -->
 <!-- \textcolor{fgcolor}{\textbf{\hlCeHDIBlue{colortest}}} -->
@@ -124,10 +173,10 @@ print(
   # params$mmr_map_plot+theme(
   #   plot.background = element_blank()
   # )&
-    # plot_annotation(theme = theme(
-    #   plot.background = element_rect(color = "#1c164d", fill=NA)
-    #   )
-    #   )
+  # plot_annotation(theme = theme(
+  #   plot.background = element_rect(color = "#1c164d", fill=NA)
+  #   )
+  #   )
 )
 ```
 

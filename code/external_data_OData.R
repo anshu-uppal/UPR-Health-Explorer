@@ -58,6 +58,89 @@ theme_labels <- tribble(
 )
 
 
+# UHRI dataset --------------------------------------------------------
+# Download the full UHRI dataset from https://uhri.ohchr.org/en/our-data-api
+# The direct download of the excel file is: https://dataex.ohchr.org/uhri/export-results/export-full-en.xlsx
+
+httr::GET("https://dataex.ohchr.org/uhri/export-results/export-full-en.xlsx", httr::write_disk(tf <- tempfile(fileext = ".xlsx")))
+df_0 <-  read_xlsx(tf,
+                   # Specify the column types, otherwise some show up as NA in R
+                   col_types = c(
+                     rep("text", 7), "date", rep("text", 7), "date")) |>
+  janitor::clean_names();unlink(tf);rm(tf)
+df<-df_0 |> janitor::clean_names() |>
+  # Add the date that the dataset was accessed from the UHRI website
+  mutate(date_accessed = ymd(Sys.Date())) |>
+  mutate(countries_concerned = str_remove(countries_concerned, "- "),
+         reccomending_body = str_remove(reccomending_body, "- ")
+  ) |>
+  mutate(
+    text = str_remove_all(text, "&nbsp;"),
+  ) |>
+  arrange(countries_concerned, reccomending_body, document_publication_date) |>
+  rename(document = document_symbol, body = reccomending_body) |>
+  mutate(
+    paragraph = case_when(
+      # CASE 1: The text starts with "Recommendation No."
+      # This detects the first pattern you described.
+      str_detect(text, "^Recommendation No\\.") ~ {
+        # str_match() lets us capture parts of the text.
+        # We look for "para. [number]: [number]"
+        matches <- str_match(text, "para\\.\\s*(\\d+):\\s*(\\d+)")
+        # We then take the captured numbers (the 2nd and 3rd elements from the match)
+        # and paste them together with a dot, creating the "96.21" format.
+        paste(matches[, 2], matches[, 3], sep = ".")
+      },
+
+      # CASE 2: The text starts with "para" or "paragraph"
+      # This is the new case to handle paragraph-only identifiers.
+      str_detect(text, "^[Pp]ara") ~ str_match(text, "[Pp]ara(?:graph)?\\.?\\s*(\\d+)")[, 2],
+
+      # CASE 3: The text starts with a "number.number" format (e.g., "136.1 ...")
+      # This must come before the single-number check to be matched correctly.
+      str_detect(text, "^\\d+\\.\\d+") ~ str_extract(text, "^\\d+\\.\\d+"),
+
+      # CASE 4: The text starts with just one number (e.g., "1 ...")
+      # This is the new case to handle single leading numbers.
+      str_detect(text, "^\\d+") ~ str_extract(text, "^\\d+"),
+
+      # If none of the above patterns match, return NA
+      TRUE ~ NA_character_
+    ),
+    upr_session = str_remove(upr_session, "- "),
+    upr_session = str_split_i(upr_session, " - ", 1),
+    upr_session_number = as.numeric(str_extract(upr_session, "\\d+")),
+    upr_cycle = case_when(
+      upr_session_number <= 12 ~ "Cycle 1",
+      upr_session_number <= 26 ~ "Cycle 2",
+      upr_session_number <= 40 ~ "Cycle 3",
+      upr_session_number <= 54 ~ "Cycle 4",
+    ),
+    type = str_remove(type, "- "),
+    upr_position = str_remove(upr_position, "- "),
+    title_a = str_split_i(paragraph,"\\.",1),
+    title_b = str_pad(str_split_i(paragraph,"\\.",2), , width = 3, side = "left", pad = "0"),
+    title_2 = paste(title_a, title_b,sep = ".")
+  )|>
+  arrange(upr_session_number) |>
+  mutate(
+    upr_session = fct_inorder(upr_session),
+    upr_cycle = fct_inorder(upr_cycle)
+    ) |>
+  select(-title_a, -title_b) |>
+  relocate(paragraph, .after=document) |>
+  relocate(title_2, upr_position, type, .after = paragraph) |>
+  arrange(countries_concerned, body, document_publication_date, title_2) |>
+  rename(
+    state_under_review = countries_concerned,
+    document_code = document
+  )
+
+saveRDS(df, here("data", "UHRI_full.rds"))
+saveRDS(df, here("data", paste0("UHRI_full_", Sys.Date(), ".rds")))
+
+uhri_full <- readRDS(here("data", "UHRI_full.rds"))
+
 # Human Development Index (HDI) ---------------------------------------
 # https://hdr.undp.org/data-center/documentation-and-downloads
 HDI <- vroom::vroom(here("data", "HDR25_Composite_indices_complete_time_series.csv")) |> 
@@ -133,7 +216,7 @@ live_births_wide <- live_births |>
   )
 
 maternal_deaths <- readxl::read_xlsx(here("data", "WHO_data_export_250917.xlsx"), 
-                                 sheet = "Data") |> 
+                                     sheet = "Data") |> 
   janitor::clean_names() |> 
   filter(indicator=="Number of maternal deaths") |> 
   select(year:country_iso_3_code, value_numeric) |> 
@@ -146,7 +229,7 @@ maternal_deaths_wide <- maternal_deaths |>
   )
 
 mmr_WHO <- readxl::read_xlsx(here("data", "WHO_data_export_250917.xlsx"), 
-                                     sheet = "Data") |> 
+                             sheet = "Data") |> 
   janitor::clean_names() |> 
   filter(indicator=="Maternal mortality ratio (per 100 000 live births) (SDG 3.1.1)") |> 
   select(year:country_iso_3_code, value_numeric) |> 
@@ -193,10 +276,10 @@ WB_income_codes <- gho_api$path("Dimension", "WORLDBANKINCOMEGROUP", "DimensionV
 
 
 ## Search GHO codes ####
-search_term <- "adolescent"
-# search_term <- "(?=.*cause)(?=.*death)"
+search_term <- "expenditure|spending"
+search_term <- "(?=.*expenditure|spending)(?=.*poverty)"
 search_term_results <- gho_indicators |> filter(str_detect(IndicatorName, regex(search_term, ignore_case = TRUE))|
-                           str_detect(IndicatorCode, regex(search_term, ignore_case = TRUE)))
+                                                  str_detect(IndicatorCode, regex(search_term, ignore_case = TRUE)))
 
 ## Indicators ####
 
@@ -234,7 +317,12 @@ UHC_all <- bind_rows(UHC_INDEX_REPORTED,
     year = ymd(paste0(YEAR, "-01-01"))
   )
 
-## Maternal mortality ratio ####
+### Health Expenditure ####
+
+# SDGOOP Out-of-pocket expenditure as a percentage of total expenditure on health
+
+
+### Maternal mortality ratio ####
 MMR <- gho_api$path("MDG_0000000026")$retrieve()$value |> tibble() |> 
   mutate(
     COUNTRY = case_when(SpatialDimType == "COUNTRY" ~ SpatialDim),
@@ -263,7 +351,25 @@ MMR <- gho_api$path("MDG_0000000026")$retrieve()$value |> tibble() |>
     )
   )
 
-## Health check after delivery ####
+### Antenatal care ####
+anc4 <- gho_api$path("anc4")$retrieve()$value |> tibble() |> 
+  mutate(
+    COUNTRY = case_when(SpatialDimType == "COUNTRY" ~ SpatialDim),
+    REGION = case_when(SpatialDimType %in% c("REGION", "GLOBAL")~SpatialDim)
+  ) |> 
+  left_join(gho_indicators) |> 
+  left_join(country_codes) |> 
+  left_join(region_codes) |> 
+  rename(YEAR = TimeDim) |> 
+  group_by(SpatialDim) |> 
+  slice_max(order_by = as.numeric(YEAR), n=1) |> 
+  mutate(
+    # NumericValue = as.numeric(NumericValue),
+    across(c(NumericValue:High), ~ as.numeric(.x)),
+    year = ymd(paste0(YEAR, "-01-01"))
+  )
+
+### Health check after delivery ####
 postnatal_care <- gho_api$path("UNICEF_PNCMOTHER")$retrieve()$value |> tibble() |> 
   mutate(
     COUNTRY = case_when(SpatialDimType == "COUNTRY" ~ SpatialDim),
@@ -314,7 +420,7 @@ postnatal_care_3 <- gho_api$path("pncall3")$retrieve()$value |> tibble() |>
 
 # See: https://maternalhealthatlas.org/factsheets
 
-## Births in health facility ####
+### Births in health facility ####
 institutional_birth <- gho_api$path("SRHINSTITUTIONALBIRTH")$retrieve()$value |> tibble() |> 
   mutate(
     COUNTRY = case_when(SpatialDimType == "COUNTRY" ~ SpatialDim),
@@ -330,7 +436,7 @@ institutional_birth <- gho_api$path("SRHINSTITUTIONALBIRTH")$retrieve()$value |>
     year = ymd(paste0(YEAR, "-01-01"))
   ) |> arrange(YEAR) |> group_by(COUNTRY, YEAR) |> slice_head(n=1)
 
-## HIV death ####
+### HIV death ####
 HIV_death <- gho_api$path("HIV_0000000006")$retrieve()$value |> tibble() |> 
   mutate(
     COUNTRY = case_when(SpatialDimType == "COUNTRY" ~ SpatialDim),
@@ -346,8 +452,8 @@ HIV_death <- gho_api$path("HIV_0000000006")$retrieve()$value |> tibble() |>
     year = ymd(paste0(YEAR, "-01-01"))
   ) 
 
-## Family planning ####
-### Need for family planning met ####
+### Family planning ####
+#### Need for family planning met ####
 family_planning <- gho_api$path("SDGFPALL")$retrieve()$value |> tibble() |> 
   mutate(
     COUNTRY = case_when(SpatialDimType == "COUNTRY" ~ SpatialDim),
@@ -373,7 +479,7 @@ family_planning <- gho_api$path("SDGFPALL")$retrieve()$value |> tibble() |>
       levels = c("10", "<30", "<60", "<90", "90+")
     ))
 
-### Modern contraceptive prevalence ####
+#### Modern contraceptive prevalence ####
 contraceptive_prevalence <- gho_api$path("cpmowho")$retrieve()$value |>
   mutate(
     COUNTRY = case_when(SpatialDimType == "COUNTRY" ~ SpatialDim),
@@ -389,7 +495,7 @@ contraceptive_prevalence <- gho_api$path("cpmowho")$retrieve()$value |>
     year = ymd(paste0(YEAR, "-01-01"))
   )
 
-### Unintended pregnancy ####
+#### Unintended pregnancy ####
 unintended_pregnancy <- gho_api$path("SRH_PREGNANCY_UNINTENDED_RATE")$retrieve()$value |> tibble() |> 
   mutate(
     COUNTRY = case_when(SpatialDimType == "COUNTRY" ~ SpatialDim),
@@ -404,7 +510,7 @@ unintended_pregnancy <- gho_api$path("SRH_PREGNANCY_UNINTENDED_RATE")$retrieve()
     across(c(NumericValue:High), ~ as.numeric(.x)),
     year = ymd(paste0(YEAR, "-01-01"))
   )
-### Abortion rate ####
+#### Abortion rate ####
 abortion_rate <- gho_api$path("SRH_ABORTION_RATE")$retrieve()$value |> tibble() |> 
   mutate(
     COUNTRY = case_when(SpatialDimType == "COUNTRY" ~ SpatialDim),
@@ -420,7 +526,7 @@ abortion_rate <- gho_api$path("SRH_ABORTION_RATE")$retrieve()$value |> tibble() 
     year = ymd(paste0(YEAR, "-01-01"))
   )
 
-### Adolescent birth rate ####
+#### Adolescent birth rate ####
 adolescent_birth_rate <- gho_api$path("MDG_0000000003")$retrieve()$value |> tibble() |> 
   mutate(
     COUNTRY = case_when(SpatialDimType == "COUNTRY" ~ SpatialDim),
@@ -438,7 +544,7 @@ adolescent_birth_rate <- gho_api$path("MDG_0000000003")$retrieve()$value |> tibb
     year = ymd(paste0(YEAR, "-01-01"))
   )
 
-### Own informed decisions ####
+#### Own informed decisions ####
 informed_decisions <- gho_api$path("SG_DMK_SRCR_FN_ZS")$retrieve()$value |> tibble() |> 
   mutate(
     COUNTRY = case_when(SpatialDimType == "COUNTRY" ~ SpatialDim),
@@ -456,12 +562,12 @@ informed_decisions <- gho_api$path("SG_DMK_SRCR_FN_ZS")$retrieve()$value |> tibb
     year = ymd(paste0(YEAR, "-01-01"))
   )
 
-## Skilled birth ####
-skilled_birth <- gho_api$path("MDG_0000000025")$retrieve()$value |> tibble() |> 
-  mutate(
-    COUNTRY = case_when(SpatialDimType == "COUNTRY" ~ SpatialDim),
-    REGION = case_when(SpatialDimType %in% c("REGION", "GLOBAL")~SpatialDim)
-  ) |> 
+### Skilled birth ####
+skilled_birth <- gho_api$path("MDG_0000000025")$retrieve()$value |> tibble() #|> 
+mutate(
+  COUNTRY = case_when(SpatialDimType == "COUNTRY" ~ SpatialDim),
+  REGION = case_when(SpatialDimType %in% c("REGION", "GLOBAL")~SpatialDim)
+) |> 
   left_join(gho_indicators) |> 
   left_join(country_codes) |> 
   left_join(region_codes) |> 
@@ -483,13 +589,13 @@ skilled_birth <- gho_api$path("MDG_0000000025")$retrieve()$value |> tibble() |>
       levels = c("<60", "60-69", "70-79", "80-89", "90-97", "98+")
     ))
 
-## Density of nursing and midwifery personnel ####
+### Density of nursing and midwifery personnel ####
 
 
 
 
-## HPV ####
-### National program ####
+### HPV ####
+#### National program ####
 HPV_national <- gho_api$path("NCD_CCS_hpv")$retrieve()$value |> tibble() |> 
   mutate(
     COUNTRY = case_when(SpatialDimType == "COUNTRY" ~ SpatialDim),
@@ -505,7 +611,7 @@ HPV_national <- gho_api$path("NCD_CCS_hpv")$retrieve()$value |> tibble() |>
     year = ymd(paste0(YEAR, "-01-01"))
   ) 
 
-### Coverage estimates ####
+#### Coverage estimates ####
 HPV_coverage <- gho_api$path("SDGHPVRECEIVED")$retrieve()$value |> tibble() |> 
   mutate(
     COUNTRY = case_when(SpatialDimType == "COUNTRY" ~ SpatialDim),
@@ -547,7 +653,7 @@ rm(
   country_codes, gho_dimensions, gho_indicators, region_codes, 
   state_geo, theme_labels, gestational_text, UN_region_codes, WB_income_codes, 
   search_term, search_term_results
-  )
+)
 
 # Save all objects to .rds files
 lapply(ls(), function(obj_name) {
