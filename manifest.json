@@ -2685,6 +2685,37 @@
         "Built": "R 4.5.0; ; 2025-05-31 01:33:31 UTC; windows"
       }
     },
+    "httr2": {
+      "Source": "CRAN",
+      "Repository": "https://cran.rstudio.com",
+      "description": {
+        "Package": "httr2",
+        "Title": "Perform HTTP Requests and Process the Responses",
+        "Version": "1.1.2",
+        "Authors@R": "c(\n    person(\"Hadley\", \"Wickham\", , \"hadley@posit.co\", role = c(\"aut\", \"cre\")),\n    person(\"Posit Software, PBC\", role = c(\"cph\", \"fnd\")),\n    person(\"Maximilian\", \"Girlich\", role = \"ctb\")\n  )",
+        "Description": "Tools for creating and modifying HTTP requests, then\n    performing them and processing the results. 'httr2' is a modern\n    re-imagining of 'httr' that uses a pipe-based interface and solves\n    more of the problems that API wrapping packages face.",
+        "License": "MIT + file LICENSE",
+        "URL": "https://httr2.r-lib.org, https://github.com/r-lib/httr2",
+        "BugReports": "https://github.com/r-lib/httr2/issues",
+        "Depends": "R (>= 4.0)",
+        "Imports": "cli (>= 3.0.0), curl (>= 6.2.1), glue, lifecycle, magrittr,\nopenssl, R6, rappdirs, rlang (>= 1.1.0), vctrs (>= 0.6.3),\nwithr",
+        "Suggests": "askpass, bench, clipr, covr, docopt, httpuv, jose, jsonlite,\nknitr, later (>= 1.4.0), nanonext, paws.common, promises,\nrmarkdown, testthat (>= 3.1.8), tibble, webfakes, xml2",
+        "VignetteBuilder": "knitr",
+        "Config/Needs/website": "tidyverse/tidytemplate",
+        "Config/testthat/edition": "3",
+        "Config/testthat/parallel": "true",
+        "Config/testthat/start-first": "multi-req, resp-stream, req-perform",
+        "Encoding": "UTF-8",
+        "RoxygenNote": "7.3.2",
+        "NeedsCompilation": "no",
+        "Packaged": "2025-03-25 18:33:11 UTC; hadleywickham",
+        "Author": "Hadley Wickham [aut, cre],\n  Posit Software, PBC [cph, fnd],\n  Maximilian Girlich [ctb]",
+        "Maintainer": "Hadley Wickham <hadley@posit.co>",
+        "Repository": "CRAN",
+        "Date/Publication": "2025-03-26 06:20:02 UTC",
+        "Built": "R 4.5.0; ; 2025-05-31 01:33:40 UTC; windows"
+      }
+    },
     "ids": {
       "Source": "CRAN",
       "Repository": "https://cran.rstudio.com",
@@ -5828,7 +5859,7 @@
   },
   "files": {
     "app.R": {
-      "checksum": "cbb874e9e215d348ea98933f82e1fba2"
+      "checksum": "23793ae4fc6826f65c0e4c430ddb9a96"
     },
     "code/.gitkeep": {
       "checksum": "81051bcc2cf1bedf378224b0a93e2877"
@@ -5843,16 +5874,19 @@
       "checksum": "8952ddc95bdef9346124d5d4d53f6a37"
     },
     "code/external_data_OData.R": {
-      "checksum": "bfa0cb68927a7c89c4f9c9bf3b1ecac4"
+      "checksum": "8aa517865bf31adbfa14e4e97e10d2bd"
     },
     "code/geo_code.R": {
-      "checksum": "7a14f483c6c9d71360b98938203eee72"
+      "checksum": "32cf2fe7170d2cc728596826dde392ce"
     },
     "code/MLM_abortion.R": {
       "checksum": "09f9189f7a29b6c71650fb829803b073"
     },
     "code/MLM_alt.R": {
       "checksum": "34a5d24ea48ee998644d5e0af93f8147"
+    },
+    "code/my_api.R": {
+      "checksum": "5329bfcc330d61882fc5010ba4517958"
     },
     "code/profile_pdf_plots_to delete.R": {
       "checksum": "8f77c9f12fabfe01bd912fd34f2b126c"
@@ -5863,8 +5897,14 @@
     "code/theme_labels.R": {
       "checksum": "978328eaecf9c92c0aaf0a32d3429bc5"
     },
+    "code/uhri_api.R": {
+      "checksum": "1d1674ce90a79e868844337a38ff0f94"
+    },
     "code/uhri_prep_to delete.R": {
       "checksum": "819bdff2e8b8a41b94ad1f057c3bb03c"
+    },
+    "code/UHRI_recommendation_definitions.qmd": {
+      "checksum": "6e5f198a79e4c14f076b5fd412275731"
     },
     "countryflag.png": {
       "checksum": "55c6210b6b320b5788235a6ed99be646"
@@ -5873,103 +5913,115 @@
       "checksum": "81051bcc2cf1bedf378224b0a93e2877"
     },
     "data/API_data/abortion_rate.rds": {
-      "checksum": "4b123f033fd9bf377717d69d81f5a9c0"
+      "checksum": "d14b0179c0dd386e9b896b8edd38d6fc"
     },
     "data/API_data/adolescent_birth_rate.rds": {
-      "checksum": "c5dd5c4da789175970f96ae673b9292a"
+      "checksum": "c32fa4c1427f6af2deac61e5d25b891f"
+    },
+    "data/API_data/anc4.rds": {
+      "checksum": "ed9f59fb770efec0144a7cd33164f2cd"
     },
     "data/API_data/contraceptive_prevalence.rds": {
-      "checksum": "0baa637c177bd12f40cc6599c106a7f5"
+      "checksum": "06883aca27d2a2dea50e2539fb392dee"
+    },
+    "data/API_data/e01dt.rds": {
+      "checksum": "df73667412a3410b6a10b57c00457ca9"
     },
     "data/API_data/family_planning.rds": {
-      "checksum": "8d285c57c652d0b382628a2907194d45"
+      "checksum": "e4b5db636732c9cd78f9576eb097105c"
     },
     "data/API_data/gho_api.rds": {
-      "checksum": "2d44d421f011a3ee84d455fe46e599f2"
+      "checksum": "5bf3179b1ad78339dcb6025b65717781"
     },
     "data/API_data/HDI.rds": {
-      "checksum": "2d3904a1ed84a91f1aab84faadba8247"
+      "checksum": "a69046557301e8cb92402646392f6bb9"
     },
     "data/API_data/HIV_death.rds": {
-      "checksum": "3476e1e0f8c357204eaee1483b39cdd3"
+      "checksum": "6b6f561429405552f4393f9730635062"
     },
     "data/API_data/HPV_coverage.rds": {
-      "checksum": "ce07a899b611fa9ec031339b97ad1adc"
+      "checksum": "d20ab5f17cc2687e22417439dd640268"
     },
     "data/API_data/HPV_national.rds": {
-      "checksum": "fc09bfd7d7e80a67cfe49c46ae41ea06"
+      "checksum": "a5a9874ee41e94518ce0d68b01d78fc6"
     },
     "data/API_data/informed_decisions.rds": {
-      "checksum": "c2dfe15cf314a859dda76f722bd22c1d"
+      "checksum": "3cc76d74b95a2299ae22c03443d78015"
     },
     "data/API_data/institutional_birth.rds": {
-      "checksum": "2866bd8eb07e81cce53c40b54305ec65"
+      "checksum": "9364da7cc5093402d88bec98efa76fe8"
     },
     "data/API_data/live_births.rds": {
-      "checksum": "28c6fdbfc4bf9afc63e25bdbb74dd780"
+      "checksum": "b20a8fe578d12934096837215a5b3ce9"
     },
     "data/API_data/live_births_wide.rds": {
-      "checksum": "db3c6f921ae983a00787b5c5922201e5"
+      "checksum": "cab8229a89722dd047a6516b033d2280"
     },
     "data/API_data/maternal_deaths.rds": {
-      "checksum": "ceb2205a89e890dbb546dba37afb844a"
+      "checksum": "0e330996322789a82ac0d32a1212e679"
     },
     "data/API_data/maternal_deaths_wide.rds": {
-      "checksum": "f67c5410d4e6cdd1b4f1213adac19f36"
+      "checksum": "096804224dc1b607e511658141709fba"
     },
     "data/API_data/MMR.rds": {
-      "checksum": "b05fc4d5efc496a02c106997626e74db"
+      "checksum": "e5769f3ea9b4ad3c413653d32ae1801d"
     },
     "data/API_data/mmr_data_WHO.rds": {
-      "checksum": "cb1359263a72f60c1584db6b257e740b"
+      "checksum": "9a95ce42d73a4008dde6da833f76a393"
     },
     "data/API_data/mmr_WHO.rds": {
-      "checksum": "a8954176e3a0ff350588f9165bd5c8e5"
+      "checksum": "907bedeade8cee9188e80fef5e66a933"
     },
     "data/API_data/mmr_WHO_wide.rds": {
-      "checksum": "af29a510be52306d4a9f2fb4965d0364"
+      "checksum": "97ced109e697a5b638af16ec2023f813"
     },
     "data/API_data/NMIRF.rds": {
-      "checksum": "f5ce74671a4522b4659a27b1bb54fee2"
+      "checksum": "a2ab6aeff43c325a14faebf2e106c851"
+    },
+    "data/API_data/pop1dt.rds": {
+      "checksum": "a9a41820752c4374964c2032ba0562c0"
+    },
+    "data/API_data/popAge5dt.rds": {
+      "checksum": "a2e6d3b4d2b279eff633049704f1290e"
     },
     "data/API_data/postnatal_care.rds": {
-      "checksum": "e1461b76d8c1e22b3edb0fbc10f66926"
+      "checksum": "aeb778eabb22595b0be1ea1c18f2819c"
     },
     "data/API_data/postnatal_care_3.rds": {
-      "checksum": "41ed120f762d5b375bcb91c341fbd064"
+      "checksum": "434714dc94b7a9fcac44c6010074e9be"
     },
     "data/API_data/postnatal_care_5.rds": {
-      "checksum": "253887872e0727001700908f5e339201"
+      "checksum": "73cb0659344c032b2e8355a1fffa5d02"
     },
     "data/API_data/skilled_birth.rds": {
-      "checksum": "7ac0ee859f479160f325031a57600b18"
+      "checksum": "44ec8f7c555cd40d518dd442b8cebf6e"
     },
     "data/API_data/UHC_all.rds": {
-      "checksum": "6219f248e10fd00c4878c5d54762bb77"
+      "checksum": "5741cb1113c902095ae583dd080cd4be"
     },
     "data/API_data/UHC_AVAILABILITY_SCORE.rds": {
-      "checksum": "f819ff89002f1c86e8bc969efbccae68"
+      "checksum": "5e047bc8c14c323ec538fc0b081a83b9"
     },
     "data/API_data/UHC_INDEX_REPORTED.rds": {
-      "checksum": "ce68265a1b44e61792d254d9fa3e1939"
+      "checksum": "025493b3023ce543fadcb455cb31aae8"
     },
     "data/API_data/UHC_SCI_CAPACITY.rds": {
-      "checksum": "625dc78d5775c9f0397676d8539edf0f"
+      "checksum": "b0e1e05d183ad3110913a2eff91aee98"
     },
     "data/API_data/UHC_SCI_INFECT.rds": {
-      "checksum": "18664bd63f75ae9514de7f4fb7209b7e"
+      "checksum": "a826df6866977ccc199c7c89aede41dc"
     },
     "data/API_data/UHC_SCI_NCD.rds": {
-      "checksum": "783d48edfb358edbf6b8fc95fc2ea1f9"
+      "checksum": "d2bdcf6e0dbc02d4abfb3ed898103ca5"
     },
     "data/API_data/UHC_SCI_RMNCH.rds": {
-      "checksum": "9b4e664ae567354c91add03731b2433d"
+      "checksum": "83efe942b06ab3f5cf85f6940f91665c"
     },
     "data/API_data/unintended_pregnancy.rds": {
-      "checksum": "e0b488cf8299b0331df9abc6fd4c578f"
+      "checksum": "fe689b21de066c9b29b053da56c1a5bf"
     },
     "data/API_data/world_abortion_laws.rds": {
-      "checksum": "40afdb8307ed3b923536816b2b6741ae"
+      "checksum": "52dc0dbaf5ed1d58da35db0e355c4447"
     },
     "data/CARICOM_status.csv": {
       "checksum": "3efbd86fbeca5a69b2cc15d7ba30d586"
@@ -6044,10 +6096,16 @@
       "checksum": "e386fc68f31948dcb7f27754087e2527"
     },
     "data/UHRI_full.rds": {
-      "checksum": "b6e218bdb25c43f424f8d9386e79b0ca"
+      "checksum": "4428306f1193543c252e11524e9dc8d9"
     },
     "data/UHRI_full_2025-09-29.rds": {
       "checksum": "b6e218bdb25c43f424f8d9386e79b0ca"
+    },
+    "data/UHRI_full_2025-10-06.rds": {
+      "checksum": "1e6b72f56b93931b8947faf0d8635628"
+    },
+    "data/UHRI_full_2025-10-07.rds": {
+      "checksum": "4428306f1193543c252e11524e9dc8d9"
     },
     "data/UHRI_full_export_20250929.xlsx": {
       "checksum": "05978d1881fa18c45e2b52e050e20614"
@@ -6063,9 +6121,6 @@
     },
     "data/world_abortion_laws.xlsx": {
       "checksum": "8ef034657d6d462896629aa0def80bd8"
-    },
-    "fhgh.pdf": {
-      "checksum": "0f5172b33098807f81b47567e3df8c11"
     },
     "flags/ad.png": {
       "checksum": "5074501fe7dee5dcdd6e1fb6cf4e46f2"
@@ -6817,21 +6872,6 @@
     "flags/zw.png": {
       "checksum": "ada2b312e1377be4b749c4aa47ae491d"
     },
-    "full_plot.png": {
-      "checksum": "70504245c917340cd27172fb8cd0e995"
-    },
-    "ggjgj.pdf": {
-      "checksum": "56de2ffb7c1b1d53e3707397451131dd"
-    },
-    "Jamaica.png": {
-      "checksum": "5204f7d670ac8e0d0639851a68e7c6a6"
-    },
-    "Kenya.png": {
-      "checksum": "9a877939c6fada11e9fb4263c679bbe7"
-    },
-    "Liberia.png": {
-      "checksum": "9762ea7b4c1b7dc0257f79f76b28b059"
-    },
     "logo.png": {
       "checksum": "ff8f04ba9185dde3ba807f748c32bd57"
     },
@@ -6847,18 +6887,6 @@
     "logos/logo2-svg.svg": {
       "checksum": "6a1a4d910dbdb3e27d8de461629d44fb"
     },
-    "MALALALA.png": {
-      "checksum": "ef4cfedb61c787740fb002bace208124"
-    },
-    "mozambique.png": {
-      "checksum": "1cfdb75f56552acb30a50cb5fa3b31ca"
-    },
-    "mozambique2.png": {
-      "checksum": "61ea3f4f62a70225fc80937f44ff60c7"
-    },
-    "mozambique2.svg": {
-      "checksum": "9ea58a4650227dd69c1ee2d8304c3727"
-    },
     "output/.gitkeep": {
       "checksum": "81051bcc2cf1bedf378224b0a93e2877"
     },
@@ -6869,94 +6897,31 @@
       "checksum": "706ef28604d408f3ed70f31d6d94ba24"
     },
     "output/state_geo_enhanced.rds": {
-      "checksum": "c4c046b4f14371a367f05e44603e2563"
+      "checksum": "c610e19c8f3370f879a0431fa1c5257e"
     },
-    "preamble-alt.tex": {
-      "checksum": "922802b3ade5816f4e0abf764256588f"
-    },
-    "preamble-b.log": {
-      "checksum": "d756b95ab3724f96a40e8577dababcec"
-    },
-    "preamble-b.tex": {
-      "checksum": "fd6758d193f38a5cc771e0cef8bf9b25"
-    },
-    "preamble.log": {
-      "checksum": "37cdf1fafb60a596aad74c8f2ca230ad"
+    "output/UHRI_UPR_enhanced.rds": {
+      "checksum": "63ade0b3d27362a3fc170b4481439254"
     },
     "preamble.tex": {
-      "checksum": "ff5c3275c9f9aed540c18cf9a4b8695d"
+      "checksum": "cd18a1979345d38f315c4fe0bd002670"
     },
     "README.md": {
       "checksum": "17aebe0c4de1aa1626e5bcce1b9d0af9"
     },
-    "report-template-alt.log": {
-      "checksum": "911a0ee159dbeecf61f5d09f89b3f3df"
-    },
-    "report-template-alt.pdf": {
-      "checksum": "c41e7eaedc4ed7aeb8271ab7cd0d358f"
-    },
-    "report-template-alt.Rmd": {
-      "checksum": "43d68d67f12e49dbd0e32699dbc1416c"
-    },
-    "report-template.html": {
-      "checksum": "599131b8a4d86395831267572f6b61a6"
-    },
-    "report-template.log": {
-      "checksum": "5c45016ae2b1c25f6ccaf7cbdcc3f5ac"
-    },
     "report-template.pdf": {
-      "checksum": "a254144ce8b642598dd0242f67e8de50"
-    },
-    "report-template.qmd": {
-      "checksum": "fb9654ca7b1999b56cc038974caacb9b"
+      "checksum": "0a1e6f47a8e8ace5bce8abe59c24672a"
     },
     "report-template.Rmd": {
-      "checksum": "9678ed38c996bcf0e92303338dc0be55"
+      "checksum": "91db1ed2fb14fa37dad013793ed6db62"
     },
     "report-template.tex": {
-      "checksum": "e6d56088d66539117df224339a22de6f"
-    },
-    "report-template_f1.pdf": {
-      "checksum": "a540072c76e808470f865d402596f77e"
-    },
-    "report-template_files/figure-latex/unnamed-chunk-1-1.pdf": {
-      "checksum": "4478ba4ded134c56e0a6e0ab58b3243c"
-    },
-    "report-template_files/figure-latex/unnamed-chunk-10-1.pdf": {
-      "checksum": "53c6508e28d98402223de07df70191c7"
-    },
-    "report-template_files/figure-latex/unnamed-chunk-11-1.pdf": {
-      "checksum": "ebe73da48915b9f70cb35de8bf43b6cb"
-    },
-    "report-template_files/figure-latex/unnamed-chunk-2-1.pdf": {
-      "checksum": "11a8ced5d04ae2dd0607c5a4ec61a7ba"
+      "checksum": "609cd26647cb5ffaf3c2784388cee0c3"
     },
     "report-template_files/figure-latex/unnamed-chunk-3-1.pdf": {
-      "checksum": "8455b1178efdbaaee61a83f3b0b5932f"
+      "checksum": "3587972d59fb3c8a8bc6a30a66c47352"
     },
     "report-template_files/figure-latex/unnamed-chunk-4-1.pdf": {
-      "checksum": "0535ebe34115b1438ca243b89258205f"
-    },
-    "report-template_files/figure-latex/unnamed-chunk-5-1.pdf": {
-      "checksum": "26ae9e0b51e9d5412c1d8b693e5b1fc3"
-    },
-    "report-template_files/figure-latex/unnamed-chunk-6-1.pdf": {
-      "checksum": "cba94f52de5d4085c9c4f0dd3c9193bf"
-    },
-    "report-template_files/figure-latex/unnamed-chunk-7-1.pdf": {
-      "checksum": "9f5c2eab0994024d94fa82861f9b8b83"
-    },
-    "report-template_files/figure-latex/unnamed-chunk-8-1.pdf": {
-      "checksum": "25f2ab127397fdac0ee7ee0c22fd728d"
-    },
-    "report-template_files/figure-latex/unnamed-chunk-9-1.pdf": {
-      "checksum": "9b7503baa23bbf701a30238bd1554cf6"
-    },
-    "report.pdf": {
-      "checksum": "029dab313e00edf99ed703af5b9adfc6"
-    },
-    "report_qmd.pdf": {
-      "checksum": "b7849a5840cdc384985338f101f35dbe"
+      "checksum": "c8b99da6fc10aaeca5f067e21d0b029f"
     },
     "upr_cols.csv": {
       "checksum": "64a02b52049db9228904ccfdec2d2bee"
