@@ -190,10 +190,10 @@ contraceptive_prevalence_text_15_19 <-
               pull(NumericValue))){
     "Data not available"
   } else{
-    paste0(contraceptive_prevalence_C |> 
+    paste0(round(contraceptive_prevalence_C |> 
              filter(Dim1=="AGEGROUP_YEARS15-19") |> 
              filter(YEAR == max(YEAR)) |> 
-             pull(Value), 
+             pull(NumericValue),1), 
            "% in ", 
            contraceptive_prevalence_C |> 
              filter(Dim1=="AGEGROUP_YEARS15-19") |> 
@@ -208,10 +208,10 @@ contraceptive_prevalence_text_20_49 <-
               pull(NumericValue))){
     "Data not available"
   } else{
-    paste0(contraceptive_prevalence_C |> 
+    paste0(round(contraceptive_prevalence_C |> 
              filter(Dim1=="AGEGROUP_YEARS20-49") |> 
              filter(YEAR == max(YEAR)) |> 
-             pull(Value), 
+             pull(NumericValue),1),
            "% in ", 
            contraceptive_prevalence_C |> 
              filter(Dim1=="AGEGROUP_YEARS20-49") |> 
