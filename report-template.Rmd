@@ -114,8 +114,8 @@ pop_text <- paste0(round(pop_C |> filter(year==max(year)) |> pull(pop)/1000,1),
                    " million in ",
                    pop_C |> filter(year==max(year)) |> pull(year),
                    " (",
-                   (round(pop_C |> filter(year==max(year)) |> pull(pop)/pop_C |> filter(year==min(year)) |> pull(pop),1)-1)*100,
-                   "% growth since ",
+                   sprintf("%+.0f", (round(pop_C |> filter(year==max(year)) |> pull(pop)/pop_C |> filter(year==min(year)) |> pull(pop),2)-1)*100),
+                   "% since ",
                    pop_C |> filter(year==min(year)) |> pull(year),
                    ")")
 ```
