@@ -13,17 +13,18 @@ pacman::p_load(
   # plotly,
   janitor,
   sf,
-  ODataQuery
+  ODataQuery # More general API use of OData protocol
 )
 
-# # Load or install packages from GitHub:
-# pacman::p_load_gh(
-#   # "DrMattG/SDGsR", # Uses API to get SDGs data
-#   "ODataQuery" # More general API use of OData protocol
-#   # "aphp/rgho" # Uses API to get data from Global Health Observatory
-#   # "PPgp/wpp2024" # United Nations World Population Prospects 2024
-#   # "m-muecke/isocountry" # Get ISO codes for countries
-# )
+# Load or install packages from GitHub:
+pacman::p_load_gh(
+  "PPgp/wpp2024" 
+  # "DrMattG/SDGsR", # Uses API to get SDGs data
+  # "ODataQuery" # Development version from github
+  # "aphp/rgho" # Uses API to get data from Global Health Observatory
+  # "PPgp/wpp2024" # United Nations World Population Prospects 2024
+  # "m-muecke/isocountry" # Get ISO codes for countries
+)
 
 state_geo <- readRDS(here("output", "state_geo_enhanced.rds"))
 
@@ -57,89 +58,92 @@ theme_labels <- tribble(
   "incarcerated", "Health of incarcerated persons"
 )
 
+# Population data --------------------------------------
+# from the wpp2024 package
+data(e01dt);data(pop1dt);data(popAge5dt)
 
 # UHRI dataset --------------------------------------------------------
 # Download the full UHRI dataset from https://uhri.ohchr.org/en/our-data-api
 # The direct download of the excel file is: https://dataex.ohchr.org/uhri/export-results/export-full-en.xlsx
 
-httr::GET("https://dataex.ohchr.org/uhri/export-results/export-full-en.xlsx", httr::write_disk(tf <- tempfile(fileext = ".xlsx")))
-df_0 <-  read_xlsx(tf,
-                   # Specify the column types, otherwise some show up as NA in R
-                   col_types = c(
-                     rep("text", 7), "date", rep("text", 7), "date")) |>
-  janitor::clean_names();unlink(tf);rm(tf)
-df<-df_0 |> janitor::clean_names() |>
-  # Add the date that the dataset was accessed from the UHRI website
-  mutate(date_accessed = ymd(Sys.Date())) |>
-  mutate(countries_concerned = str_remove(countries_concerned, "- "),
-         reccomending_body = str_remove(reccomending_body, "- ")
-  ) |>
-  mutate(
-    text = str_remove_all(text, "&nbsp;"),
-  ) |>
-  arrange(countries_concerned, reccomending_body, document_publication_date) |>
-  rename(document = document_symbol, body = reccomending_body) |>
-  mutate(
-    paragraph = case_when(
-      # CASE 1: The text starts with "Recommendation No."
-      # This detects the first pattern you described.
-      str_detect(text, "^Recommendation No\\.") ~ {
-        # str_match() lets us capture parts of the text.
-        # We look for "para. [number]: [number]"
-        matches <- str_match(text, "para\\.\\s*(\\d+):\\s*(\\d+)")
-        # We then take the captured numbers (the 2nd and 3rd elements from the match)
-        # and paste them together with a dot, creating the "96.21" format.
-        paste(matches[, 2], matches[, 3], sep = ".")
-      },
-
-      # CASE 2: The text starts with "para" or "paragraph"
-      # This is the new case to handle paragraph-only identifiers.
-      str_detect(text, "^[Pp]ara") ~ str_match(text, "[Pp]ara(?:graph)?\\.?\\s*(\\d+)")[, 2],
-
-      # CASE 3: The text starts with a "number.number" format (e.g., "136.1 ...")
-      # This must come before the single-number check to be matched correctly.
-      str_detect(text, "^\\d+\\.\\d+") ~ str_extract(text, "^\\d+\\.\\d+"),
-
-      # CASE 4: The text starts with just one number (e.g., "1 ...")
-      # This is the new case to handle single leading numbers.
-      str_detect(text, "^\\d+") ~ str_extract(text, "^\\d+"),
-
-      # If none of the above patterns match, return NA
-      TRUE ~ NA_character_
-    ),
-    upr_session = str_remove(upr_session, "- "),
-    upr_session = str_split_i(upr_session, " - ", 1),
-    upr_session_number = as.numeric(str_extract(upr_session, "\\d+")),
-    upr_cycle = case_when(
-      upr_session_number <= 12 ~ "Cycle 1",
-      upr_session_number <= 26 ~ "Cycle 2",
-      upr_session_number <= 40 ~ "Cycle 3",
-      upr_session_number <= 54 ~ "Cycle 4",
-    ),
-    type = str_remove(type, "- "),
-    upr_position = str_remove(upr_position, "- "),
-    title_a = str_split_i(paragraph,"\\.",1),
-    title_b = str_pad(str_split_i(paragraph,"\\.",2), , width = 3, side = "left", pad = "0"),
-    title_2 = paste(title_a, title_b,sep = ".")
-  )|>
-  arrange(upr_session_number) |>
-  mutate(
-    upr_session = fct_inorder(upr_session),
-    upr_cycle = fct_inorder(upr_cycle)
-    ) |>
-  select(-title_a, -title_b) |>
-  relocate(paragraph, .after=document) |>
-  relocate(title_2, upr_position, type, .after = paragraph) |>
-  arrange(countries_concerned, body, document_publication_date, title_2) |>
-  rename(
-    state_under_review = countries_concerned,
-    document_code = document
-  )
-
-saveRDS(df, here("data", "UHRI_full.rds"))
-saveRDS(df, here("data", paste0("UHRI_full_", Sys.Date(), ".rds")))
-
-uhri_full <- readRDS(here("data", "UHRI_full.rds"))
+# httr::GET("https://dataex.ohchr.org/uhri/export-results/export-full-en.xlsx", httr::write_disk(tf <- tempfile(fileext = ".xlsx")))
+# df_0 <-  read_xlsx(tf,
+#                    # Specify the column types, otherwise some show up as NA in R
+#                    col_types = c(
+#                      rep("text", 7), "date", rep("text", 7), "date")) |>
+#   janitor::clean_names();unlink(tf);rm(tf)
+# df<-df_0 |> janitor::clean_names() |>
+#   # Add the date that the dataset was accessed from the UHRI website
+#   mutate(date_accessed = ymd(Sys.Date())) |>
+#   mutate(countries_concerned = str_remove(countries_concerned, "- "),
+#          reccomending_body = str_remove(reccomending_body, "- ")
+#   ) |>
+#   mutate(
+#     text = str_remove_all(text, "&nbsp;"),
+#   ) |>
+#   arrange(countries_concerned, reccomending_body, document_publication_date) |>
+#   rename(document = document_symbol, body = reccomending_body) |>
+#   mutate(
+#     paragraph = case_when(
+#       # CASE 1: The text starts with "Recommendation No."
+#       # This detects the first pattern you described.
+#       str_detect(text, "^Recommendation No\\.") ~ {
+#         # str_match() lets us capture parts of the text.
+#         # We look for "para. [number]: [number]"
+#         matches <- str_match(text, "para\\.\\s*(\\d+):\\s*(\\d+)")
+#         # We then take the captured numbers (the 2nd and 3rd elements from the match)
+#         # and paste them together with a dot, creating the "96.21" format.
+#         paste(matches[, 2], matches[, 3], sep = ".")
+#       },
+# 
+#       # CASE 2: The text starts with "para" or "paragraph"
+#       # This is the new case to handle paragraph-only identifiers.
+#       str_detect(text, "^[Pp]ara") ~ str_match(text, "[Pp]ara(?:graph)?\\.?\\s*(\\d+)")[, 2],
+# 
+#       # CASE 3: The text starts with a "number.number" format (e.g., "136.1 ...")
+#       # This must come before the single-number check to be matched correctly.
+#       str_detect(text, "^\\d+\\.\\d+") ~ str_extract(text, "^\\d+\\.\\d+"),
+# 
+#       # CASE 4: The text starts with just one number (e.g., "1 ...")
+#       # This is the new case to handle single leading numbers.
+#       str_detect(text, "^\\d+") ~ str_extract(text, "^\\d+"),
+# 
+#       # If none of the above patterns match, return NA
+#       TRUE ~ NA_character_
+#     ),
+#     upr_session = str_remove(upr_session, "- "),
+#     upr_session = str_split_i(upr_session, " - ", 1),
+#     upr_session_number = as.numeric(str_extract(upr_session, "\\d+")),
+#     upr_cycle = case_when(
+#       upr_session_number <= 12 ~ "Cycle 1",
+#       upr_session_number <= 26 ~ "Cycle 2",
+#       upr_session_number <= 40 ~ "Cycle 3",
+#       upr_session_number <= 54 ~ "Cycle 4",
+#     ),
+#     type = str_remove(type, "- "),
+#     upr_position = str_remove(upr_position, "- "),
+#     title_a = str_split_i(paragraph,"\\.",1),
+#     title_b = str_pad(str_split_i(paragraph,"\\.",2), , width = 3, side = "left", pad = "0"),
+#     title_2 = paste(title_a, title_b,sep = ".")
+#   )|>
+#   arrange(upr_session_number) |>
+#   mutate(
+#     upr_session = fct_inorder(upr_session),
+#     upr_cycle = fct_inorder(upr_cycle)
+#     ) |>
+#   select(-title_a, -title_b) |>
+#   relocate(paragraph, .after=document) |>
+#   relocate(title_2, upr_position, type, .after = paragraph) |>
+#   arrange(countries_concerned, body, document_publication_date, title_2) |>
+#   rename(
+#     state_under_review = countries_concerned,
+#     document_code = document
+#   )
+# 
+# saveRDS(df, here("data", "UHRI_full.rds"))
+# saveRDS(df, here("data", paste0("UHRI_full_", Sys.Date(), ".rds")))
+# 
+# uhri_full <- readRDS(here("data", "UHRI_full.rds"))
 
 # Human Development Index (HDI) ---------------------------------------
 # https://hdr.undp.org/data-center/documentation-and-downloads
@@ -563,7 +567,7 @@ informed_decisions <- gho_api$path("SG_DMK_SRCR_FN_ZS")$retrieve()$value |> tibb
   )
 
 ### Skilled birth ####
-skilled_birth <- gho_api$path("MDG_0000000025")$retrieve()$value |> tibble() #|> 
+skilled_birth <- gho_api$path("MDG_0000000025")$retrieve()$value |> tibble() |> 
 mutate(
   COUNTRY = case_when(SpatialDimType == "COUNTRY" ~ SpatialDim),
   REGION = case_when(SpatialDimType %in% c("REGION", "GLOBAL")~SpatialDim)
