@@ -90,6 +90,25 @@ UHC_estimate <- UHC_all |>
          YEAR == max(YEAR)
   )
 
+antenatal_WHO_C <- antenatal_WHO |> filter(country_iso_3_code == iso3_SUR)
+antenatal_WHO_text <- if(is_empty(antenatal_WHO_C |> 
+                                                filter(year == max(year)) |> 
+                                                pull(antenatal_WHO))){
+  "Data not available"
+} else{
+  paste0(antenatal_WHO_C |> 
+           filter(year == max(year)) |> 
+           pull(antenatal_WHO), 
+         "% in ", 
+         antenatal_WHO_C |> 
+           filter(year == max(year)) |> 
+           pull(year)
+  )
+}
+
+
+#########
+
 life_expectancy_C <- life_expectancy |> filter(iso3 == iso3_SUR)
 life_expectancy_text <- paste0(life_expectancy_C |> 
                                  filter(year==max(year)) |>  
@@ -319,6 +338,7 @@ Aged 20 to 49:  `r contraceptive_prevalence_text_20_49`
 
 \textcolor{fgcolor}{\hlCeHDIBlue{HPV Coverage (9-14 year old girls):}}  `r HPV_coverage_text`  
 \textcolor{fgcolor}{\hlCeHDIBlue{UHC service coverage index:}} `r UHC_estimate |> pull(Value)` in `r UHC_estimate |> pull(YEAR)`  
+\textcolor{fgcolor}{\hlCeHDIBlue{Antenatal care coverage (\ge 4 visits):}} `r antenatal_WHO_text`  
 \textcolor{fgcolor}{\hlCeHDIBlue{Life expectancy at birth:}} `r life_expectancy_text`  
 ```{=latex}
 \end{multicols}
