@@ -346,7 +346,7 @@ ggplot()+  # default x-axis is age in years;
 Aged 10 to 14:  `r adolescent_birth_rate_text_10_14`  
 Aged 15 to 19:  `r adolescent_birth_rate_text_15_19`  
 
-\textcolor{fgcolor}{\hlCeHDIBlue{Contraceptive Prevalence:}}  
+\textcolor{fgcolor}{\hlCeHDIBlue{Contraceptive Prevalence (modern methods):}}  
 Aged 15 to 19:  `r contraceptive_prevalence_text_15_19`  
 Aged 20 to 49:  `r contraceptive_prevalence_text_20_49`  
 
