@@ -108,8 +108,8 @@ UHC_RMNCH_estimate <- UHC_all |>
 
 antenatal_WHO_C <- antenatal_WHO |> filter(country_iso_3_code == iso3_SUR)
 antenatal_WHO_text <- if(is_empty(antenatal_WHO_C |> 
-                                                filter(year == max(year)) |> 
-                                                pull(antenatal_WHO))){
+                                  filter(year == max(year)) |> 
+                                  pull(antenatal_WHO))){
   "Data not available"
 } else{
   paste0(antenatal_WHO_C |> 
@@ -155,25 +155,25 @@ pop_text <- paste0(round(pop_C |> filter(year==max(year)) |> pull(pop)/1000,1),
                    ")")
 
 fertility_rate_text <- paste0(fertility_rate_C |> 
-                                 filter(year==max(year)) |>  
-                                 pull(tfr) |> round(1), 
-                               " children per woman in ",
-                               fertility_rate_C |> 
-                                 filter(year==max(year)) |> 
-                                 pull(year),
-                               " (",
-                               fertility_rate_C |> 
-                                 filter(year==min(year)) |>  
-                                 pull(tfr) |> round(1),
-                               " in ",
-                               fertility_rate_C |> 
-                                 filter(year==min(year)) |> 
-                                 pull(year),
-                               ")")
+                                filter(year==max(year)) |>  
+                                pull(tfr) |> round(1), 
+                              " children per woman in ",
+                              fertility_rate_C |> 
+                                filter(year==max(year)) |> 
+                                pull(year),
+                              " (",
+                              fertility_rate_C |> 
+                                filter(year==min(year)) |>  
+                                pull(tfr) |> round(1),
+                              " in ",
+                              fertility_rate_C |> 
+                                filter(year==min(year)) |> 
+                                pull(year),
+                              ")")
 ```
 
 \maketitle
-# `r params$country_name`  
+# \underline{`r params$country_name`}  
 
 <!-- Some brief text here, for context, that runs the \textcolor{CeHDIRed}{entire width of the page}. Indicator results, tables, and figures can go into the columns below. -->
 ```{r, out.width="30%", warning=FALSE}
@@ -269,9 +269,9 @@ contraceptive_prevalence_text_15_19 <-
     "Data not available"
   } else{
     paste0(round(contraceptive_prevalence_C |> 
-             filter(Dim1=="AGEGROUP_YEARS15-19") |> 
-             filter(YEAR == max(YEAR)) |> 
-             pull(NumericValue),1), 
+                   filter(Dim1=="AGEGROUP_YEARS15-19") |> 
+                   filter(YEAR == max(YEAR)) |> 
+                   pull(NumericValue),1), 
            "% in ", 
            contraceptive_prevalence_C |> 
              filter(Dim1=="AGEGROUP_YEARS15-19") |> 
@@ -287,9 +287,9 @@ contraceptive_prevalence_text_20_49 <-
     "Data not available"
   } else{
     paste0(round(contraceptive_prevalence_C |> 
-             filter(Dim1=="AGEGROUP_YEARS20-49") |> 
-             filter(YEAR == max(YEAR)) |> 
-             pull(NumericValue),1),
+                   filter(Dim1=="AGEGROUP_YEARS20-49") |> 
+                   filter(YEAR == max(YEAR)) |> 
+                   pull(NumericValue),1),
            "% in ", 
            contraceptive_prevalence_C |> 
              filter(Dim1=="AGEGROUP_YEARS20-49") |> 
@@ -303,18 +303,22 @@ contraceptive_prevalence_text_20_49 <-
 \raggedcolumns     %new code
 \interlinepenalty=10000
 ```
-\begin{center}\textcolor{fgcolor}{\textbf{\hlCeHDIRed{Demographics}}}\end{center}  
+\begin{center}\textcolor{fgcolor}{\textbf{\hlCeHDIRed{\ \ \ \ Demographics \ \ \ \ }}}\end{center}  
 \textcolor{fgcolor}{\hlCeHDIBlue{Population:}} `r pop_text`  
 ```{r, out.width="90%"}
 pop_age_wpp_C_split <- pop_age_wpp_C |> 
-  mutate(prop = case_when(Gender == "Male" ~ -prop*100, .default = prop*100))
+  mutate(prop = case_when(Gender == "Male" ~ -prop*100, .default = prop*100)) |>
+group_by(year, age) |> 
+  mutate(midpoint_prop = case_when(year == 2005 ~ NA,
+                                   year == 2020 ~ mean(prop))) |> 
+  ungroup()
 
 max_per <- max(pop_age_wpp_C_split$prop, na.rm=T)
 min_per <- min(pop_age_wpp_C_split$prop, na.rm=T)
 # begin ggplot
 ##############
 ggplot()+  # default x-axis is age in years;
-
+  
   # population data graph
   geom_col(
     data = pop_age_wpp_C_split |> filter(year == 2005),
@@ -337,6 +341,17 @@ ggplot()+  # default x-axis is age in years;
     alpha = 1,                                      # not transparent 
     width = 0.4)+                                   # half width
   
+  geom_point(
+    data=pop_age_wpp_C_split,
+    aes(x=age, y=midpoint_prop
+        # , color=midpoint_prop>0
+        ),
+    color = "yellow",
+    shape = "|",
+    # shape = 124,
+    size = 4
+  )+
+
   # flip the X and Y axes to make pyramid vertical
   coord_flip()+
   
@@ -348,22 +363,29 @@ ggplot()+  # default x-axis is age in years;
     limits = c(min_per, max_per),                                      # min and max defined above
     breaks = seq(floor(min_per), ceiling(max_per), by = 1),                # from min% to max% by 2
     labels = paste0(                                                       # for the labels, paste together...
-              abs(seq(floor(min_per), ceiling(max_per), by = 1)), "%")
-    )+
-
+      abs(seq(floor(min_per), ceiling(max_per), by = 1)), "%")
+  )+
+  
   # designate colors and legend labels manually
   scale_fill_manual(
     # values = c("#7fc97f", "#beaed4")
     values = c("#1c164d", "#ec5557")
   ) +
-
+  # scale_color_manual(
+  #   # values = c("#7fc97f", "#beaed4")
+  #   values = c("#ec5557", "#1c164d")
+  # ) +
+  # scale_color_manual(
+  #   # values = c("#7fc97f", "#beaed4")
+  #   values = c("#ec5557", "#1c164d")
+  # ) +
   # plot labels, titles, caption    
   labs(
     title = "Age and gender distribution in 2020, drawn over baseline in 2005",
     x = "Age category",
     y = "Percent of total",
     fill = NULL) +
-  
+  guides(color = "Midpoint")+
   # optional aesthetic themes
   theme(
     legend.position = "inside",
@@ -385,18 +407,18 @@ ggplot()+  # default x-axis is age in years;
 \textcolor{fgcolor}{\hlCeHDIBlue{Total Fertility Rate:}} `r fertility_rate_text`  
 \columnbreak
 
-\begin{center}\textcolor{fgcolor}{\textbf{\hlCeHDIRed{Key Health Indicators (latest available data)}}}\end{center}  
+\begin{center}\textcolor{fgcolor}{\textbf{\hlCeHDIRed{\ \ \ \ Key Health Indicators (latest available data) \ \ \ \ }}}\end{center}  
 \textcolor{fgcolor}{\hlCeHDIBlue{Life expectancy at birth:}} `r life_expectancy_text`
 <!-- Maternal Mortality Ratio:   -->
 <!-- Under-Five Mortality Rate   -->  
 \textcolor{fgcolor}{\hlCeHDIBlue{Adolescent Birth Rate:}}  
-- Aged 10 to 14:  `r adolescent_birth_rate_text_10_14`  
-- Aged 15 to 19:  `r adolescent_birth_rate_text_15_19`  
+\ \ - Aged 10 to 14:  `r adolescent_birth_rate_text_10_14`  
+\ \ - Aged 15 to 19:  `r adolescent_birth_rate_text_15_19`  
 
 \textcolor{fgcolor}{\hlCeHDIBlue{Contraceptive Prevalence (modern methods):}}  
-- Aged 15 to 19:  `r contraceptive_prevalence_text_15_19`  
-- Aged 20 to 49:  `r contraceptive_prevalence_text_20_49`
-\begin{center}\textcolor{fgcolor}{\textbf{\hlCeHDIRed{Health Services Coverage (latest available data)}}}\end{center}  
+\ \ - Aged 15 to 19:  `r contraceptive_prevalence_text_15_19`  
+\ \ - Aged 20 to 49:  `r contraceptive_prevalence_text_20_49`
+\begin{center}\textcolor{fgcolor}{\textbf{\hlCeHDIRed{\ \ \ \ Health Services Coverage (latest available data) \ \ \ \ }}}\end{center}  
 \textcolor{fgcolor}{\hlCeHDIBlue{UHC service coverage index:}} `r UHC_estimate |> pull(Value)` in `r UHC_estimate |> pull(YEAR)`  
 \textcolor{fgcolor}{\hlCeHDIBlue{UHC Sub-Index on RMNCH:}} `r UHC_RMNCH_estimate |> pull(Value)` in `r UHC_RMNCH_estimate |> pull(YEAR)`  
 \textcolor{fgcolor}{\hlCeHDIBlue{Antenatal care coverage (\ge 4 visits):}} `r antenatal_WHO_text`  
