@@ -47,9 +47,6 @@ for (file_name in list.files(path = here("data", "API_data"), pattern = "\\.rds$
   assign(object_name, readRDS(here("data", "API_data", file_name)))
 }
 
-# UPR plot data
-health_rec_C <- params$rec_plot@data |> ungroup()
-
 # Life expectancy
 life_expectancy <- e01dt |> 
   left_join(state_geo |> sf::st_drop_geometry() |> select(iso3,iso2, loc_id),
@@ -97,17 +94,11 @@ fertility_rate_C <- tfr1dt |>
   ) |> 
   filter(iso3 == iso3_SUR) 
 
-relabel_na <- function(x) {
-  x <- as.character(x)
-  x[is.na(x)] <- "No data"
-  factor(x)
-}
 
 map_insetting <- function(
     p1, 
     plot_dat,
-    bbox_SUR_region_dynamic, bbox_sur, sur_area,
-    legend_title_text = "Update this text",
+    bbox_SUR_region_dynamic, bbox_sur, sur_area, 
     p_title_text="Update this text", 
     p_caption_text = "Update this text",
     title_size=14, title_margin=17,
@@ -136,12 +127,9 @@ map_insetting <- function(
       fill = "transparent",
       color = "red",
       linewidth = 0.5
-    )+
-    labs(fill = legend_title_text)+
-    theme_void()
+    )
   
   p3 <- p1 + guides(fill="none")+
-    theme_void()+
     ggnewscale::new_scale_fill()+ 
     geom_sf(
       # data=plot_dat, 
@@ -154,10 +142,9 @@ map_insetting <- function(
       xlim = c(bbox_sur[[1]]-.11, bbox_sur[[3]]+.11),
       ylim = c(bbox_sur[[2]]-.11, bbox_sur[[4]]+.11)
     ) +
-    # theme_void()+
+    theme_void()+
     theme(
-      plot.background = element_rect(fill="white"),
-      panel.background = element_rect(fill="transparent"), 
+      panel.background = element_rect(fill="white"), 
       panel.border = element_rect(color = "red")
     )+
     geom_rect(
@@ -208,11 +195,9 @@ map_insetting <- function(
     # sur_area > 11^11 | 
     area_b > 0.02*area_a
   ) {
-    p2 + 
-      theme_void() #+ p_title
+    p2 + p_title
   } else {
-    p2 + inset_element(p3, inset_dimensions[1], inset_dimensions[2],inset_dimensions[3],inset_dimensions[4])+ 
-      theme_void() #+ p_title
+    p2 + inset_element(p3, inset_dimensions[1], inset_dimensions[2],inset_dimensions[3],inset_dimensions[4]) + p_title
   }
 }
 
@@ -431,157 +416,117 @@ contraceptive_prevalence_text_20_49 <-
              pull(YEAR)
     )
   }
-
 ```
 ```{=latex}
 \begin{multicols}{2}
 \raggedcolumns     %new code
 \interlinepenalty=10000
 ```
-\begin{center}\textcolor{fgcolor}{\textbf{\hlCeHDIRed{\ \ \ \ The Right to Health \ \ \ \ }}}\end{center}  
-As enshrined in Article 12 of the International Convenant on Economic, Social and Cultural Rights, the right to health is an inclusive human right that extends beyond timely and appropriate health care to encompass the underlying determinants of health.  
-
-Under the Right to Health, States have the following obligations:
-\begin{myitemize}
-\item \textcolor{fgcolor}{\hlCeHDIBlue{Respect:}} refrain from directly or indirectly interfering with the enjoyment of the right to health.  
-\item \textcolor{fgcolor}{\hlCeHDIBlue{Protect:}} take effective measures to prevent third parties from undermining of violating the guarantees of the right to health.  
-\item \textcolor{fgcolor}{\hlCeHDIBlue{Fulfill:}} adopt appropriate legislative, administrative, budgetary, judicial, promotional, and other measures toward the full realization of the right to health.
-\end{myitemize}  
-
-\begin{center}\textcolor{fgcolor}{\textbf{\hlCeHDIRed{\ \ \ \ The Universal Periodic Review (UPR) \ \ \ \ }}}\end{center}  
-The UPR is a **State-led mechanism** that aims to evaluate each State’s human rights obligations and commitments. The review process is participatory and includes interactive discussions during which any UN Member State may issue recommendations to the State under review, which may then choose to **"Support"** or **"Note"** those recommendations.  
-
-A CeHDI analysis of recommendations from all cycles of the UPR was used to identify health-related recommendations, which have globally gained prominence in the UPR over time (for `r params$country_name`, health-related recommendations accounted for `r health_rec_C |> filter(cycle == "Cycle 1", health_related == "Health-related") |> pull(perc)` of all recommendations in Cycle 1, and `r health_rec_C |> filter(health_related == "Health-related") |> slice_max(order_by = cycle) |> pull(perc)` in `r health_rec_C |> filter(health_related == "Health-related") |> slice_max(order_by = cycle) |> pull(cycle)`). These recommendations were further categorized into the following themes:\footnote{Visit \href{https://cehdi-har.share.connect.posit.cloud/}{cehdi-har.share.connect.posit.cloud} for more details.\label{fn:cehdiHAR}}
-```{r, fig.width=5.2, fig.height=4}
-print(params$upr_all+
-        labs(title = params$country_name)+
-        theme(
-          axis.title.x = element_text(color = "#1c164d"),
-          axis.text = element_text(color = "#1c164d"),
-          plot.title = element_text(color = "#1c164d"),
-          plot.caption = element_text(color = "#1c164d"),
-          plot.background = element_rect(color = "#1c164d", fill = NA),
-          panel.background = element_blank(),
-          legend.background = element_blank()
-        )
-)
-```
-\columnbreak
 \begin{center}\textcolor{fgcolor}{\textbf{\hlCeHDIRed{\ \ \ \ Demographics \ \ \ \ }}}\end{center}  
 \textcolor{fgcolor}{\hlCeHDIBlue{Population:}}\footnote{\href{https://population.un.org/wpp}{population.un.org/wpp} \label{fn:WPP}} `r pop_text`  
+```{r, out.width="90%"}
+pop_age_wpp_C_split <- pop_age_wpp_C |> 
+  mutate(prop = case_when(Gender == "Male" ~ -prop*100, .default = prop*100)) |>
+  group_by(year, age) |> 
+  mutate(midpoint_prop = case_when(year == 2005 ~ NA,
+                                   year == 2020 ~ mean(prop))) |> 
+  ungroup()
+
+max_per <- max(pop_age_wpp_C_split$prop, na.rm=T)
+min_per <- min(pop_age_wpp_C_split$prop, na.rm=T)
+# begin ggplot
+##############
+ggplot()+  # default x-axis is age in years;
+  
+  # population data graph
+  geom_col(
+    data = pop_age_wpp_C_split |> filter(year == 2005),
+    mapping = aes(
+      x = age,
+      y = prop,
+      fill = Gender),
+    colour = "black",                               # black color around bars
+    alpha = 0.2,                                    # more transparent
+    width = 1)+                                     # full width
+  
+  # case data graph
+  geom_col(
+    data = pop_age_wpp_C_split |> filter(year == 2020), 
+    mapping = aes(
+      x = age,                               # age categories as original X axis
+      y = prop,                                # % as original Y-axis
+      fill = Gender),                             # fill of bars by gender
+    colour = "black",                               # black color around bars
+    alpha = 1,                                      # not transparent 
+    width = 0.4)+                                   # half width
+  
+  geom_point(
+    data=pop_age_wpp_C_split,
+    aes(x=age, y=midpoint_prop
+        # , color=midpoint_prop>0
+    ),
+    color = "yellow",
+    shape = "|",
+    # shape = 124,
+    size = 4
+  )+
+  
+  # flip the X and Y axes to make pyramid vertical
+  coord_flip()+
+  
+  # manually ensure that age-axis is ordered correctly
+  scale_x_discrete(limits = levels(pop_age_wpp_C_split$age))+     # defined in chunk above
+  
+  # set percent-axis
+  scale_y_continuous(
+    limits = c(min_per, max_per),                                      # min and max defined above
+    breaks = seq(floor(min_per), ceiling(max_per), by = 1),                # from min% to max% by 2
+    labels = paste0(                                                       # for the labels, paste together...
+      abs(seq(floor(min_per), ceiling(max_per), by = 1)), "%")
+  )+
+  
+  # designate colors and legend labels manually
+  scale_fill_manual(
+    # values = c("#7fc97f", "#beaed4")
+    values = c("#1c164d", "#ec5557")
+  ) +
+  # scale_color_manual(
+  #   # values = c("#7fc97f", "#beaed4")
+  #   values = c("#ec5557", "#1c164d")
+  # ) +
+  # scale_color_manual(
+  #   # values = c("#7fc97f", "#beaed4")
+  #   values = c("#ec5557", "#1c164d")
+  # ) +
+  # plot labels, titles, caption    
+  labs(
+    title = "Age and gender distribution in 2020, drawn over baseline in 2005",
+    x = "Age category",
+    y = "Percent of total",
+    fill = NULL) +
+  guides(color = "Midpoint")+
+  # optional aesthetic themes
+  theme(
+    legend.position = "inside",
+    legend.justification = c(1,1),
+    legend.position.inside = c(1,1), 
+    legend.background = element_rect(color = NA, fill = NA), 
+    legend.key = element_rect(color = NA, fill=NA),
+    legend.text = element_text(size=11, color = "#1c164d"),
+    axis.text = element_text(size=10, color = "#1c164d"),
+    axis.title = element_text(size=11, color = "#1c164d"),
+    panel.grid.major = element_blank(),
+    panel.grid.minor = element_blank(),
+    plot.background = element_rect(color = "#1c164d", fill = NA),
+    panel.background = element_rect(color = "#1c164d", fill=NA),
+    axis.line = element_line(colour = "#1c164d"),
+    plot.title = element_text(hjust = 0, color = "#1c164d"), 
+    plot.caption = element_text(hjust=0, size=11, face = "italic"))
+```
 \textcolor{fgcolor}{\hlCeHDIBlue{Total fertility rate:}}\textsuperscript{\ref{fn:WPP}} `r fertility_rate_text`  
+\columnbreak
 
 \begin{center}\textcolor{fgcolor}{\textbf{\hlCeHDIRed{\ \ \ \ Key Health Indicators (latest available data) \ \ \ \ }}}\end{center}  
-\textcolor{fgcolor}{\hlCeHDIBlue{Maternal mortality ratio (MMR):}}\textsuperscript{\ref{fn:whoGHO}} `r MMR |> filter(SpatialDim == iso3_SUR, YEAR == 2023) |> pull(NumericValue) |> round(digits = 0)` per 100,000 livebirths in 2023 (`r MMR |> filter(SpatialDim == iso3_SUR, YEAR == 2005) |> pull(NumericValue) |> round(digits = 0)` in 2005)  
-```{r, }
-# mmr_estimate_2023 = params$mmr_map_plot@data |>
-#   filter(country_name == params$country_name,
-#          YEAR == "2023") |>
-#   pull(NumericValue) |>
-#   round(0)
-# 
-# map_insetting(
-#   p1 = params$mmr_map_plot,
-#   p_caption_text = paste0(params$country_name, ": ", mmr_estimate_2023, " per 100,000 live births"),
-#   legend_title_text = "MMR",
-#   p_title_text = "Maternal mortality ratio (MMR) estimates in 2023",
-#   bbox_SUR_region_dynamic = params$bbox_SUR_region_dynamic,
-#   bbox_sur = params$bbox_selected_SUR,
-#   sur_area = params$sur_area
-# )+labs(fill="MMR")
-
-p1<-MMR |> 
-  filter(YEAR==2023, !is.na(country_name)) |> 
-  right_join(state_geo, by=join_by(SpatialDim==iso3)) |> 
-  mutate(selected_sur = factor(case_when(
-    country_name == params$country_name ~ params$country_name,
-    .default = "Other"
-  ),
-  levels = c(params$country_name, "Other")
-  )) |> 
-  ggplot(aes(geometry = polygon))+
-  geom_sf(aes(fill=mmr_cat), color = NA)+
-  scale_fill_brewer(palette = "YlOrRd", na.value = "grey80", labels = relabel_na)+
-  theme_void()+
-  labs(fill="MMR")+
-  coord_sf(
-    # expand = FALSE,
-    xlim = c(params$bbox_SUR_region_dynamic[[1]],params$bbox_SUR_region_dynamic[[3]]),
-    ylim = c(params$bbox_SUR_region_dynamic[[2]], params$bbox_SUR_region_dynamic[[4]])
-  )
-
-p2 <- p1 +
-  # geom_sf(color="black", fill=NA)+
-  geom_rect(
-    aes(
-      xmin = params$bbox_selected_SUR["xmin"] - 0.7,
-      xmax = params$bbox_selected_SUR["xmax"] + 0.7,
-      ymin = params$bbox_selected_SUR["ymin"] - 0.7,
-      ymax = params$bbox_selected_SUR["ymax"] + 0.7
-    ),
-    fill = "transparent",
-    color = "red",
-    linewidth = 0.5
-  )
-
-p3<-p1+
-  guides(fill="none")+
-  ggnewscale::new_scale_fill()+ 
-  geom_sf(
-    aes(fill = selected_sur),
-    color = "transparent")+ 
-  scale_fill_manual(values=c("transparent", "white"))+
-  guides(fill="none")+
-  coord_sf(
-    expand=FALSE,
-    xlim = c(params$bbox_selected_SUR[[1]]-.11, params$bbox_selected_SUR[[3]]+.11),
-    ylim = c(params$bbox_selected_SUR[[2]]-.11, params$bbox_selected_SUR[[4]]+.11)
-  )+
-  theme(panel.background = element_rect(fill="white"))+
-  geom_rect(
-    aes(
-      xmin = params$bbox_selected_SUR["xmin"]-.1,
-      xmax = params$bbox_selected_SUR["xmax"]+.1,
-      ymin = params$bbox_selected_SUR["ymin"]-.1,
-      ymax = params$bbox_selected_SUR["ymax"]+.1
-    ),
-    fill = "transparent",
-    color = "red",
-    linewidth = 0.5
-  )
-
-a<-ggplot_build(p2)
-b<-ggplot_build(p3)
-multiplier_a <- abs(a$layout$coord$limits$x[1]-a$layout$coord$limits$x[2])/abs(a$layout$coord$limits$y[1]-a$layout$coord$limits$y[2])
-multiplier_b <- abs(b$layout$coord$limits$x[1]-b$layout$coord$limits$x[2])/abs(b$layout$coord$limits$y[1]-b$layout$coord$limits$y[2])
-
-area_a <- abs(a$layout$coord$limits$x[1]-a$layout$coord$limits$x[2])*abs(a$layout$coord$limits$y[1]-a$layout$coord$limits$y[2])
-area_b <- abs(b$layout$coord$limits$x[1]-b$layout$coord$limits$x[2])*abs(b$layout$coord$limits$y[1]-b$layout$coord$limits$y[2])
-
-key_dim <- 0.3/(multiplier_a/multiplier_b)
-inset_dimensions <- if(multiplier_b<=3){c(0,0,key_dim,key_dim*multiplier_a/multiplier_b)}else{c(0,0,key_dim*multiplier_a/multiplier_b,0.2)}
-
-if (
-  # sur_area > 11^11 | 
-  area_b > 0.02*area_a
-) {
-  p2
-} else {
-  p2 + inset_element(p3, inset_dimensions[1], inset_dimensions[2],inset_dimensions[3],inset_dimensions[4])+ plot_annotation(
-    theme = theme(plot.margin = margin(0,0,0,0), plot.background = element_blank()
-                  ))
-}
-
-# params$mmr_map_plot
-
-# params$mmr_map_plot+theme(
-#   plot.background = element_blank()
-# )&
-# plot_annotation(theme = theme(
-#   plot.background = element_rect(color = "#1c164d", fill=NA)
-#   )
-#   )
-```
 \textcolor{fgcolor}{\hlCeHDIBlue{Life expectancy at birth:}}\textsuperscript{\ref{fn:WPP}} `r life_expectancy_text`
 <!-- Maternal Mortality Ratio:   -->
 <!-- Under-Five Mortality Rate   -->  
@@ -601,6 +546,139 @@ if (
 \textcolor{fgcolor}{\hlCeHDIBlue{HPV coverage (9-14 year old girls):}}\textsuperscript{\ref{fn:whoGHO}}  `r HPV_coverage_text`  
 \textcolor{fgcolor}{\hlCeHDIBlue{HPV vaccine introduction:}}\footnote{\href{https://immunizationdata.who.int}{immunizationdata.who.int} \label{fn:whoimmunization}} `r HPV_national_alt_text`  
 \textcolor{fgcolor}{\hlCeHDIBlue{DTP3 coverage (among 1-year-olds):}}\textsuperscript{\ref{fn:whoGHO}} `r DTP3_coverage_text`  
+```{=latex}
+\end{multicols}
+```
+\redrule
+
+```{=latex}
+\setlength\columnseprule{.3pt}
+\renewcommand{\columnseprulecolor}{\color{CeHDIRed}}
+\begin{multicols}{2}
+\raggedcolumns     %new code
+\interlinepenalty=10000
+```
+<!-- \columnbreak -->
+
+```{r, fig.width=6}
+mmr_estimate_2023 = params$mmr_map_plot@data |>
+  filter(country_name == params$country_name,
+         YEAR == "2023") |>
+  pull(NumericValue) |>
+  round(0)
+
+map_insetting(
+  p1 = params$mmr_map_plot,
+  p_caption_text = paste0(params$country_name, ": ", mmr_estimate_2023, " per 100,000 live births"),
+  p_title_text = "Maternal mortality ratio (MMR) estimates in 2023",
+  bbox_SUR_region_dynamic = params$bbox_SUR_region_dynamic,
+  bbox_sur = params$bbox_selected_SUR,
+  sur_area = params$sur_area
+)
+
+# params$mmr_map_plot
+
+# params$mmr_map_plot+theme(
+#   plot.background = element_blank()
+# )&
+# plot_annotation(theme = theme(
+#   plot.background = element_rect(color = "#1c164d", fill=NA)
+#   )
+#   )
+```
+
+\pagebreak
+
+\begin{center}\textcolor{fgcolor}{\textbf{\hlCeHDIRed{\ \ \ \ The Right to Health \ \ \ \ }}}\end{center}  
+As enshrined in Article 12 of the International Convenant on Economic, Social and Cultural Rights, the right to health is an inclusive human right that extends beyond timely and appropriate health care to encompass the underlying determinants of health.  
+
+It forms an essential part of States’ obligations under international human rights law and provides a binding normative framework for advancing well-being, equity, and dignity across all sectors of society.  
+
+Under the Right to Health, States have the following obligations:
+\begin{myitemize}
+\item \textcolor{fgcolor}{\hlCeHDIBlue{Respect:}} refrain from directly or indirectly interfering with the enjoyment of the right to health.  
+\item \textcolor{fgcolor}{\hlCeHDIBlue{Protect:}} take effective measures to prevent third parties from undermining of violating the guarantees of the right to health.  
+\item \textcolor{fgcolor}{\hlCeHDIBlue{Fulfill:}} adopt appropriate legislative, administrative, budgetary, judicial, promotional, and other measures toward the full realization of the right to health.
+\end{myitemize}  
+
+\begin{center}\textcolor{fgcolor}{\textbf{\hlCeHDIRed{\ \ \ \ The Universal Periodic Review (UPR) \ \ \ \ }}}\end{center}  
+The UPR is a **State-led mechanism** that aims to evaluate each State’s human rights obligations and commitments. The review process is participatory and includes interactive discussions during which any UN Member State may issue recommendations to the State under review, which may then choose to ‘support’ or ‘note’ those recommendations.  
+\includegraphics[width=\columnwidth]{WHO_UPR-removebg3.png}
+An analysis of recommendations from all cycles of the UPR was used to identify health-related recommendations within the following themes:\footnote{Visit \href{https://cehdi-har.share.connect.posit.cloud/}{cehdi-har.share.connect.posit.cloud} for more details.\label{fn:cehdiHAR}}
+```{r, fig.width=6, fig.height=5.5}
+print(params$upr_all+
+        labs(title = params$country_name)+
+        theme(
+          axis.title.x = element_text(color = "black"),
+          plot.background = element_rect(color = "#1c164d", fill = NA),
+          panel.background = element_blank(),
+          legend.background = element_blank()
+        )
+)
+```
+
+**Note:** See wrapfig package: <https://latex-tutorial.com/wrap-image-text/>
+```{r, fig.width=4, fig.height=3.5, out.width="50%"}
+print(
+  params$rec_plot+
+    labs(y="Recommendations (N)")+
+    geom_text(aes(label = sprintf("%1.0f", n_tot), y = n_tot, vjust = -0.2), size = 5, fontface = "bold", color = "#1c164d") +
+    theme(
+      panel.grid = element_blank(),
+      axis.text.x = element_text(size = 12, color = "#1c164d"),
+      axis.text.y = element_text(size = 12, color = "#1c164d"),
+      axis.title.x = element_blank(),
+      axis.title.y = element_text(size = 14, color = "#1c164d"),
+      legend.position = "bottom",
+      # legend.position = c(0.01, 0.99),
+      # legend.justification = c("left", "top"),
+      legend.text = element_text(size = 12,colour = "#1c164d"),
+      # plot.background = element_blank(),
+      plot.background = element_rect(color = "#1c164d", fill = NA),
+      panel.border = element_rect(color = "#1c164d"),
+      # panel.border = element_blank(),
+      axis.ticks = element_line(color = "#1c164d"),
+      panel.background = element_blank(),
+      legend.background = element_blank(),
+      strip.background = element_blank(),
+      strip.text = element_blank(),
+      plot.title = element_blank()
+    )
+)
+```
+
+<!-- ```{r, fig.height=3, out.width="80%"} -->
+<!-- penguins |> ggplot(aes(x = island, y = bill_len, fill=species))+geom_violin() -->
+<!-- ``` -->
+
+<!-- ```{r} -->
+<!-- penguins |> ggplot(aes(x = island, y = bill_len, fill=species))+geom_boxplot() -->
+<!-- ``` -->
+
+<!-- ```{r, fig.height=3, out.width="80%"} -->
+<!-- penguins |> ggplot(aes(x = island, y = bill_len, fill=species))+geom_violin() -->
+<!-- ``` -->
+
+<!-- ```{r, fig.width=3, out.height="500pt", } -->
+<!-- penguins |> ggplot(aes(x = island, y = bill_len, fill=species))+geom_boxplot() -->
+<!-- ``` -->
+
+<!-- ```{r, fig.height=3, out.width="80%"} -->
+<!-- penguins |> ggplot(aes(x = island, y = bill_len, fill=species))+geom_violin() -->
+<!-- ``` -->
+
+<!-- ```{r} -->
+<!-- penguins |> ggplot(aes(x = island, y = bill_len, fill=species))+geom_boxplot() -->
+<!-- ``` -->
+
+<!-- ```{r, fig.height=3, out.width="80%"} -->
+<!-- penguins |> ggplot(aes(x = island, y = bill_len, fill=species))+geom_violin() -->
+<!-- ``` -->
+
+<!-- ```{r} -->
+<!-- penguins |> ggplot(aes(x = island, y = bill_len, fill=species))+geom_boxplot() -->
+<!-- ``` -->
+
 ```{=latex}
 \end{multicols}
 ```
