@@ -18,8 +18,8 @@ pacman::p_load(
   # necountries,
   patchwork,
   pdftools,
-  tinytex,
-  quarto
+  tinytex
+  # quarto
 )
 
 # tinytex::install_tinytex()
@@ -888,6 +888,8 @@ server <- function(input, output, session) {
         # Copy Rmd and other relevant files into that directory.
         temp_report_path <- file.path(temp_dir, "report-template.Rmd")
         file.copy("report-template.Rmd", temp_report_path, overwrite = TRUE)
+        # temp_report_path <- file.path(temp_dir, "report-template-2.Rmd")
+        # file.copy("report-template-2.Rmd", temp_report_path, overwrite = TRUE)
         file.copy("preamble.tex", temp_dir, overwrite = TRUE)
         file.copy("logo.png", temp_dir, overwrite = TRUE)
         file.copy("logo2.png", temp_dir, overwrite = TRUE)
@@ -1219,7 +1221,7 @@ server <- function(input, output, session) {
       group_by(theme) |>
       mutate(
         n_sup = paste0("(", sprintf("%1.0f", n / sum(n) * 100), "%)"),
-        n_sup = case_when(n_tot_theme == 0 ~ "(NA)", .default = n_sup)
+        n_sup = case_when(n_tot_theme == 0 ~ "", .default = n_sup)
       ) |>
       ungroup() |>
       filter(!theme %in% c("health_related", "TB_malaria", "NTD")) |>
@@ -1269,7 +1271,7 @@ server <- function(input, output, session) {
         data = a |> filter(response_upr == "Supported"),
         aes(label = paste0(n_tot_theme, " ", n_sup), x = perc_theme),
         hjust = -0.05,
-        size = 3, 
+        size = 3, color = "#1c164d"
         # vjust = 0.25
       )
   })
@@ -1556,7 +1558,7 @@ server <- function(input, output, session) {
       group_by(theme) |>
       mutate(
         n_sup = paste0("(", sprintf("%1.0f", n / sum(n) * 100), "%)"),
-        n_sup = case_when(n_tot_theme == 0 ~ "(NA)", .default = n_sup)
+        n_sup = case_when(n_tot_theme == 0 ~ "", .default = n_sup)
       ) |>
       ungroup() |>
       filter(!theme %in% c("health_related", "TB_malaria", "NTD")) |>
@@ -1603,7 +1605,7 @@ server <- function(input, output, session) {
       geom_text(
         data = a |> filter(response_upr == "Supported"),
         aes(label = paste0(n_tot_theme, " ", n_sup), x = perc_theme),
-        hjust = -0.15, size = 3, vjust = 0.25
+        hjust = -0.15, size = 3, vjust = 0.25, color = "#1c164d"
       )
     p
   })
