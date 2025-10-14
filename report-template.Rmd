@@ -262,7 +262,7 @@ life_expectancy_text <- paste0(life_expectancy_C |>
                                life_expectancy_C |> 
                                  filter(year==min(year)) |>  
                                  pull(e0B) |> round(1),
-                               " years in ",
+                               " in ",
                                life_expectancy_C |> 
                                  filter(year==min(year)) |> 
                                  pull(year),
@@ -472,7 +472,7 @@ print(params$upr_all+
 \textcolor{fgcolor}{\hlCeHDIBlue{Total fertility rate:}}\textsuperscript{\ref{fn:WPP}} `r fertility_rate_text`  
 
 \begin{center}\textcolor{fgcolor}{\textbf{\hlCeHDIRed{\ \ \ \ Key Health Indicators (latest available data) \ \ \ \ }}}\end{center}  
-\textcolor{fgcolor}{\hlCeHDIBlue{Maternal mortality ratio (MMR):}}\textsuperscript{\ref{fn:whoGHO}} `r MMR |> filter(SpatialDim == iso3_SUR, YEAR == 2023) |> pull(NumericValue) |> round(digits = 0)` per 100,000 livebirths in 2023 (`r MMR |> filter(SpatialDim == iso3_SUR, YEAR == 2005) |> pull(NumericValue) |> round(digits = 0)` in 2005)  
+\textcolor{fgcolor}{\hlCeHDIBlue{Maternal mortality ratio (MMR):}}\textsuperscript{\ref{fn:whoGHO}} `r MMR |> filter(SpatialDim == iso3_SUR, YEAR == 2023) |> pull(NumericValue) |> round(digits = 0)` maternal deaths per 100,000 live births in 2023 (`r MMR |> filter(SpatialDim == iso3_SUR, YEAR == 2005) |> pull(NumericValue) |> round(digits = 0)` in 2005)  
 ```{r, }
 # mmr_estimate_2023 = params$mmr_map_plot@data |>
 #   filter(country_name == params$country_name,
