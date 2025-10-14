@@ -503,7 +503,7 @@ p1<-MMR |>
   geom_sf(aes(fill=mmr_cat), color = NA)+
   scale_fill_brewer(palette = "YlOrRd", na.value = "grey80", labels = relabel_na)+
   theme_void()+
-  labs(fill="MMR")+
+  labs(fill="MMR\nin 2023")+
   coord_sf(
     # expand = FALSE,
     xlim = c(params$bbox_SUR_region_dynamic[[1]],params$bbox_SUR_region_dynamic[[3]]),
