@@ -117,120 +117,6 @@ relabel_na <- function(x) {
   x[is.na(x)] <- "No data"
   factor(x)
 }
-
-map_insetting <- function(
-    p1, 
-    plot_dat,
-    bbox_SUR_region_dynamic, bbox_sur, sur_area,
-    legend_title_text = "Update this text",
-    p_title_text="Update this text", 
-    p_caption_text = "Update this text",
-    title_size=14, title_margin=17,
-    caption_size=14
-) {
-  p2 <- p1 + 
-    geom_sf(
-      # data=plot_dat, 
-      color="grey80", fill="transparent")+
-    coord_sf(
-      # expand = FALSE,
-      xlim = c(bbox_SUR_region_dynamic[[1]],bbox_SUR_region_dynamic[[3]]),
-      ylim = c(bbox_SUR_region_dynamic[[2]], bbox_SUR_region_dynamic[[4]])
-      
-      # Alternative mapping centered on the selected State
-      # xlim = c(max(-180, bbox_selected_SUR()[[1]] - 20), min(180, bbox_selected_SUR()[[3]] + 20)),
-      # ylim = c(max(-55.67295, bbox_selected_SUR()[[2]] - 20), min(83.6341, bbox_selected_SUR()[[4]] + 20))
-    )+
-    geom_rect(
-      aes(
-        xmin = bbox_sur["xmin"] - 0.7,
-        xmax = bbox_sur["xmax"] + 0.7,
-        ymin = bbox_sur["ymin"] - 0.7,
-        ymax = bbox_sur["ymax"] + 0.7
-      ),
-      fill = "transparent",
-      color = "red",
-      linewidth = 0.5
-    )+
-    labs(fill = legend_title_text)+
-    theme_void()
-  
-  p3 <- p1 + guides(fill="none")+
-    theme_void()+
-    ggnewscale::new_scale_fill()+ 
-    geom_sf(
-      # data=plot_dat, 
-      aes(geometry=polygon, fill = selected_sur),
-      color = "transparent")+ 
-    scale_fill_manual(values=c("transparent", "white"))+
-    # scale_linewidth_manual(values = c(0.2, 0.1)) +
-    coord_sf(
-      expand=FALSE,
-      xlim = c(bbox_sur[[1]]-.11, bbox_sur[[3]]+.11),
-      ylim = c(bbox_sur[[2]]-.11, bbox_sur[[4]]+.11)
-    ) +
-    # theme_void()+
-    theme(
-      plot.background = element_rect(fill="white"),
-      panel.background = element_rect(fill="transparent"), 
-      panel.border = element_rect(color = "red")
-    )+
-    geom_rect(
-      aes(
-        xmin = bbox_sur["xmin"]-.1,
-        xmax = bbox_sur["xmax"]+.1,
-        ymin = bbox_sur["ymin"]-.1,
-        ymax = bbox_sur["ymax"]+.1
-      ),
-      fill = "transparent",
-      color = "red",
-      linewidth = 0.5
-    )+
-    guides(fill = "none") +
-    labs(
-      # subtitle = "(map zoom)", 
-      caption = NULL)
-  
-  p_title <- plot_annotation(
-    title = p_title_text,
-    caption = p_caption_text,
-    theme = theme(
-      plot.background = element_rect(color = "#1c164d", fill=NA),
-      plot.title = element_textbox_simple(
-        size = title_size,
-        margin = margin(t = title_margin, b = title_margin, r=0, l=0, unit = "pt")
-      ),
-      plot.caption = element_textbox_simple(
-        size = caption_size, halign = 0.5,
-        margin = margin(t = 10, b = 2, r=0, l=0, unit = "pt")
-      )
-    )
-  )
-  
-  # Calculate Inset dimensions for lower left
-  a<-ggplot_build(p2)
-  b<-ggplot_build(p3)
-  multiplier_a <- abs(a$layout$coord$limits$x[1]-a$layout$coord$limits$x[2])/abs(a$layout$coord$limits$y[1]-a$layout$coord$limits$y[2])
-  multiplier_b <- abs(b$layout$coord$limits$x[1]-b$layout$coord$limits$x[2])/abs(b$layout$coord$limits$y[1]-b$layout$coord$limits$y[2])
-  
-  area_a <- abs(a$layout$coord$limits$x[1]-a$layout$coord$limits$x[2])*abs(a$layout$coord$limits$y[1]-a$layout$coord$limits$y[2])
-  area_b <- abs(b$layout$coord$limits$x[1]-b$layout$coord$limits$x[2])*abs(b$layout$coord$limits$y[1]-b$layout$coord$limits$y[2])
-  
-  key_dim <- 0.3/(multiplier_a/multiplier_b)
-  inset_dimensions <- if(multiplier_b<=3){c(0,0,key_dim,key_dim*multiplier_a/multiplier_b)}else{c(0,0,key_dim*multiplier_a/multiplier_b,0.2)}
-  
-  if (
-    # sur_area > 11^11 | 
-    area_b > 0.02*area_a
-  ) {
-    p2 + 
-      theme_void() #+ p_title
-  } else {
-    p2 + inset_element(p3, inset_dimensions[1], inset_dimensions[2],inset_dimensions[3],inset_dimensions[4])+ 
-      theme_void() #+ p_title
-  }
-}
-
 ```
 
 ```{r}
@@ -312,19 +198,11 @@ fertility_rate_text <- paste0(fertility_rate_C |>
                               ")")
 
 constitutions_C <- constitutions |> filter(iso3 == iso3_SUR)
+
+
 ```
 
-\maketitle
-# \underline{`r params$country_name`}  
-
-<!-- Some brief text here, for context, that runs the \textcolor{CeHDIRed}{entire width of the page}. Indicator results, tables, and figures can go into the columns below. -->
-```{r, out.width="30%", warning=FALSE}
-p1<-UHC_all |> 
-  filter(country_name == params$country_name, 
-         IndicatorCode == "UHC_INDEX_REPORTED") |>
-  ggplot(aes(x = YEAR, y= NumericValue))+geom_line()+
-  theme_void()
-
+```{r, warning=FALSE}
 #####################
 HPV_coverage_C <- HPV_coverage |> filter(SpatialDim==iso3_SUR)
 HPV_coverage_text <- if(is_empty(HPV_coverage_C |> filter(YEAR == max(YEAR)) |> pull(NumericValue))){
@@ -332,6 +210,24 @@ HPV_coverage_text <- if(is_empty(HPV_coverage_C |> filter(YEAR == max(YEAR)) |> 
 } else{
   paste0(HPV_coverage_C |> filter(YEAR == max(YEAR)) |> pull(NumericValue), 
          "% in ", HPV_coverage_C |> filter(YEAR == max(YEAR)) |> pull(YEAR))
+}
+
+family_planning_C <- family_planning |> filter(SpatialDim==iso3_SUR)
+family_planning_text <- if(is_empty(family_planning_C |> filter(YEAR == max(YEAR)) |> pull(NumericValue))){
+  "Data not available"
+} else{
+  paste0(family_planning_C |> filter(YEAR == max(YEAR)) |> pull(Value), 
+         "% in ", family_planning_C |> filter(YEAR == max(YEAR)) |> pull(YEAR))
+}
+
+unintended_pregnancy_C <- unintended_pregnancy |> 
+  filter(SpatialDim==iso3_SUR, 
+         Dim1 == "UNCERTAINTY_INTERVAL_UI95")
+unintended_pregnancy_text <- if(is_empty(unintended_pregnancy_C |> filter(YEAR == max(YEAR)) |> pull(NumericValue))){
+  "Data not available"
+} else{
+  paste0(unintended_pregnancy_C |> filter(YEAR == max(YEAR)) |> pull(NumericValue) |> round(0), 
+         " per 1,000 women in ", unintended_pregnancy_C |> filter(YEAR == max(YEAR)) |> pull(YEAR))
 }
 
 
@@ -448,6 +344,9 @@ contraceptive_prevalence_text_20_49 <-
   }
 
 ```
+\maketitle
+# \underline{`r params$country_name`}
+<!-- Some brief text here, for context, that runs the \textcolor{CeHDIRed}{entire width of the page}. Indicator results, tables, and figures can go into the columns below. -->
 ```{=latex}
 \begin{multicols}{2}
 \raggedcolumns     %new code
@@ -478,6 +377,13 @@ print(params$upr_all+
         )
 )
 ```
+\begin{center}\textcolor{fgcolor}{\textbf{\hlCeHDIRed{\ \ \ \ Legal Basis for Health \ \ \ \ }}}\end{center}  
+\textcolor{fgcolor}{\hlCeHDIBlue{Constitutional guarantees for citizens (as of June 2024):}}\footnote{\href{https://www.worldpolicycenter.org/maps-data/data-download/constitutions-data-download}{worldpolicycenter.org} \label{fn:worldpolicy}}  
+\ \ - Right to health: `r constitutions |> filter(iso3 == iso3_SUR) |> pull(const_health)`  
+\ \ - Right to public health: `r constitutions |> filter(iso3 == iso3_SUR) |> pull(const_publichealth)`  
+\ \ - Right to medical care: `r constitutions |> filter(iso3 == iso3_SUR) |> pull(const_medcare)`  
+\ \ - Right to a healthy environment: `r constitutions |> filter(iso3 == iso3_SUR) |> pull(const_enviro)`  
+\textcolor{fgcolor}{\hlCeHDIBlue{Legal status of abortion (as of June 2023):}}\footnote{\href{https://reproductiverights.org/wp-content/uploads/2023/12/WALM_2023-v3-Updated_12-20-23.pdf}{reproductiverights.org} \label{fn:reproductiverights}} `r world_abortion_laws |> filter(country == params$country_name) |> pull(category)`
 \columnbreak
 \begin{center}\textcolor{fgcolor}{\textbf{\hlCeHDIRed{\ \ \ \ Demographics \ \ \ \ }}}\end{center}  
 \textcolor{fgcolor}{\hlCeHDIBlue{Population:}}\footnote{\href{https://population.un.org/wpp}{population.un.org/wpp} \label{fn:WPP}} `r pop_text`  
@@ -595,43 +501,101 @@ if (
 #   )
 #   )
 ```
-<!-- Maternal Mortality Ratio:   -->
-<!-- Under-Five Mortality Rate   -->  
+```{r, fig.width=8, fig.height=1.5}
+start_year <- "2005"
+dat_plot <- MMR |>
+  mutate(selected_sur = factor(case_when(
+    country_name == params$country_name ~ params$country_name,
+    .default = "Other"
+  ),
+  levels = c(params$country_name, "Other")
+  )) |>
+  filter(country_name %in% c(
+    params$country_name,
+    nearest_neighbors_list[, params$country_name][1:4]
+  )) |>
+  filter(year >= ymd(paste0(start_year, "-01-01"))) |>
+  mutate(country_name = fct_relevel(country_name, params$country_name)) |>
+  group_by(country_name) |>
+  mutate(
+    num_stand = NumericValue - NumericValue[YEAR == start_year],
+    num_low = Low - NumericValue[YEAR == start_year],
+    num_high = High - NumericValue[YEAR == start_year]
+  ) |>
+  ungroup()
+
+hline_data <- dat_plot |>
+  filter(YEAR == as.numeric(start_year))
+
+dat_plot |>
+  mutate(country_name = fct_relevel(country_name, params$country_name)) |>
+  ggplot(aes(x = YEAR, y = NumericValue)) +
+  labs(
+    # title = paste0("Trends in MMR, neighboring States plotted for comparison"),
+    x = NULL, y = "MMR estimate",
+    color = NULL,
+    fill = NULL
+  ) +
+  scale_x_continuous(breaks = c(2005, 2020), 
+                     expand = expansion(mult = c(0, 0)))+
+  geom_line(lwd = 1, aes(color = selected_sur)) +
+  geom_ribbon(aes(ymin = Low, ymax = High, fill = selected_sur), color = NA, alpha = 0.4) +
+  scale_color_manual(values = c("#ec5557", "#1c164d")) +
+  scale_fill_manual(values = c("#ec5557", "#1c164d")) +
+  guides(color = "none", lwd = "none", fill = "none") +
+  facet_wrap(. ~ country_name, nrow=1, scales = "free",
+             labeller = labeller(country_name = label_wrap_gen(15))) +
+  geom_hline(data = hline_data, aes(yintercept = NumericValue), lty = 2) +
+  theme_bw()+
+  theme(
+    axis.text = element_text(color = "#1c164d"),
+    axis.title = element_text(color = "#1c164d"),
+    axis.line = element_line(color = "#1c164d"),
+    axis.ticks = element_line(color = "#1c164d"),
+    panel.border = element_blank(),
+    plot.background = element_blank(),
+    panel.background = element_blank(),
+    strip.background =element_rect(fill="#1c164d"),
+    strip.text = element_text(colour = 'white')
+  )+
+  coord_cartesian(clip="off")
+```
+
+\textcolor{fgcolor}{\hlCeHDIBlue{Met need for family planning:}}\textsuperscript{\ref{fn:whoGHO}} `r family_planning_text`  
 \textcolor{fgcolor}{\hlCeHDIBlue{Adolescent birth rate:}}\footnote{\href{https://www.who.int/data/gho/info/gho-odata-api}{WHO Global Health Observatory} \label{fn:whoGHO}}  
 \ \ - Aged 10 to 14: `r adolescent_birth_rate_text_10_14`  
 \ \ - Aged 15 to 19: `r adolescent_birth_rate_text_15_19`  
-
-\textcolor{fgcolor}{\hlCeHDIBlue{Contraceptive prevalence (modern methods):}}\textsuperscript{\ref{fn:whoGHO}}  
-\ \ - Aged 15 to 19:  `r contraceptive_prevalence_text_15_19`  
-\ \ - Aged 20 to 49:  `r contraceptive_prevalence_text_20_49`
+<!-- \textcolor{fgcolor}{\hlCeHDIBlue{Contraceptive prevalence (modern methods):}}\textsuperscript{\ref{fn:whoGHO}}   -->
+<!-- \ \ - Aged 15 to 19:  `r contraceptive_prevalence_text_15_19`   -->
+<!-- \ \ - Aged 20 to 49:  `r contraceptive_prevalence_text_20_49` -->
 \begin{center}\textcolor{fgcolor}{\textbf{\hlCeHDIRed{\ \ \ \ Health Services Coverage (latest available data) \ \ \ \ }}}\end{center}  
 <!-- \textcolor{fgcolor}{\hlCeHDIBlue{UHC service coverage index:}}\textsuperscript{\ref{fn:whoGHO}} `r UHC_estimate |> pull(Value)` in `r UHC_estimate |> pull(YEAR)`   -->
 \textcolor{fgcolor}{\hlCeHDIBlue{UHC service coverage}}\textsuperscript{\ref{fn:whoGHO}} (`r UHC_all |> filter(COUNTRY == iso3_SUR, IndicatorCode == "UHC_INDEX_REPORTED", YEAR == min(YEAR)) |> pull(YEAR)` to `r UHC_all |> filter(COUNTRY == iso3_SUR, IndicatorCode == "UHC_INDEX_REPORTED", YEAR == max(YEAR)) |> pull(YEAR)`):
 ```{r, fig.align="center", fig.width=10, fig.height=2, out.width="90%"}
 uhc_plots <- function(dat, title_text = "Update title", yMAX = 100){
   p_data <- dat |> 
-  filter(COUNTRY == iso3_SUR)
-label_data <- p_data |> 
-  filter(YEAR %in% c(max(YEAR), min(YEAR)))
-p1<-p_data |> 
-  # mutate(val_maxtime = NumericValue[TimeDim==max(TimeDim)])
-  ggplot(aes(x=YEAR, y= NumericValue))+
-  geom_hline(aes(yintercept = yMAX), color = "green", lty=2, lwd=1)+
-  geom_line(color = "#ec5557", lwd=1, fill=NA)+
-  geom_text(
-    data = label_data, # Use the special, single-row data frame
-    aes(label = Value, # The text for the label
-    nudge_y = -4),      # Nudge the label slightly
-    size=6,
-    color = "#1c164d", # Match theme color
-    fontface = "bold" # Make it stand out
-  )+
-  scale_y_continuous(limits = c(0,yMAX))+
-  theme_void()+
-  labs(title = title_text)+
-  theme(axis.line = element_line(color = "#1c164d"))+
-  coord_cartesian(clip = "off")
-p1
+    filter(COUNTRY == iso3_SUR)
+  label_data <- p_data |> 
+    filter(YEAR %in% c(max(YEAR), min(YEAR)))
+  p1<-p_data |> 
+    # mutate(val_maxtime = NumericValue[TimeDim==max(TimeDim)])
+    ggplot(aes(x=YEAR, y= NumericValue))+
+    geom_hline(aes(yintercept = yMAX), color = "green", lty=2, lwd=1)+
+    geom_line(color = "#ec5557", lwd=1, fill=NA)+
+    geom_text(
+      data = label_data, # Use the special, single-row data frame
+      aes(label = Value, # The text for the label
+          nudge_y = -4),      # Nudge the label slightly
+      size=6,
+      color = "#1c164d", # Match theme color
+      fontface = "bold" # Make it stand out
+    )+
+    scale_y_continuous(limits = c(0,yMAX))+
+    theme_void()+
+    labs(title = title_text)+
+    theme(axis.line = element_line(color = "#1c164d"))+
+    coord_cartesian(clip = "off")
+  p1
 }
 
 p1<-uhc_plots(UHC_all |> filter(IndicatorCode == "UHC_INDEX_REPORTED"), 
@@ -656,14 +620,7 @@ p5<-uhc_plots(UHC_all |> filter(IndicatorCode == "UHC_SCI_RMNCH"),
 
 \textcolor{fgcolor}{\hlCeHDIBlue{HPV coverage (9-14 year old girls):}}\textsuperscript{\ref{fn:whoGHO}}  `r HPV_coverage_text`  
 \textcolor{fgcolor}{\hlCeHDIBlue{HPV vaccine introduction:}}\footnote{\href{https://immunizationdata.who.int}{immunizationdata.who.int} \label{fn:whoimmunization}} `r HPV_national_alt_text`  
-\textcolor{fgcolor}{\hlCeHDIBlue{DTP3 coverage (among 1-year-olds):}}\textsuperscript{\ref{fn:whoGHO}} `r DTP3_coverage_text`  
-\begin{center}\textcolor{fgcolor}{\textbf{\hlCeHDIRed{\ \ \ \ Legal Basis for Health \ \ \ \ }}}\end{center}  
-\textcolor{fgcolor}{\hlCeHDIBlue{Constitutional guarantees for citizens (as of June 2024):}}\footnote{\href{https://www.worldpolicycenter.org/maps-data/data-download/constitutions-data-download}{worldpolicycenter.org} \label{fn:worldpolicy}}  
-\ \ - Right to health: `r constitutions |> filter(iso3 == iso3_SUR) |> pull(const_health)`  
-\ \ - Right to public health: `r constitutions |> filter(iso3 == iso3_SUR) |> pull(const_publichealth)`  
-\ \ - Right to medical care: `r constitutions |> filter(iso3 == iso3_SUR) |> pull(const_medcare)`  
-\ \ - Right to a healthy environment: `r constitutions |> filter(iso3 == iso3_SUR) |> pull(const_enviro)`  
-\textcolor{fgcolor}{\hlCeHDIBlue{Legal status of abortion (as of June 2023):}}\footnote{\href{https://reproductiverights.org/wp-content/uploads/2023/12/WALM_2023-v3-Updated_12-20-23.pdf}{reproductiverights.org} \label{fn:reproductiverights}} `r world_abortion_laws |> filter(country == params$country_name) |> pull(category)`  
+\textcolor{fgcolor}{\hlCeHDIBlue{DTP3 coverage (among 1-year-olds):}}\textsuperscript{\ref{fn:whoGHO}} `r DTP3_coverage_text`
 ```{=latex}
 \end{multicols}
 ```
