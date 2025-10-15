@@ -52,18 +52,18 @@ for (file_name in list.files(path = here("data", "API_data"), pattern = "\\.rds$
 # UPR plot data
 health_rec_C <- sdg_data |> 
   filter(state_under_review == params$country_name) |> 
-      droplevels() |>
-      group_by(cycle, state_under_review) |>
-      count(health_related, .drop = FALSE) |> 
-      group_by(cycle) |>
-      mutate(
-        n_tot = sum(n),
-        perc = (n / n_tot) * 100,
-        perc = case_when(
-          health_related == "Other" ~ "",
-          .default = paste0(sprintf("%1.0f", perc), "%")
-        )
-      ) |> ungroup()
+  droplevels() |>
+  group_by(cycle, state_under_review) |>
+  count(health_related, .drop = FALSE) |> 
+  group_by(cycle) |>
+  mutate(
+    n_tot = sum(n),
+    perc = (n / n_tot) * 100,
+    perc = case_when(
+      health_related == "Other" ~ "",
+      .default = paste0(sprintf("%1.0f", perc), "%")
+    )
+  ) |> ungroup()
 
 # Life expectancy
 life_expectancy <- e01dt |> 
@@ -581,7 +581,7 @@ if (
 } else {
   p2 + inset_element(p3, inset_dimensions[1], inset_dimensions[2],inset_dimensions[3],inset_dimensions[4])+ plot_annotation(
     theme = theme(plot.margin = margin(0,0,0,0), plot.background = element_blank()
-                  ))
+    ))
 }
 
 # params$mmr_map_plot
@@ -605,8 +605,51 @@ if (
 \ \ - Aged 15 to 19:  `r contraceptive_prevalence_text_15_19`  
 \ \ - Aged 20 to 49:  `r contraceptive_prevalence_text_20_49`
 \begin{center}\textcolor{fgcolor}{\textbf{\hlCeHDIRed{\ \ \ \ Health Services Coverage (latest available data) \ \ \ \ }}}\end{center}  
-\textcolor{fgcolor}{\hlCeHDIBlue{UHC service coverage index:}}\textsuperscript{\ref{fn:whoGHO}} `r UHC_estimate |> pull(Value)` in `r UHC_estimate |> pull(YEAR)`  
-\textcolor{fgcolor}{\hlCeHDIBlue{UHC sub-Index on RMNCH:}}\textsuperscript{\ref{fn:whoGHO}} `r UHC_RMNCH_estimate |> pull(Value)` in `r UHC_RMNCH_estimate |> pull(YEAR)`  
+<!-- \textcolor{fgcolor}{\hlCeHDIBlue{UHC service coverage index:}}\textsuperscript{\ref{fn:whoGHO}} `r UHC_estimate |> pull(Value)` in `r UHC_estimate |> pull(YEAR)`   -->
+\textcolor{fgcolor}{\hlCeHDIBlue{UHC service coverage:}} (`r UHC_all |> filter(COUNTRY == iso3_SUR, IndicatorCode == "UHC_INDEX_REPORTED", YEAR == min(YEAR)) |> pull(YEAR)` to `r UHC_all |> filter(COUNTRY == iso3_SUR, IndicatorCode == "UHC_INDEX_REPORTED", YEAR == max(YEAR)) |> pull(YEAR)`)\textsuperscript{\ref{fn:whoGHO}}
+```{r, fig.align="center", fig.width=10, fig.height=2, out.width="90%"}
+uhc_plots <- function(dat, title_text = "Update title", yMAX = 100){
+  p_data <- dat |> 
+  filter(COUNTRY == iso3_SUR)
+label_data <- p_data |> 
+  filter(YEAR %in% c(max(YEAR), min(YEAR)))
+p1<-p_data |> 
+  # mutate(val_maxtime = NumericValue[TimeDim==max(TimeDim)])
+  ggplot(aes(x=YEAR, y= NumericValue))+
+  geom_hline(aes(yintercept = yMAX), color = "green", lty=2, lwd=1)+
+  geom_line(color = "#ec5557", lwd=1, fill=NA)+
+  geom_text(
+    data = label_data, # Use the special, single-row data frame
+    aes(label = Value, # The text for the label
+    nudge_y = -4),      # Nudge the label up slightly
+    color = "#1c164d", # Match your theme color
+    fontface = "bold" # Make it stand out
+  )+
+  scale_y_continuous(limits = c(0,yMAX))+
+  theme_void()+
+  labs(title = title_text)+
+  theme(axis.line = element_line(color = "#1c164d"))+
+  coord_cartesian(clip = "off")
+p1
+}
+
+p1<-uhc_plots(UHC_all |> filter(IndicatorCode == "UHC_INDEX_REPORTED"), 
+              title_text = "Services Coverage\nIndex", yMAX = 80)
+p2<-uhc_plots(UHC_all |> filter(IndicatorCode == "UHC_SCI_CAPACITY"), 
+              title_text = "Sub-index on service\ncapacity and access")
+p3<-uhc_plots(UHC_all |> filter(IndicatorCode == "UHC_SCI_INFECT"), 
+              title_text = "Sub-index\non infectious diseases")
+p4<-uhc_plots(UHC_all |> filter(IndicatorCode == "UHC_SCI_NCD"), 
+              title_text = "Sub-index\non NCDs")
+p5<-uhc_plots(UHC_all |> filter(IndicatorCode == "UHC_SCI_RMNCH"), 
+              title_text = "Sub-index on reproduct-\nive, maternal, newborn,\nand child health")
+
+(p1 | p2 | p3 | p4 | p5)+plot_annotation(
+  theme = theme(plot.margin = margin(0,0,0,0), 
+                plot.background = element_blank()
+  ))
+```
+<!-- \textcolor{fgcolor}{\hlCeHDIBlue{UHC sub-index on RMNCH:}}\textsuperscript{\ref{fn:whoGHO}} `r UHC_RMNCH_estimate |> pull(Value)` in `r UHC_RMNCH_estimate |> pull(YEAR)`   -->
 \textcolor{fgcolor}{\hlCeHDIBlue{Antenatal care coverage (\ge 4 visits):}}\footnote{\href{https://platform.who.int/data/maternal-newborn-child-adolescent-ageing}{WHO MNCAH Data Portal} \label{fn:whoMNCAH}} `r antenatal_WHO_text`  
 \textcolor{fgcolor}{\hlCeHDIBlue{Nursing/midwifery personnel (per 10,000):}}\textsuperscript{\ref{fn:whoGHO}}  `r nursing_density_text`  
 
