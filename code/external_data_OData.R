@@ -80,6 +80,12 @@ data(e01dt);data(pop1dt);data(popAge5dt);data(tfr1dt)
 #   ) |>
 #   mutate(
 #     text = str_remove_all(text, "&nbsp;"),
+#     text = case_when(str_starts(text, "R ") ~ str_remove(text, "R "),
+#                      .default = text),
+#     text = str_replace(text, " . ", ". "),
+#     text = str_replace(text, ":.", ":"),
+#     text = str_replace(text, ",.", ":"),
+#     text = str_remove_all(text, "\\[...\\]")
 #   ) |>
 #   arrange(countries_concerned, reccomending_body, document_publication_date) |>
 #   rename(document = document_symbol, body = reccomending_body) |>
@@ -87,14 +93,26 @@ data(e01dt);data(pop1dt);data(popAge5dt);data(tfr1dt)
 #     paragraph = case_when(
 #       # CASE 1: The text starts with "Recommendation No."
 #       # This detects the first pattern you described.
-#       str_detect(text, "^Recommendation No\\.") ~ {
-#         # str_match() lets us capture parts of the text.
-#         # We look for "para. [number]: [number]"
-#         matches <- str_match(text, "para\\.\\s*(\\d+):\\s*(\\d+)")
-#         # We then take the captured numbers (the 2nd and 3rd elements from the match)
-#         # and paste them together with a dot, creating the "96.21" format.
+#       # str_detect(text, "^Recommendation No\\.") ~ {
+#       #   # str_match() lets us capture parts of the text.
+#       #   # We look for "para. [number]: [number]"
+#       #   matches <- str_match(text, "para\\.\\s*(\\d+):\\s*(\\d+)")
+#       #   # We then take the captured numbers (the 2nd and 3rd elements from the match)
+#       #   # and paste them together with a dot, creating the "96.21" format.
+#       #   paste(matches[, 2], matches[, 3], sep = ".")
+#       # },
+#       str_detect(text, "^Recommendation No") ~ {
+#         # This regex now finds the paragraph number, skips to the recommendation number, and captures both.
+#         # It works whether there is a colon or not.
+#         matches <- str_match(text, "para\\.\\s*(\\d+).*?(\\d+)\\.")
 #         paste(matches[, 2], matches[, 3], sep = ".")
 #       },
+# 
+#       # NEW CASE: The text starts with "Recommendations contained in para."
+#       # str_detect(text, "^Recommendations contained in para") ~ str_match(text, "para\\.\\s*(\\d+)")[, 2],
+#       # str_detect(text, "^Recommendation(s)? contained in para(graph)?") ~ str_match(text, "[Pp]ara(?:graph)?\\s*(\\d+\\(?[a-z]?\\)?)")[, 2],
+#       str_detect(text, "^Recommendation(s)? (?:contained in|from) para(graph)?") ~ str_match(text, "[Pp]ara(?:graph)?\\s*(.*?):")[, 2],
+#       str_detect(text, "^Recommendation(s)? contained in ") ~ str_match(text, "contained in\\s*(\\d+\\(?[a-z]?\\)?)")[, 2],
 # 
 #       # CASE 2: The text starts with "para" or "paragraph"
 #       # This is the new case to handle paragraph-only identifiers.
@@ -123,27 +141,90 @@ data(e01dt);data(pop1dt);data(popAge5dt);data(tfr1dt)
 #     type = str_remove(type, "- "),
 #     upr_position = str_remove(upr_position, "- "),
 #     title_a = str_split_i(paragraph,"\\.",1),
+#     title_a = case_when(is.na(as.numeric(title_a)) ~ str_extract(title_a, "^\\d+"),
+#                         .default = title_a),
 #     title_b = str_pad(str_split_i(paragraph,"\\.",2), , width = 3, side = "left", pad = "0"),
-#     title_2 = paste(title_a, title_b,sep = ".")
+#     title_b = case_when(is.na(title_b) | str_starts(title_b, "\\(") ~ "0",
+#                         .default = title_b),
+#     title_2 = as.numeric(paste(title_a, title_b,sep = "."))
 #   )|>
 #   arrange(upr_session_number) |>
 #   mutate(
 #     upr_session = fct_inorder(upr_session),
 #     upr_cycle = fct_inorder(upr_cycle)
 #     ) |>
-#   select(-title_a, -title_b) |>
+#   # select(-title_a, -title_b) |>
 #   relocate(paragraph, .after=document) |>
 #   relocate(title_2, upr_position, type, .after = paragraph) |>
-#   arrange(countries_concerned, body, document_publication_date, title_2) |>
+#   arrange(countries_concerned, body, document_publication_date, title_2, paragraph) |>
 #   rename(
 #     state_under_review = countries_concerned,
-#     document_code = document
-#   )
+#     document_code = document,
+#     session = upr_session,
+#     cycle = upr_cycle,
+#     recommending_state_upr = upr_reccomending_states,
+#     response_upr = upr_position
+#   ) |>
+#   left_join(state_geo |> select(country, iso3, iso2) |> st_drop_geometry(),
+#             by = join_by(state_under_review == country))
+# 
+# # Filter for only the UPR dataset
+# upr_df <- df |> filter(body == "UPR") |> droplevels() |>
+#   mutate(
+#     recommending_state_upr = str_remove(recommending_state_upr, "^- "),
+#     recommending_states_count = case_when(
+#       is.na(recommending_state_upr) ~ NA,
+#       .default = str_count(recommending_state_upr, "-") %>% coalesce(0L)+1
+#     ),
+#   text_2 = case_when(
+#     # CASE 1: Remove "Recommendation No. ..." prefix
+#     str_detect(text, "^Recommendation No") ~ str_remove(text, "^Recommendation No.*?\\d+\\.\\s*"),
+#     # str_detect(text, "^Recommendations contained in para") ~ str_remove(text, "^Recommendations contained in para\\.\\s*\\d+:\\s*"),
+#     str_detect(text, "^Recommendation(s)? contained in para(graph)?") ~ str_remove(text, "^Recommendation(?:s)? contained in para(?:graph)?.*?\\:\\s*"),
+#     str_detect(text, "^Recommendation(s)? contained in ") ~ str_remove(text, "^Recommendation(?:s)? contained in .*?\\:\\s*"),
+# 
+#     # CASE 2: Remove "para. ..." prefix
+#     str_detect(text, "^[Pp]ara") ~ str_remove(text, "^[Pp]ara(?:graph)?\\.?\\s*(\\d+\\.?)\\s*"),
+#     # CASE 3: Remove "number.number" prefix
+#     str_detect(text, "^\\d+\\.\\d+") ~ str_remove(text, "^\\d+\\.\\d+\\.?\\s*"),
+#     # CASE 4: Remove single number prefix
+#     str_detect(text, "^\\d+") ~ str_remove(text, "^\\d+\\.?\\s*"),
+#     # If no pattern matches, just keep the original text
+#     TRUE ~ text
+#   ),
+#   text_2 = case_when(
+#     str_detect(text_2, "^\\d+") ~ str_remove(text_2, "^\\d+\\.?\\s*"),
+#     TRUE ~ text_2
+#   ),
+#   text_2 = str_remove(text_2,"^. "),
+#   text_2 = str_squish(str_trim(text_2)),
+#   text_2 = str_replace(text_2, ". visit", "a visit"),
+#   text_2 = str_replace(text_2, ". standing", "a standing"),
+#   text_2 = str_replace(text_2, ". method", "a method"),
+#   text_2 = str_replace(text_2, ". dialogue", "a dialogue"),
+#   text_2 = str_replace(text_2, ". comprehensive", "a comprehensive"),
+#   text_2 = str_replace(text_2, ". national", "a national")
+#   ) |>
+#   filter(!str_starts(text, "Response of "),
+#          response_upr != "Concerns/Observations") |> 
+#   rowid_to_column() |> 
+#   
+#   # Create a new column that lists recommending states by commas
+#   mutate(recommending_state_upr_comma = recommending_state_upr) |> 
+#   separate_wider_delim(recommending_state_upr_comma, delim = "-", names_sep = "_", too_few = "align_start") |> 
+#   mutate(across(starts_with("recommending_state_upr_comma"), ~ str_squish(.))) |> 
+#   unite(col = "recommending_state_upr_comma", sep = ", ", starts_with("recommending_state_upr_comma"), na.rm = TRUE) |> 
+#   relocate(text_2, .after = text) |> 
+#   relocate(recommending_state_upr_comma, recommending_states_count, .after= recommending_state_upr) |> 
+#   mutate(recommending_state_upr_comma = case_when(recommending_state_upr_comma == "" ~ NA, .default = recommending_state_upr_comma))
 # 
 # saveRDS(df, here("data", "UHRI_full.rds"))
 # saveRDS(df, here("data", paste0("UHRI_full_", Sys.Date(), ".rds")))
-# 
-# uhri_full <- readRDS(here("data", "UHRI_full.rds"))
+# saveRDS(upr_df, here("data", "UHRI_UPR.rds"))
+# saveRDS(upr_df, here("data", paste0("UHRI_UPR_", Sys.Date(), ".rds")))
+
+uhri_full <- readRDS(here("data", "UHRI_full.rds"))
+uhri_upr <- readRDS(here("data", "UHRI_UPR.rds"))
 
 # Human Development Index (HDI) ---------------------------------------
 # https://hdr.undp.org/data-center/documentation-and-downloads
@@ -206,8 +287,6 @@ world_abortion_laws <- readxl::read_xlsx(here("data", "world_abortion_laws.xlsx"
 # Constitutional rights -----------------------------
 # Downloaded from https://www.worldpolicycenter.org/constitutional-approaches-to-the-right-to-health
 # Data download > Constitutions Data Download
-constitutions <- read_xls(here("data", "constitutions", "WORLD_constitutions_2024_6Oct25.xls"))
-#
 constitutions_variables <- tribble(
   ~varname, ~description, ~details,
   "const_health_20", "Does the constitution explicitly guarantee an approach to non-citizens’ right to health?", "•	The right to health is considered to be protected for non-citizens when the following are explicitly granted to non-citizens or are granted in general and the constitution states that foreign citizens enjoy rights on an equal basis as citizens: a less broad protection of public health, the right to health, the right to healthcare services, the right to public health, the right to medical care, the right to free preventive health services, the right to free medical care, and the right to free health care services.
@@ -265,8 +344,53 @@ constitutions_variables <- tribble(
 •	Aspirational or subject to progressive realization means that the constitution protects the right to health but does not use language strong enough to be considered a guarantee, or states that these rights will be implemented progressively or within a certain time period. For example, the nation will endeavor to ensure the right to health or will promote the right to health within three years.
 •	Guaranteed right means that the constitution explicitly guarantees the right to health to citizens in authoritative language. For example, constitutions in this category might guarantee citizens’ right to health or make it the State’s responsibility to ensure the protection of health."
 )
-constitutions <- constitutions |> 
-  select(country:const_yr_adopt, any_of(constitutions_variables$varname))
+constitutions <- read_xls(here("data", "constitutions", "WORLD_constitutions_2024_6Oct25.xls")) |> 
+  select(country:const_yr_adopt, any_of(constitutions_variables$varname)) |> 
+  mutate(
+    const_health = fct_recode(
+      factor(const_health),
+      "No specific provision" = "1",
+      "Guaranteed for some groups, not universally" = "2",
+      "Aspirational or subject to progressive realization" = "3",
+      "Guaranteed right" = "5"
+    ),
+    const_publichealth = fct_recode(
+      factor(const_publichealth),
+      "No specific provision" = "1",
+      "Aspirational or subject to progressive realization" = "3",
+      "Some aspects guaranteed" = "4",
+      "Guaranteed right" = "5"
+    ),
+    const_anyhealth = fct_recode(
+      factor(const_anyhealth),
+      "No specific provision" = "1",
+      "Guaranteed for some groups, not universally" = "2",
+      "Aspirational or subject to progressive realization" = "3",
+      "Guaranteed right" = "5"
+    ),
+    const_health_20 = fct_recode(
+      factor(const_health_20),
+      "Health rights are explicitly reserved for citizens or restrictions permitted" = "1",
+      "No specific provision" = "2",
+      "Right guaranteed using citizenship language" = "3",
+      "Guaranteed right, not specific for non-citizens" = "4",
+      "Guaranteed for non-citizens" = "5"
+    ),
+    const_medcare = fct_recode(
+      factor(const_medcare),
+      "No specific provision" = "1",
+      "Guaranteed for some groups, not universally" = "2",
+      "Aspirational or subject to progressive realization" = "3",
+      "Guaranteed right" = "4",
+      "Guaranteed free" = "5"
+    ),
+    const_enviro = fct_recode(
+      factor(const_enviro),
+      "No specific provision" = "1",
+      "Aspirational or subject to progressive realization" = "3",
+      "Guaranteed right" = "5"
+    )
+  )
 
 # WHO ---------------------------------------------
 # https://platform.who.int/data/maternal-newborn-child-adolescent-ageing/data-export
@@ -353,7 +477,7 @@ WB_income_codes <- gho_api$path("Dimension", "WORLDBANKINCOMEGROUP", "DimensionV
 ## Search GHO codes ####
 search_term <- "expenditure|spending"
 search_term <- "(?=.*expenditure|spending)(?=.*poverty)"
-search_term <- "women"
+search_term <- "cervi"
 search_term_results <- gho_indicators |> filter(str_detect(IndicatorName, regex(search_term, ignore_case = TRUE))|
                                                   str_detect(IndicatorCode, regex(search_term, ignore_case = TRUE)))
 
@@ -660,10 +784,10 @@ informed_decisions <- gho_api$path("SG_DMK_SRCR_FN_ZS")$retrieve()$value |> tibb
 
 ### Skilled birth ####
 skilled_birth <- gho_api$path("MDG_0000000025")$retrieve()$value |> tibble() |> 
-mutate(
-  COUNTRY = case_when(SpatialDimType == "COUNTRY" ~ SpatialDim),
-  REGION = case_when(SpatialDimType %in% c("REGION", "GLOBAL")~SpatialDim)
-) |> 
+  mutate(
+    COUNTRY = case_when(SpatialDimType == "COUNTRY" ~ SpatialDim),
+    REGION = case_when(SpatialDimType %in% c("REGION", "GLOBAL")~SpatialDim)
+  ) |> 
   left_join(gho_indicators) |> 
   left_join(country_codes) |> 
   left_join(region_codes) |> 
@@ -757,6 +881,39 @@ DTP3_coverage <- gho_api$path("WHS4_100")$retrieve()$value |> tibble() |>
     across(c(NumericValue:High), ~ as.numeric(.x)),
     year = ymd(paste0(YEAR, "-01-01"))
   )
+
+# Alternative HPV program data ####
+# https://immunizationdata.who.int/global/wiise-detail-page/introduction-of-hpv-(human-papilloma-virus)-vaccine?ISO_3_CODE=&YEAR=
+# Accessed on 10.10.2025
+HPV_national_alt <- read_xlsx(here("data", "HPV_introduction.xlsx"), sheet = "Sheet1")
+HPV_national_alt <- HPV_national_alt |> group_by(ISO_3_CODE) |> 
+  summarise(
+    year_intr = min(YEAR[INTRO == "Yes"]),
+    year_intr_P = max(YEAR[INTRO == "Yes (P)"]),
+    year_intr_D = max(YEAR[INTRO == "Yes (D)"]),
+    year_na = max(YEAR[!str_detect(INTRO, "Yes")])
+  ) |> 
+  ungroup() |> 
+  mutate(YEAR = case_when(
+    year_na > year_intr ~ year_na,
+    year_intr == Inf ~ year_intr_P, 
+    .default = year_intr)
+  ) |> 
+  mutate(YEAR=case_when(
+    YEAR == -Inf ~ year_na, 
+    .default = YEAR)
+  ) |> 
+  left_join(HPV_national_alt |> select(ISO_3_CODE, YEAR, INTRO)) |> 
+  mutate(INTRO_text = case_when(
+    INTRO == "Yes" & (year_intr_D != -Inf) ~ paste0(YEAR, " (partial introduction in ",year_intr_D, ")"),
+    INTRO == "Yes" & (year_intr_P != -Inf) ~ paste0(YEAR, " (partial introduction in ",year_intr_P, ")"),
+    INTRO == "Yes" ~ paste0(YEAR),
+    INTRO == "Yes (D)" ~ paste0(YEAR, " (ongoing demonstration projects)"),
+    INTRO == "Yes (P)" ~ paste0(YEAR, " (only in certain regions)"),
+    INTRO == "No" ~ paste0("Vaccine not administered (", YEAR, ")"),
+    .default = "Data not available"
+  ))
+
 
 # NMIRF status -------------------------------
 # Data extracted from Annex 02 of URG's report https://www.universal-rights.org/urg-policy-reports/the-emergence-and-evolution-of-national-mechanisms-for-implementation-reporting-and-follow-up/
