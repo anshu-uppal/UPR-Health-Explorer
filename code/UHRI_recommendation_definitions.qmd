@@ -47,55 +47,195 @@ pacman::p_load(
 # )
 
 # Load in custom functions
-source(here("utils.R"))
+# source(here("utils.R"))
+
 ```
 
-### Read in the UPR data 
-From the SDG data from the "Human Rights Data Explorer" (created and maintained by the Danish Institute for Human Rights):
-<https://sdgdata.humanrights.dk/en/mechanisms/upr/cycle-4>
-(Navigate to the link above and click "download all data" - the download preparation takes >30 minutes)
-
-For the present analysis, the dataset was downloaded on June 3rd, 2025. I then converted the CSV file to RDS format to save disk space and for faster importing.
+### Download and pre-process the UPR data from UHRI  
+Download the full UHRI dataset from <https://uhri.ohchr.org/en/our-data-api>
+The direct download of the excel file is: <https://dataex.ohchr.org/uhri/export-results/export-full-en.xlsx>
 ```{r}
-# Download from https://sdgdata.humanrights.dk/en/solr-explorer
-sdg_data1 <- readRDS(here("data","sdg_data.rds")) |> 
-  janitor::clean_names() |> 
-  mutate_if(is.character, ~na_if(., "")) |> # convert blank spaces to true NA
-  filter(mechanism == "Universal Periodic Review") |> 
-  rename(state_under_review = state) |> 
-  mutate(
-    year = ymd(paste0(year, "01-01")),
-    cycle = factor(cycle),
-    sdg_linked = factor(case_when(sdg_goals == "No SDG link identified" ~ "No SDG link",
-                                  .default = "Linked to an SDG"), 
-                        levels = c("No SDG link", "Linked to an SDG")),
-    response_upr = factor(case_when(
-      response_upr %in% c("Supported/Noted", "Noted") ~ "Noted/Other",
-      .default = response_upr)),
-    title = str_split_i(paragraph, "\\|", 2)
-  ) |> 
-  mutate(title_a = str_split_i(title,"\\.",1),
-         title_b = str_pad(str_split_i(title,"\\.",2), , width = 3, side = "left", pad = "0"),
-         title_2 = paste(title_a, title_b,sep = ".")) |> 
-  select(-title_a, -title_b) |> 
-  relocate(sdg_linked, .after = sdg_goals) |> 
-  # remove duplicate entries of same recommendation 
-  # (sometimes repeated when multiple states are ascribed to same recommendation)
-  # group_by(cycle, state_under_review) |>
-  # distinct(title, .keep_all = TRUE) |>
-  # ungroup() |> 
-  arrange(state_under_review, cycle, title_2)
+# httr::GET("https://dataex.ohchr.org/uhri/export-results/export-full-en.xlsx", httr::write_disk(tf <- tempfile(fileext = ".xlsx")))
+# df_0 <-  read_xlsx(tf,
+#                    # Specify the column types, otherwise some show up as NA in R
+#                    col_types = c(
+#                      rep("text", 7), "date", rep("text", 7), "date")) |>
+#   janitor::clean_names();unlink(tf);rm(tf)
+# df<-df_0 |> janitor::clean_names() |>
+#   # Add the date that the dataset was accessed from the UHRI website
+#   mutate(date_accessed = ymd(Sys.Date())) |>
+#   mutate(countries_concerned = str_remove(countries_concerned, "- "),
+#          reccomending_body = str_remove(reccomending_body, "- ")
+#   ) |>
+#   mutate(
+#     text = str_remove_all(text, "&nbsp;"),
+#     text = case_when(str_starts(text, "R ") ~ str_remove(text, "R "),
+#                      .default = text),
+#     text = str_replace(text, " . ", ". "),
+#     text = str_replace(text, ":.", ":"),
+#     text = str_replace(text, ",.", ":"),
+#     text = str_remove_all(text, "\\[...\\]")
+#   ) |>
+#   arrange(countries_concerned, reccomending_body, document_publication_date) |>
+#   rename(document = document_symbol, body = reccomending_body) |>
+#   mutate(
+#     paragraph = case_when(
+#       # CASE 1: The text starts with "Recommendation No."
+#       # This detects the first pattern you described.
+#       # str_detect(text, "^Recommendation No\\.") ~ {
+#       #   # str_match() lets us capture parts of the text.
+#       #   # We look for "para. [number]: [number]"
+#       #   matches <- str_match(text, "para\\.\\s*(\\d+):\\s*(\\d+)")
+#       #   # We then take the captured numbers (the 2nd and 3rd elements from the match)
+#       #   # and paste them together with a dot, creating the "96.21" format.
+#       #   paste(matches[, 2], matches[, 3], sep = ".")
+#       # },
+#       str_detect(text, "^Recommendation No") ~ {
+#         # This regex now finds the paragraph number, skips to the recommendation number, and captures both.
+#         # It works whether there is a colon or not.
+#         matches <- str_match(text, "para\\.\\s*(\\d+).*?(\\d+)\\.")
+#         paste(matches[, 2], matches[, 3], sep = ".")
+#       },
+# 
+#       # NEW CASE: The text starts with "Recommendations contained in para."
+#       # str_detect(text, "^Recommendations contained in para") ~ str_match(text, "para\\.\\s*(\\d+)")[, 2],
+#       # str_detect(text, "^Recommendation(s)? contained in para(graph)?") ~ str_match(text, "[Pp]ara(?:graph)?\\s*(\\d+\\(?[a-z]?\\)?)")[, 2],
+#       str_detect(text, "^Recommendation(s)? (?:contained in|from) para(graph)?") ~ str_match(text, "[Pp]ara(?:graph)?\\s*(.*?):")[, 2],
+#       str_detect(text, "^Recommendation(s)? contained in ") ~ str_match(text, "contained in\\s*(\\d+\\(?[a-z]?\\)?)")[, 2],
+# 
+#       # CASE 2: The text starts with "para" or "paragraph"
+#       # This is the new case to handle paragraph-only identifiers.
+#       str_detect(text, "^[Pp]ara") ~ str_match(text, "[Pp]ara(?:graph)?\\.?\\s*(\\d+)")[, 2],
+# 
+#       # CASE 3: The text starts with a "number.number" format (e.g., "136.1 ...")
+#       # This must come before the single-number check to be matched correctly.
+#       str_detect(text, "^\\d+\\.\\d+") ~ str_extract(text, "^\\d+\\.\\d+"),
+# 
+#       # CASE 4: The text starts with just one number (e.g., "1 ...")
+#       # This is the new case to handle single leading numbers.
+#       str_detect(text, "^\\d+") ~ str_extract(text, "^\\d+"),
+# 
+#       # If none of the above patterns match, return NA
+#       TRUE ~ NA_character_
+#     ),
+#     upr_session = str_remove(upr_session, "- "),
+#     upr_session = str_split_i(upr_session, " - ", 1),
+#     upr_session_number = as.numeric(str_extract(upr_session, "\\d+")),
+#     upr_cycle = case_when(
+#       upr_session_number <= 12 ~ "Cycle 1",
+#       upr_session_number <= 26 ~ "Cycle 2",
+#       upr_session_number <= 40 ~ "Cycle 3",
+#       upr_session_number <= 54 ~ "Cycle 4",
+#     ),
+#     type = str_remove(type, "- "),
+#     upr_position = str_remove(upr_position, "- "),
+#     title_a = str_split_i(paragraph,"\\.",1),
+#     title_a = case_when(is.na(as.numeric(title_a)) ~ str_extract(title_a, "^\\d+"),
+#                         .default = title_a),
+#     title_b = str_pad(str_split_i(paragraph,"\\.",2), , width = 3, side = "left", pad = "0"),
+#     title_b = case_when(is.na(title_b) | str_starts(title_b, "\\(") ~ "0",
+#                         .default = title_b),
+#     title_2 = as.numeric(paste(title_a, title_b,sep = "."))
+#   )|>
+#   arrange(upr_session_number) |>
+#   mutate(
+#     upr_session = fct_inorder(upr_session),
+#     upr_cycle = fct_inorder(upr_cycle)
+#     ) |>
+#   # select(-title_a, -title_b) |>
+#   relocate(paragraph, .after=document) |>
+#   relocate(title_2, upr_position, type, .after = paragraph) |>
+#   arrange(countries_concerned, body, document_publication_date, title_2, paragraph) |>
+#   rename(
+#     state_under_review = countries_concerned,
+#     document_code = document,
+#     session = upr_session,
+#     cycle = upr_cycle,
+#     recommending_state_upr = upr_reccomending_states,
+#     response_upr = upr_position
+#   ) |>
+#   left_join(state_geo |> select(country, iso3, iso2) |> st_drop_geometry(),
+#             by = join_by(state_under_review == country))
+# 
+# # Filter for only the UPR dataset
+# upr_df <- df |> filter(body == "UPR") |> droplevels() |>
+#   mutate(
+#     recommending_state_upr = str_remove(recommending_state_upr, "^- "),
+#     recommending_states_count = case_when(
+#       is.na(recommending_state_upr) ~ NA,
+#       .default = str_count(recommending_state_upr, "-") %>% coalesce(0L)+1
+#     ),
+#   text_2 = case_when(
+#     # CASE 1: Remove "Recommendation No. ..." prefix
+#     str_detect(text, "^Recommendation No") ~ str_remove(text, "^Recommendation No.*?\\d+\\.\\s*"),
+#     # str_detect(text, "^Recommendations contained in para") ~ str_remove(text, "^Recommendations contained in para\\.\\s*\\d+:\\s*"),
+#     str_detect(text, "^Recommendation(s)? contained in para(graph)?") ~ str_remove(text, "^Recommendation(?:s)? contained in para(?:graph)?.*?\\:\\s*"),
+#     str_detect(text, "^Recommendation(s)? contained in ") ~ str_remove(text, "^Recommendation(?:s)? contained in .*?\\:\\s*"),
+# 
+#     # CASE 2: Remove "para. ..." prefix
+#     str_detect(text, "^[Pp]ara") ~ str_remove(text, "^[Pp]ara(?:graph)?\\.?\\s*(\\d+\\.?)\\s*"),
+#     # CASE 3: Remove "number.number" prefix
+#     str_detect(text, "^\\d+\\.\\d+") ~ str_remove(text, "^\\d+\\.\\d+\\.?\\s*"),
+#     # CASE 4: Remove single number prefix
+#     str_detect(text, "^\\d+") ~ str_remove(text, "^\\d+\\.?\\s*"),
+#     # If no pattern matches, just keep the original text
+#     TRUE ~ text
+#   ),
+#   text_2 = case_when(
+#     str_detect(text_2, "^\\d+") ~ str_remove(text_2, "^\\d+\\.?\\s*"),
+#     TRUE ~ text_2
+#   ),
+#   text_2 = str_remove(text_2,"^. "),
+#   text_2 = str_squish(str_trim(text_2)),
+#   text_2 = str_replace(text_2, ". visit", "a visit"),
+#   text_2 = str_replace(text_2, ". standing", "a standing"),
+#   text_2 = str_replace(text_2, ". method", "a method"),
+#   text_2 = str_replace(text_2, ". dialogue", "a dialogue"),
+#   text_2 = str_replace(text_2, ". comprehensive", "a comprehensive"),
+#   text_2 = str_replace(text_2, ". national", "a national")
+#   ) |>
+#   filter(!str_starts(text, "Response of "),
+#          response_upr != "Concerns/Observations") |>
+#   rowid_to_column() |>
+# 
+#   # Create a new column that lists recommending states by commas
+#   mutate(recommending_state_upr_comma = recommending_state_upr) |>
+#   separate_wider_delim(recommending_state_upr_comma, delim = "-", names_sep = "_", too_few = "align_start") |>
+#   mutate(across(starts_with("recommending_state_upr_comma"), ~ str_squish(.))) |>
+#   unite(col = "recommending_state_upr_comma", sep = ", ", starts_with("recommending_state_upr_comma"), na.rm = TRUE) |>
+#   relocate(text_2, .after = text) |>
+#   relocate(recommending_state_upr_comma, recommending_states_count, .after= recommending_state_upr) |>
+#   mutate(recommending_state_upr_comma = case_when(recommending_state_upr_comma == "" ~ NA, .default = recommending_state_upr_comma)) |> 
+#   mutate(response_upr = factor(
+#     case_when(
+#       response_upr == "Supported/Noted" ~ "Partially supported",
+#       .default = response_upr),
+#       levels = c("Supported", "Partially supported", "Noted")
+#     )
+#   )
+# 
+# saveRDS(df, here("data", "UHRI_full.rds"))
+# saveRDS(df, here("data", paste0("UHRI_full_", Sys.Date(), ".rds")))
+# saveRDS(upr_df, here("data", "UHRI_UPR.rds"))
+# saveRDS(upr_df, here("data", paste0("UHRI_UPR_", Sys.Date(), ".rds")))
+```
 
+
+```{r}
+# Read in the UPR data
 uhri_upr <- readRDS(here("data", "UHRI_UPR.rds"))
 ```
 
-### Create definitions 
+
+For the present analysis, the dataset was downloaded on `r unique(uhri_upr$date_accessed)`.  
+
+## Create definitions 
 
 **Still to refine, especially the definitions related to maternal health**
 
 See also: <https://www.who.int/health-topics>
 
-#### Right to health
+### Right to health
 I then created a set of keywords to assign recommendations as being related to the "right to health". This is a key step to refine in case we opt for an automated process. Some of the keywords are partial words because I use a partial word matching (e.g. "prophyla" will match with both "prophylaxis" as well as "prophylactics"). **Need to be careful to not accidentally include irrelevent terms.**
 
 Need to review inclusion of remaining recommendations with reference to CEDAW (~400 entries)
@@ -118,7 +258,7 @@ keywords_comb3b <- "surgery|sterili"
 
 ```
 
-##### Health systems and services
+#### Health systems and services
 > In 2007 the World Health Organization (WHO) proposed a framework describing health systems in terms of six core components or ‘building blocks’: (i) service delivery and safety; (ii) health workforce; (iii) health statistics and information systems; (iv) access to essential medicines; (v) financing; and (vi) leadership/ governance.  
 
 When applying these definitions, I think we will need to first more generally define health-related recommendations, and then within that context we can apply the keywords below to define health systems and services.
@@ -136,7 +276,7 @@ hss_keywords_comb2c <- "financ"
 
 ```
 
-##### Health security, emergencies, and disaster relief
+#### Health security, emergencies, and disaster relief
 > This category relates to health in the context of humanitarian, emergency and disaster relief in order to reduce avoidable loss of life and the burden of disease and disability. Emergencies include any event that may have negative consequences for human health including events that have not yet led to disease in humans but have the potential to cause human disease through exposure to infected or contaminated food, water, animals, manufactured products or environments. Emergencies are situations impacting the lives and well-being of a large number of people or significant percentage of a population and requiring substantial multi-sectoral assistance. For WHO to respond, there must be clear health consequences.
 
 ```{r}
@@ -149,7 +289,7 @@ emergencies_keywords_comb2a <- "earthquake|flood|drought"
 emergencies_keywords_comb2b <- "relief"
 ```
 
-##### NCDs
+#### NCDs
 > The four main types of noncommunicable diseases (NCD) are cardiovascular diseases (like heart attacks and stroke); cancers; chronic respiratory diseases (such as chronic obstructed pulmonary disease and asthma); diabetes; alcohol and drug use. But this category also includes other types of NCD.
 
 ```{r}
@@ -163,7 +303,7 @@ ncd_keywords_comb2b <- "pollution| quality"
 
 ncd_exclusion <- ""
 ```
-##### Communicable diseases
+#### Communicable diseases
 > Communicable diseases comprise both infectious diseases and zoonotic diseases. Infectious diseases are caused by pathogenic microorganisms, such as bacteria, viruses, parasites or fungi; the diseases can be spread, directly or indirectly, from one person to another. Zoonotic diseases are infectious diseases of animals that can cause disease when transmitted to humans.
 
 ```{r}
@@ -176,7 +316,7 @@ communicable_keywords_comb1b <- "with hiv| hiv |hiv/aids|hiv-aids|hiv and aids|h
 communicable_exclusion <- ""
 ```
 
-##### SRHR
+#### SRHR
 > Sexual health is a state of physical, mental and social well-being in relation to sexuality. It requires a positive and respectful approach to sexuality and sexual relationships, as well as the possibility of having pleasurable and safe sexual experiences, free of coercion, discrimination and violence.  
 
 > Reproductive health is concerned with a state of physical, mental and social well-being in relation to sexuality, as well as the reproductive processes, functions and system at all stages of life. Examples include the freedom to decide if, when, and how often to engage in sexual activity; the right of men and women to be informed about and have access to safe, effective, affordable and acceptable methods of fertility regulation of their choice; and the right of women to access appropriate health care services that will enable them to go through pregnancy safely.
@@ -189,7 +329,7 @@ srhr_keywords_comb1a <- "sex|gender|civil identity|transgender"
 srhr_keywords_comb1b <- "sterili"
 ```
 
-##### Mental health
+#### Mental health
 > Mental health refers to a broad array of activities directly or indirectly related to the mental well-being component included in the WHO’s definition of health: “A state of complete physical, mental and social well-being, and not merely the absence of disease”. It is related to the promotion of well-being, the prevention of mental disorders, and the treatment and rehabilitation of people affected by mental disorders.
 
 ```{r}
@@ -198,7 +338,7 @@ mental_keywords <- "anxiety|depression| mental|suicide|psychosocial|psychiatr|in
 mental_keywords_comb1a <- " mental"
 mental_keywords_comb1b <- "health|disorder|illness"
 ```
-##### Social and economic determinants of health
+#### Social and economic determinants of health
 > The social determinants of health (SDH) are the conditions in which people are born, grow, work, live, and age, and the wider set of forces and systems shaping the conditions of daily life. These forces and systems include economic policies and systems, development agendas, social norms, social policies and political systems. The Sustainable Development Goals (SDGs) provide a comprehensive blueprint for human development and for systematically addressing the social determinants of health.
 
 May need to first generally define health, and then classify SOCED as health-related recommendations that touch on social determinants
@@ -206,7 +346,7 @@ May need to first generally define health, and then classify SOCED as health-rel
 SOCED_keywords <- "social determinants|migrant|poverty| poor|destitut|inequality|vulnerable| elder| older"
 ```
 
-##### GBV - Gender-based violence
+#### GBV - Gender-based violence
 > This category includes any violence which has been perpetrated against another based on their sex, gender identity and expression, or their sexual orientation, as well as harmful practices such as female genital mutilation (FGM), female infanticide, sex-selective abortions, forced and early marriage, honour crimes or killings, polygamy, wife inheritance, virginity tests, breast ironing and similar practices.
 
 ```{r}
@@ -221,7 +361,7 @@ GBV_keywords_comb2b <- "abuse|maltreatment|violence|harassment|intimidation"
 GBV_keywords_comb3a <- "abort"
 GBV_keywords_comb3b <- "select|forced"
 ```
-##### Women's health
+#### Women's health
 > This category is concerned with any health recommendation relating to women’s health, which was not linked to violence or SRHR, but rather addresses general health through a gendered lens. Recommendations classified here include the ratification of CEDAW.
 
 May need to move this to end of the definitions, so that we can use the health_related definition and exclude those already included under SRHR or GBV
@@ -231,7 +371,7 @@ women_keywords <- "cedaw|elimination of all forms of discrimination against wome
 women_keywords_comb1a <- "woman|women"
 women_keywords_comb1b <- "death|mortality|health"
 ```
-##### Maternal, child, and adolescent health
+#### Maternal, child, and adolescent health
 > This category covers issues relating to maternal, foetal, newborn, infant, child and adolescent health. Also included in this category are recommendations relating to the ratification of the Convention on the Rights of the Child (CRC) and its optional protocol regarding the sale of children.
 
 ```{r}
@@ -244,7 +384,7 @@ MCAH_keywords_comb2a <- " child"
 MCAH_keywords_comb2b <- " traffic"
 ```
 
-##### Essential medicines and health products
+#### Essential medicines and health products
 > The issue of essential medicines covers the availability of essential medicines within the context of functioning health systems. Ideally, essential medicines are available at all times in adequate amounts, in the appropriate dosage forms, with assured quality, and at a price the individual and the community can afford.
 
 ```{r}
@@ -252,7 +392,7 @@ essential_medicines_keywords <- "medicine"
 ```
 
 
-##### Disabilities and health
+#### Disabilities and health
 > Disability is an umbrella term for impairments, activity limitations and participation restrictions. This category includes any issue that relates to persons with disabilities and their right to access health services. Recommendations to ratify the Convention on the Rights of Persons with Disabilities fall in this category.
 
 ```{r}
@@ -262,7 +402,7 @@ disabilities_keywords_comb1a <- "health"
 disabilities_keywords_comb1b <- "disabil|disabled"
 ```
 
-##### Health of LGBTI persons
+#### Health of LGBTI persons
 > This category includes any issue related to lesbian, gay, bisexual, transgender, and intersex (LGBTI) persons and their right to access health services, including general health services but also specific LGBTI health needs, such as hormone therapy and sex reassignment surgery.
 
 Difficult to tease this category out of SRHR based only on keywords - need to look in more details at the resulting recommendations and finetune it all.
@@ -275,7 +415,7 @@ LGBTI_keywords_comb1a <- "lgbt|lgtb| gay|lesbian|transgender|intersex|same sex|s
 LGBTI_keywords_comb1b <- "health|surgery|reassignment"
 ```
 
-##### HIV/AIDS and STIs
+#### HIV/AIDS and STIs
 > This category is concerned with any recommendation relating to HIV/ AIDS and sexually transmitted infections (STIs), such as access to healthcare for persons with HIV/AIDS or STIs or prevention of the spread of HIV/AIDS and STIs.
 
 ```{r}
@@ -284,7 +424,7 @@ HIV_keywords <- "with hiv| hiv |hiv/aids|hiv-aids|hiv and aids|hiv-positive| hiv
 HIV_keywords_comb1a <- ""
 HIV_keywords_comb1b <- ""
 ```
-##### TB, Malaria, and NTDs
+#### TB, Malaria, and NTDs
 > This category includes any health issues related to tuberculosis, malaria or diseases such as rabies, leprosy, foodborne trematodiases, lymphatic filariasis, dracunculiasis (Guinea-worm disease), sleeping sickness, chikunguya, etc.
 
 ```{r}
@@ -292,7 +432,7 @@ TB_malaria_keywords <- "tuberculosis|malaria| tb | tb,"
 
 NTD_keywords <- "buruli|chagas|dengue|chikungunya|dracunculiasis|echinococcosis|trematod|trypano|sleeping sickness|leishmaniasis|leprosy|leper|filariasis|mycetoma|chromoblastomycosis| noma |onchocerciasis|rabies|scabies|schistosomiasis|helminth|snakebite|snake|taenia|trachoma|yaws"
 ```
-##### Vaccinations
+#### Vaccinations
 > This category refers to any health issues related to immunization, vaccines and pharmaceutical products.
 
 ```{r}
@@ -302,7 +442,7 @@ vaccinations_keywords_comb1a <- ""
 vaccinations_keywords_comb1b <- ""
 ```
 
-##### WASH
+#### WASH
 > This category is concerned with access to safe or clean drinking water and basic standards of sanitation, including drinking-water quality management, water supply and sanitation monitoring, cholera surveillance and prevention, water and sanitation in different settings, and water resources management.
 
 ```{r}
@@ -311,7 +451,7 @@ WASH_keywords <- "sanitation|safe water|drinking water|drinkable water|affordabl
 WASH_keywords_comb1a <- ""
 WASH_keywords_comb1b <- ""
 ```
-##### Nutrition
+#### Nutrition
 > Recommendations relating to food were included when they referred to nutrition or diet-related concerns such as obesity, malnutrition or micronutrient supplementation.
 
 ```{r}
@@ -321,23 +461,23 @@ nutrition_keywords_comb1a <- ""
 nutrition_keywords_comb1b <- ""
 ```
 
-#### Separate definitions
+### Separate definitions
 
-##### Health of incarcerated persons
+#### Health of incarcerated persons
 Recommendations related to the health and well-being of incarcerated persons. Only includes recommendations already linked to health
 ```{r}
 incarcerated_keywords <- " prison|imprison|detention|detaine|incarcer"
 ```
 
 
-##### Maternal health
+#### Maternal health
 ```{r}
 maternal_keywords <- "abortion|maternal|pregnan|reproductive|sex education|sexuality education|sex education|midwif|midwiv|antenatal|neonatal|prenatal|postnatal|birth atten|childbirth|eclampsia|obstetric|intrapartum|postpartum|post-partum|contracept|breastfe"
 ```
 
-##### Abortion
+#### Abortion
 
-##### Family planning/Contraception
+#### Family planning/Contraception
 ```{r}
 contraception_keywords <- "contracept|birth control| iud |condom|family planning"
 
@@ -353,12 +493,12 @@ traffic / trafficking
 
 ### Apply the definitions
 
-#### Theme labels
+### Theme labels
 ```{r}
 source(here("code", "theme_labels.R"))
 ```
 
-#### UHRI datasat
+### UHRI datasat
 ```{r}
 sdg_data <- uhri_upr |> 
   # Health systems and services
@@ -670,7 +810,7 @@ sdg_data <- uhri_upr |>
 saveRDS(sdg_data, file = here("output", "UHRI_UPR_enhanced.rds"))
 ```
 
-#### Number of recommendations
+### Number of recommendations
 ```{r}
 #| message: false
 #| warning: false
@@ -761,7 +901,7 @@ sdg_data |>
   theme(legend.position = "bottom", panel.grid.major.x = element_blank())
 ```
 
-##### By theme
+#### By theme
 ```{r}
 #| fig-height: 9.5
 #| fig-width: 8
@@ -943,7 +1083,7 @@ p1<-a |>
 
 ```
 
-### Recommending countries
+#### Recommending countries
 ```{r}
 c<-sdg_data |> 
   filter(state_under_review == "Brazil") |> 
