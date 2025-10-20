@@ -1392,9 +1392,11 @@ server <- function(input, output, session) {
         strip.text.y = element_text(angle = 270, face = "bold"),
         strip.placement = "outside",
         panel.grid.major.y = element_blank(),
-        # legend.position = c(0.99, 0.01),
         legend.position = "top",
         legend.justification = c("left", "bottom"),
+        legend.margin = margin(0,0,0,0), 
+        legend.box.margin = margin(0,0,0,0), 
+        legend.box.spacing = unit(0,"pt"),
         legend.background = element_blank())+
       labs(y="Supported recommendations (N)", x=NULL,
            fill=NULL)
@@ -1822,9 +1824,11 @@ server <- function(input, output, session) {
         strip.text.y = element_text(angle = 270, face = "bold"),
         strip.placement = "outside",
         panel.grid.major.y = element_blank(),
-        # legend.position = c(0.99, 0.01),
         legend.position = "top",
         legend.justification = c("left", "bottom"),
+        legend.margin = margin(0,0,0,0), 
+        legend.box.margin = margin(0,0,0,0), 
+        legend.box.spacing = unit(0,"pt"),
         legend.background = element_blank())+
       labs(y="Supported recommendations (N)", x=NULL,
            fill=NULL)
