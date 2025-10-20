@@ -496,8 +496,8 @@ The platform is intended to empower diplomats, policymakers, decision-makers acr
                          nav_panel("Data Table", DTOutput("DT_table"))
                        ),
                        layout_column_wrap(
-                         # width=1,
-                         style = css(grid_template_rows = "1fr 2fr"),
+                         width=1,
+                         style = css(grid_template_rows = "1fr 1fr"),
                          card(
                            # fill = FALSE,
                            full_screen = TRUE,
