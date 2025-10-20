@@ -430,6 +430,31 @@
         "Archs": "x64"
       }
     },
+    "SnowballC": {
+      "Source": "CRAN",
+      "Repository": "https://cran.rstudio.com",
+      "description": {
+        "Package": "SnowballC",
+        "Type": "Package",
+        "Version": "0.7.1",
+        "Date": "2023-04-25",
+        "Title": "Snowball Stemmers Based on the C 'libstemmer' UTF-8 Library",
+        "Authors@R": "person(\"Milan\", \"Bouchet-Valat\", email=\"nalimilan@club.fr\",\n                  role=c(\"aut\", \"cre\"))",
+        "Description": "An R interface to the C 'libstemmer' library that implements\n  Porter's word stemming algorithm for collapsing words to a common\n  root to aid comparison of vocabulary. Currently supported languages are\n  Arabic, Basque, Catalan, Danish, Dutch, English, Finnish, French, German, Greek,\n  Hindi, Hungarian, Indonesian, Irish, Italian, Lithuanian, Nepali,\n  Norwegian, Portuguese, Romanian, Russian, Spanish, Swedish, Tamil\n  and Turkish.",
+        "License": "BSD_3_clause + file LICENSE",
+        "Copyright": "Dr Martin Porter (2001) and Richard Boulton (2004, 2005) for\nthe 'libstemmer' C library, and Milan Bouchet-Valat (2013) for\nthe R package contents.",
+        "URL": "https://github.com/nalimilan/R.TeMiS",
+        "BugReports": "https://github.com/nalimilan/R.TeMiS/issues",
+        "NeedsCompilation": "yes",
+        "Packaged": "2023-04-25 19:45:22 UTC; milan",
+        "Author": "Milan Bouchet-Valat [aut, cre]",
+        "Maintainer": "Milan Bouchet-Valat <nalimilan@club.fr>",
+        "Repository": "CRAN",
+        "Date/Publication": "2023-04-25 20:30:06 UTC",
+        "Built": "R 4.5.0; x86_64-w64-mingw32; 2025-04-08 00:45:24 UTC; windows",
+        "Archs": "x64"
+      }
+    },
     "V8": {
       "Source": "CRAN",
       "Repository": "https://cran.rstudio.com",
@@ -2929,6 +2954,33 @@
         "Date/Publication": "2022-12-20 10:00:13 UTC",
         "Built": "R 4.5.0; x86_64-w64-mingw32; 2025-05-31 00:22:12 UTC; windows",
         "Archs": "x64"
+      }
+    },
+    "janeaustenr": {
+      "Source": "CRAN",
+      "Repository": "https://cran.rstudio.com",
+      "description": {
+        "Package": "janeaustenr",
+        "Title": "Jane Austen's Complete Novels",
+        "Version": "1.0.0",
+        "Authors@R": "\n    person(\"Julia\", \"Silge\", , \"julia.silge@gmail.com\", role = c(\"aut\", \"cre\"),\n           comment = c(ORCID = \"0000-0002-3671-836X\"))",
+        "Description": "Full texts for Jane Austen's 6 completed novels, ready for\n    text analysis. These novels are \"Sense and Sensibility\", \"Pride and\n    Prejudice\", \"Mansfield Park\", \"Emma\", \"Northanger Abbey\", and\n    \"Persuasion\".",
+        "License": "MIT + file LICENSE",
+        "URL": "https://github.com/juliasilge/janeaustenr",
+        "BugReports": "https://github.com/juliasilge/janeaustenr/issues",
+        "Depends": "R (>= 3.5)",
+        "Suggests": "dplyr, testthat",
+        "Config/testthat/edition": "3",
+        "Encoding": "UTF-8",
+        "LazyData": "true",
+        "RoxygenNote": "7.2.1",
+        "NeedsCompilation": "no",
+        "Packaged": "2022-08-26 22:14:26 UTC; juliasilge",
+        "Author": "Julia Silge [aut, cre] (<https://orcid.org/0000-0002-3671-836X>)",
+        "Maintainer": "Julia Silge <julia.silge@gmail.com>",
+        "Repository": "CRAN",
+        "Date/Publication": "2022-08-26 22:32:06 UTC",
+        "Built": "R 4.5.1; ; 2025-10-06 00:54:02 UTC; windows"
       }
     },
     "janitor": {
@@ -5526,6 +5578,37 @@
         "Built": "R 4.5.0; ; 2025-05-31 01:33:28 UTC; windows"
       }
     },
+    "tidytext": {
+      "Source": "CRAN",
+      "Repository": "https://cran.rstudio.com",
+      "description": {
+        "Type": "Package",
+        "Package": "tidytext",
+        "Title": "Text Mining using 'dplyr', 'ggplot2', and Other Tidy Tools",
+        "Version": "0.4.3",
+        "Authors@R": "c(\n    person(\"Gabriela\", \"De Queiroz\", , \"gabidequeiroz@gmail.com\", role = \"ctb\"),\n    person(\"Colin\", \"Fay\", , \"contact@colinfay.me\", role = \"ctb\",\n           comment = c(ORCID = \"0000-0001-7343-1846\")),\n    person(\"Emil\", \"Hvitfeldt\", , \"emilhhvitfeldt@gmail.com\", role = \"ctb\"),\n    person(\"Os\", \"Keyes\", , \"ironholds@gmail.com\", role = \"ctb\",\n           comment = c(ORCID = \"0000-0001-5196-609X\")),\n    person(\"Kanishka\", \"Misra\", , \"kmisra@purdue.edu\", role = \"ctb\"),\n    person(\"Tim\", \"Mastny\", , \"tim.mastny@gmail.com\", role = \"ctb\"),\n    person(\"Jeff\", \"Erickson\", , \"jeff@erick.so\", role = \"ctb\"),\n    person(\"David\", \"Robinson\", , \"admiral.david@gmail.com\", role = \"aut\"),\n    person(\"Julia\", \"Silge\", , \"julia.silge@gmail.com\", role = c(\"aut\", \"cre\"),\n           comment = c(ORCID = \"0000-0002-3671-836X\"))\n  )",
+        "Description": "Using tidy data principles can make many text mining tasks\n    easier, more effective, and consistent with tools already in wide use.\n    Much of the infrastructure needed for text mining with tidy data\n    frames already exists in packages like 'dplyr', 'broom', 'tidyr', and\n    'ggplot2'. In this package, we provide functions and supporting data\n    sets to allow conversion of text to and from tidy formats, and to\n    switch seamlessly between tidy tools and existing text mining\n    packages.",
+        "License": "MIT + file LICENSE",
+        "URL": "https://juliasilge.github.io/tidytext/,\nhttps://github.com/juliasilge/tidytext",
+        "BugReports": "https://github.com/juliasilge/tidytext/issues",
+        "Depends": "R (>= 2.10)",
+        "Imports": "cli, dplyr (>= 1.1.1), generics, janeaustenr, lifecycle,\nMatrix, methods, purrr (>= 0.1.1), rlang (>= 0.4.10), stringr,\ntibble, tokenizers, vctrs",
+        "Suggests": "broom, covr, data.table, ggplot2, hunspell, knitr, mallet,\nNLP, quanteda, readr, reshape2, rmarkdown, scales, stm,\nstopwords, testthat (>= 2.1.0), textdata, tidyr, tm,\ntopicmodels, vdiffr, wordcloud",
+        "VignetteBuilder": "knitr",
+        "Config/Needs/website": "ropensci/gutenbergr",
+        "Config/testthat/edition": "3",
+        "Encoding": "UTF-8",
+        "LazyData": "TRUE",
+        "RoxygenNote": "7.3.2",
+        "NeedsCompilation": "no",
+        "Packaged": "2025-07-25 01:12:50 UTC; juliasilge",
+        "Author": "Gabriela De Queiroz [ctb],\n  Colin Fay [ctb] (ORCID: <https://orcid.org/0000-0001-7343-1846>),\n  Emil Hvitfeldt [ctb],\n  Os Keyes [ctb] (ORCID: <https://orcid.org/0000-0001-5196-609X>),\n  Kanishka Misra [ctb],\n  Tim Mastny [ctb],\n  Jeff Erickson [ctb],\n  David Robinson [aut],\n  Julia Silge [aut, cre] (ORCID: <https://orcid.org/0000-0002-3671-836X>)",
+        "Maintainer": "Julia Silge <julia.silge@gmail.com>",
+        "Repository": "CRAN",
+        "Date/Publication": "2025-07-25 05:00:02 UTC",
+        "Built": "R 4.5.1; ; 2025-10-06 02:45:49 UTC; windows"
+      }
+    },
     "tidyverse": {
       "Source": "CRAN",
       "Repository": "https://cran.rstudio.com",
@@ -5635,6 +5718,38 @@
         "Repository": "CRAN",
         "Date/Publication": "2025-04-15 15:50:03 UTC",
         "Built": "R 4.5.0; ; 2025-05-31 01:00:48 UTC; windows"
+      }
+    },
+    "tokenizers": {
+      "Source": "CRAN",
+      "Repository": "https://cran.rstudio.com",
+      "description": {
+        "Package": "tokenizers",
+        "Type": "Package",
+        "Title": "Fast, Consistent Tokenization of Natural Language Text",
+        "Version": "0.3.0",
+        "Date": "2022-12-19",
+        "Description": "Convert natural language text into tokens. Includes tokenizers for\n    shingled n-grams, skip n-grams, words, word stems, sentences, paragraphs,\n    characters, shingled characters, lines, Penn Treebank, regular\n    expressions, as well as functions for counting characters, words, and sentences,\n    and a function for splitting longer texts into separate documents, each with\n    the same number of words.  The tokenizers have a consistent interface, and\n    the package is built on the 'stringi' and 'Rcpp' packages for  fast\n    yet correct tokenization in 'UTF-8'. ",
+        "License": "MIT + file LICENSE",
+        "LazyData": "yes",
+        "Authors@R": "c(person(\"Lincoln\", \"Mullen\", role = c(\"aut\", \"cre\"),\n        email = \"lincoln@lincolnmullen.com\",\n        comment = c(ORCID = \"0000-0001-5103-6917\")),\n        person(\"Os\", \"Keyes\", role = c(\"ctb\"),\n        email = \"ironholds@gmail.com\",\n        comment = c(ORCID = \"0000-0001-5196-609X\")),\n        person(\"Dmitriy\", \"Selivanov\", role = c(\"ctb\"),\n        email = \"selivanov.dmitriy@gmail.com\"),\n        person(\"Jeffrey\", \"Arnold\", role = c(\"ctb\"),\n        email = \"jeffrey.arnold@gmail.com\",\n        comment = c(ORCID = \"0000-0001-9953-3904\")),\n        person(\"Kenneth\", \"Benoit\", role = c(\"ctb\"),\n        email = \"kbenoit@lse.ac.uk\",\n        comment = c(ORCID = \"0000-0002-0797-564X\")))",
+        "URL": "https://docs.ropensci.org/tokenizers/,\nhttps://github.com/ropensci/tokenizers",
+        "BugReports": "https://github.com/ropensci/tokenizers/issues",
+        "RoxygenNote": "7.2.1",
+        "Depends": "R (>= 3.1.3)",
+        "Imports": "stringi (>= 1.0.1), Rcpp (>= 0.12.3), SnowballC (>= 0.5.1)",
+        "LinkingTo": "Rcpp",
+        "Encoding": "UTF-8",
+        "Suggests": "covr, knitr, rmarkdown, stopwords (>= 0.9.0), testthat",
+        "VignetteBuilder": "knitr",
+        "NeedsCompilation": "yes",
+        "Packaged": "2022-12-20 21:28:10 UTC; lmullen",
+        "Author": "Lincoln Mullen [aut, cre] (<https://orcid.org/0000-0001-5103-6917>),\n  Os Keyes [ctb] (<https://orcid.org/0000-0001-5196-609X>),\n  Dmitriy Selivanov [ctb],\n  Jeffrey Arnold [ctb] (<https://orcid.org/0000-0001-9953-3904>),\n  Kenneth Benoit [ctb] (<https://orcid.org/0000-0002-0797-564X>)",
+        "Maintainer": "Lincoln Mullen <lincoln@lincolnmullen.com>",
+        "Repository": "CRAN",
+        "Date/Publication": "2022-12-22 08:50:02 UTC",
+        "Built": "R 4.5.1; x86_64-w64-mingw32; 2025-10-06 00:54:03 UTC; windows",
+        "Archs": "x64"
       }
     },
     "tzdb": {
@@ -6045,7 +6160,7 @@
       "checksum": "d733f76fc64828988bbfc86704f34d29"
     },
     "app.R": {
-      "checksum": "cd1ba7719d454d01a84ad27f3cbb4e48"
+      "checksum": "2383e13eaea392c3446c13f644484a0e"
     },
     "code/.gitkeep": {
       "checksum": "81051bcc2cf1bedf378224b0a93e2877"
@@ -6060,7 +6175,7 @@
       "checksum": "8952ddc95bdef9346124d5d4d53f6a37"
     },
     "code/external_data_OData.R": {
-      "checksum": "9d1b5e7d8574cc244adb36f14c9f8772"
+      "checksum": "06f5c2af6642b1691ba08e035ad6d190"
     },
     "code/geo_code.R": {
       "checksum": "ff8fbd79f695ac6567035c92da1cd295"
@@ -6081,7 +6196,7 @@
       "checksum": "2026bb14d182cb7703e4409904bbe59c"
     },
     "code/theme_labels.R": {
-      "checksum": "978328eaecf9c92c0aaf0a32d3429bc5"
+      "checksum": "4886b12bf8d555ae499312ba32cb6247"
     },
     "code/uhri_api.R": {
       "checksum": "1d1674ce90a79e868844337a38ff0f94"
@@ -6090,7 +6205,7 @@
       "checksum": "819bdff2e8b8a41b94ad1f057c3bb03c"
     },
     "code/UHRI_recommendation_definitions.qmd": {
-      "checksum": "a6b19be7d4fcf964739651ab7f755e77"
+      "checksum": "857f31c718c7ebbaf9e7e3c4256818fe"
     },
     "countryflag.png": {
       "checksum": "55c6210b6b320b5788235a6ed99be646"
@@ -6355,6 +6470,9 @@
     },
     "data/world_abortion_laws.xlsx": {
       "checksum": "8ef034657d6d462896629aa0def80bd8"
+    },
+    "dkdk.xlsx": {
+      "checksum": "64a08864f56d941480adc855cc83ce4f"
     },
     "flags/ad.png": {
       "checksum": "5074501fe7dee5dcdd6e1fb6cf4e46f2"
@@ -7162,6 +7280,12 @@
     },
     "report-template_files/figure-latex/unnamed-chunk-4-1.pdf": {
       "checksum": "c8b99da6fc10aaeca5f067e21d0b029f"
+    },
+    "upr_cleaned_mattia.csv": {
+      "checksum": "6646a87c9a0b7c55c56bdd924e79d85d"
+    },
+    "upr_cleaned_mattia.zip": {
+      "checksum": "22f171c09dffbfe323490450a5260afe"
     },
     "upr_cols.csv": {
       "checksum": "64a02b52049db9228904ccfdec2d2bee"
