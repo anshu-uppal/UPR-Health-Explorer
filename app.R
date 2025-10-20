@@ -230,7 +230,26 @@ ui <- page_navbar(
   ),
   bg = "#1c164d",
   header = tags$head(
-    tags$link(rel = "stylesheet", type = "text/css", href = "custom_bslib.css")
+    tags$link(rel = "stylesheet", type = "text/css", href = "custom_bslib.css"),
+    # Custom CSS for the PDF download button.
+    tags$style(HTML("
+      /* The ID selector '#' must match the downloadButton's outputId */
+      #download_report {
+        background-color: #ec5557; /* A dark slate blue */
+        color: white;             /* White text */
+        border-radius: 5px;       /* Rounded corners */
+        border: 2px solid #ec5557;
+        font-weight: bold;        /* Make the text bold */
+        transition: background-color 0.3s, border-color 0.3s; /* Smooth transition for hover effect */
+      }
+      
+      /* Style for when you hover over the button */
+      #download_report:hover {
+        background-color: #ec5557; /*  */
+        border-color: #ec5557;
+        cursor: pointer;          /* Show a 'hand' cursor on hover */
+      }
+    "))
   ),
   
   
