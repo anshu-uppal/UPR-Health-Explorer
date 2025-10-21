@@ -33,6 +33,7 @@ pacman::p_load(
   rlang,
   ggtext, 
   patchwork,
+  kableExtra,
   # apyramid,
   sf
 )
@@ -700,5 +701,5 @@ kableExtra::kbl(
     font_size = 10
     # ,position = "left"
   ) |> 
-  column_spec(1,width = "45em")
+  kableExtra::column_spec(1,width = "45em")
 ```
