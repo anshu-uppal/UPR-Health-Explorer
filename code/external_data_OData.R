@@ -357,6 +357,43 @@ UHC_all <- bind_rows(UHC_INDEX_REPORTED,
 
 # SDGOOP Out-of-pocket expenditure as a percentage of total expenditure on health
 
+#### Catastrophic health expenditure 10% -----------
+FINPROTECTION_CATA_TOT_10_POP <- gho_api$path("FINPROTECTION_CATA_TOT_10_POP")$retrieve()$value |> tibble() |> 
+  mutate(
+    COUNTRY = case_when(SpatialDimType == "COUNTRY" ~ SpatialDim),
+    REGION = case_when(SpatialDimType %in% c("REGION", "GLOBAL")~SpatialDim)
+  ) |> 
+  left_join(gho_indicators) |> 
+  left_join(country_codes) |> 
+  left_join(region_codes) |> 
+  rename(YEAR = TimeDim) |> 
+  # group_by(SpatialDim) |> 
+  # slice_max(order_by = as.numeric(YEAR), n=1) |> 
+  # ungroup() |> 
+  mutate(
+    # NumericValue = as.numeric(NumericValue),
+    across(c(NumericValue:High), ~ as.numeric(.x)),
+    year = ymd(paste0(YEAR, "-01-01"))
+  )
+
+GHED_CHEGDP_SHA2011 <- gho_api$path("GHED_CHEGDP_SHA2011")$retrieve()$value |> tibble() |> 
+  mutate(
+    COUNTRY = case_when(SpatialDimType == "COUNTRY" ~ SpatialDim),
+    REGION = case_when(SpatialDimType %in% c("REGION", "GLOBAL")~SpatialDim)
+  ) |> 
+  left_join(gho_indicators) |> 
+  left_join(country_codes) |> 
+  left_join(region_codes) |> 
+  rename(YEAR = TimeDim) |> 
+  # group_by(SpatialDim) |> 
+  # slice_max(order_by = as.numeric(YEAR), n=1) |> 
+  # ungroup() |> 
+  mutate(
+    # NumericValue = as.numeric(NumericValue),
+    across(c(NumericValue:High), ~ as.numeric(.x)),
+    year = ymd(paste0(YEAR, "-01-01"))
+  )
+
 
 ### Maternal mortality ratio ####
 MMR <- gho_api$path("MDG_0000000026")$retrieve()$value |> tibble() |> 
