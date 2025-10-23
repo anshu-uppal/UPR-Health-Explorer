@@ -379,7 +379,7 @@ SOCED_keywords <- "social determinants|migrant|poverty| poor|destitut|inequality
 > This category includes any violence which has been perpetrated against another based on their sex, gender identity and expression, or their sexual orientation, as well as harmful practices such as female genital mutilation (FGM), female infanticide, sex-selective abortions, forced and early marriage, honour crimes or killings, polygamy, wife inheritance, virginity tests, breast ironing and similar practices.
 
 ```{r}
-GBV_keywords <- "child marriage|early marriage|child marriage|forced marriage|early marriage|mutilation| fgm |honor crime|honor killing|honour crime|honour killing|breast ironing|harmful practices|harmful traditional practices|violence against women|violence against children|domestic violence|family violence|violence in the family|gender-based violence|sexual violence|marital violence|partner violence|gender violence| rape|virginity|sexual abuse|femicide|polygam|sex selection|dowry|bride kidnap|child bride"
+GBV_keywords <- "child marriage|early marriage|child marriage|forced marriage|early marriage|mutilation| fgm |honor crime|honor killing|honour crime|honour killing|breast ironing|harmful practices|harmful traditional practices|violence against women|violence against children|domestic violence|family violence|violence in the family|gender-based violence|sexual violence|marital violence|partner violence|gender violence| rape|virginity|sexual abuse|femicide|polygam|sex selection|prenatal selection|prenatal genetic|dowry|bride kidnap|child bride|forced steril"
 
 GBV_keywords_comb1a <- "forced|minimum"
 GBV_keywords_comb1b <- "marriage|pregnancy"
@@ -388,7 +388,7 @@ GBV_keywords_comb2a <- "girl|women|sexual|domestic|gender|marital|lgbt|same-sex"
 GBV_keywords_comb2b <- "abuse|maltreatment|violence|harassment|intimidation"
 
 GBV_keywords_comb3a <- "abort"
-GBV_keywords_comb3b <- "select|forced"
+GBV_keywords_comb3b <- "select|forced|coercive"
 ```
 #### Women's health
 > This category is concerned with any health recommendation relating to women’s health, which was not linked to violence or SRHR, but rather addresses general health through a gendered lens. Recommendations classified here include the ratification of CEDAW.
@@ -404,12 +404,12 @@ women_keywords_comb1b <- "death|mortality|health"
 > This category covers issues relating to maternal, foetal, newborn, infant, child and adolescent health. Also included in this category are recommendations relating to the ratification of the Convention on the Rights of the Child (CRC) and its optional protocol regarding the sale of children.
 
 ```{r}
-MCAH_keywords <- "newborn|foetal|fetal|fetus|foetus| infant|maternal|pregnan|midwif|midwiv|antenatal|neonatal|prenatal|postnatal|birth atten|childbirth|child birth|eclampsia|obstet|intrapartum|postpartum|post-partum|contracept|breastfe|rights of the child| crc|sale of children|trafficking of children|child traffic|child protection|protection of children|protection of women and children|trafficking of minor|exploitation of child"
+MCAH_keywords <- "newborn| infant|breastfe|rights of the child| crc|sale of children|trafficking of children|child traffic|child protection|protection of children|protection of women and children|trafficking of minor|exploitation of child"
 
-MCAH_keywords_comb1a <- "maternal|child|infant|adolescent| teen"
+MCAH_keywords_comb1a <- "child|infant|adolescent| teen"
 MCAH_keywords_comb1b <- "death|mortality|health|pregnan"
 
-MCAH_keywords_comb2a <- " child|girl"
+MCAH_keywords_comb2a <- " child|girl| teen"
 MCAH_keywords_comb2b <- " traffic|violen|prostitut"
 ```
 
@@ -608,6 +608,10 @@ sdg_data <- uhri_upr |>
       str_detect(tolower(text), srhr_keywords_comb1a)&
         str_detect(tolower(text), srhr_keywords_comb1b)~ "SRHR",
       
+      # Combo 2
+      str_detect(tolower(text), srhr_keywords_comb2a)&
+        str_detect(tolower(text), srhr_keywords_comb2b)~ "SRHR",
+      
       .default = "Other"
     ), levels = c("Other", "SRHR"))
   ) |> 
@@ -764,24 +768,13 @@ sdg_data <- uhri_upr |>
   
   # Women's health
   mutate(
-    women = factor(case_when(
-      str_detect(tolower(text), women_keywords) ~ "Women's health",
-      # Exclude recommendations related to GBV or SRHR
-      if_any(c(GBV, SRHR), ~ .x != "Other") ~ "Other",
-      # Combo 1
-      str_detect(tolower(text), women_keywords_comb1a)&
-        str_detect(tolower(text), women_keywords_comb1b)~ "Women's health",
-      # Assign health-related topics that relate to women
-      health_related == "Health-related" & 
-        str_detect(tolower(text), "women|woman") ~ "Women's health",
-      .default = "Other"
-    ), levels = c("Other", "Women's health"))
+    women = NA # (re-defined later on)
   ) |> 
   
   # Abortion
   mutate(
     abortion = factor(case_when(
-      str_detect(tolower(text), "abortion") ~ "Abortion",
+      str_detect(tolower(text), "abortion|foetal impairment|fetal impairment") ~ "Abortion",
       # Combo 1
       str_detect(tolower(text), "interrup|terminat")&
         str_detect(tolower(text), "pregnan")~ "Abortion",
@@ -811,9 +804,9 @@ sdg_data <- uhri_upr |>
   mutate(
     occupational_health = factor(case_when(
       str_detect(tolower(text), occupational_health_keywords) ~ "Occupational health",
-      # Combo 1
-      str_detect(tolower(text), occupational_health_keywords_comb1a)&
-        str_detect(tolower(text), occupational_health_keywords_comb1b)~ "Occupational health",
+      # # Combo 1
+      # str_detect(tolower(text), occupational_health_keywords_comb1a)&
+      #   str_detect(tolower(text), occupational_health_keywords_comb1b)~ "Occupational health",
       .default = "Other"), 
       levels = c("Other", "Occupational health"))
   ) |> 
@@ -821,7 +814,7 @@ sdg_data <- uhri_upr |>
   # Migrant health
   mutate(
     migrant_health = factor(case_when(
-      str_detect(tolower(text), migrant_health_keywords) ~ "Migrant health",
+      # str_detect(tolower(text), migrant_health_keywords) ~ "Migrant health",
       # Combo 1
       str_detect(tolower(text), migrant_health_keywords_comb1a)&
         str_detect(tolower(text), migrant_health_keywords_comb1b)~ "Migrant health",
@@ -844,7 +837,8 @@ sdg_data <- uhri_upr |>
   # Update overall Right to Health classification
   mutate(
     health_related = factor(case_when(
-      if_any(c(women, abortion, maternal_health, contraception), ~ .x != "Other") ~ "Health-related",
+      if_any(c(abortion, maternal_health, contraception,
+               occupational_health, migrant_health), ~ .x != "Other") ~ "Health-related",
       .default = health_related),
       levels = c("Other", "Health-related"))
   )|> 
@@ -858,6 +852,22 @@ sdg_data <- uhri_upr |>
       levels = c("Other", "Health systems and services"))
   ) |> 
   
+  # Update women's health
+  mutate(
+    women = factor(case_when(
+      str_detect(tolower(text), women_keywords) ~ "Women's health",
+      # Exclude recommendations related to GBV or SRHR
+      if_any(c(GBV, SRHR, maternal_health), ~ .x != "Other") ~ "Other",
+      # Combo 1
+      str_detect(tolower(text), women_keywords_comb1a)&
+        str_detect(tolower(text), women_keywords_comb1b)~ "Women's health",
+      # Assign health-related topics that relate to women
+      health_related == "Health-related" & 
+        str_detect(tolower(text), "women|woman") ~ "Women's health",
+      .default = "Other"
+    ), levels = c("Other", "Women's health"))
+  ) |> 
+  
   # # Update SRHR
   # mutate(
   #   SRHR = factor(case_when(
@@ -865,6 +875,14 @@ sdg_data <- uhri_upr |>
   #     .default = SRHR),
   #     levels = c("Other", "SRHR"))
   # )|> 
+  
+  # Update overall Right to Health classification
+  mutate(
+    health_related = factor(case_when(
+      if_any(c(women), ~ .x != "Other") ~ "Health-related",
+      .default = health_related),
+      levels = c("Other", "Health-related"))
+  )|> 
   
   # Reorder columns
   relocate(health_systems:maternal_health, .after = text) |> 
@@ -965,6 +983,100 @@ sdg_data |>
 ```
 
 #### By theme
+```{r}
+a_1 <- sdg_data |>
+      select(cycle, health_related:maternal_health, response_upr) |>
+      group_by(response_upr) |>
+      summarise(across(c(health_related:maternal_health), ~ sum(.x != "Other"))) |>
+      ungroup() |>
+      filter(response_upr %in% c("Supported", "Noted")) |>
+      pivot_longer(
+        cols = health_related:maternal_health,
+        names_to = "theme",
+        values_to = "n"
+      )
+    
+    a_2 <- sdg_data |>
+      select(cycle, health_related:maternal_health, response_upr) |>
+      group_by(response_upr) |>
+      summarise(across(c(health_related:maternal_health), ~ sum(.x == "Other"))) |>
+      ungroup() |>
+      filter(response_upr %in% c("Supported", "Noted")) |>
+      pivot_longer(
+        cols = health_related:maternal_health,
+        names_to = "theme",
+        values_to = "n_other"
+      )
+    
+    a <- left_join(a_1, a_2) |>
+      group_by(theme) |>
+      mutate(
+        n_tot = sum(n) + sum(n_other),
+        n_tot_theme = sum(n)
+      ) |>
+      mutate(
+        perc = n / n_tot * 100,
+        perc_theme = n_tot_theme / n_tot * 100
+      ) |>
+      group_by(theme) |>
+      mutate(
+        n_sup = paste0("(", sprintf("%1.0f", n / sum(n) * 100), "%)"),
+        n_sup = case_when(n_tot_theme == 0 ~ "", .default = n_sup)
+      ) |>
+      ungroup() |>
+      filter(!theme %in% c("health_related", "TB_malaria", "NTD")) |>
+      left_join(theme_labels, by = c("theme" = "variable")) |>
+      arrange(-n_tot_theme) |>
+      mutate(
+        theme_label = case_when(is.na(theme_label) ~ theme, .default = theme_label),
+        # theme_label = str_wrap(theme_label, width = 40),
+        theme_label = fct_inorder(theme_label)
+      )
+    
+    
+    max_a <- max(a$perc_theme, na.rm = TRUE)
+    a |>
+      mutate(response_upr = fct_rev(response_upr)) |> 
+      ggplot(aes(x = perc, y = fct_rev(theme_label))) +
+      geom_col(aes(fill = response_upr)) +
+      labs(
+        x = "Proportion of all recommendations (%)", y = NULL,
+        fill = "State's response",
+        title = paste0("All health-related recommendations of the UPR"),
+        caption = "*Numbers after the bars indicate N (% supported)"
+      ) +
+      theme_classic() +
+      scale_x_continuous(
+        labels = function(x) paste0(x, "%"),
+        # limits = c(0, max_a + 2),
+        expand = expansion(mult = c(0, 0.15))
+      ) +
+      coord_cartesian(clip = "off")+
+      theme(
+        plot.margin = margin(l=2,t=2,b=2, r = 30, unit = "pt"),
+        legend.position = c(0.99, 0.01),
+        legend.justification = c("right", "bottom"),
+        legend.frame = element_rect(color = "black"),
+        legend.text = element_text(size = 9),
+        legend.title = element_text(size = 11),
+        legend.background = element_rect(fill = "transparent"),
+        axis.text.y = element_text(size = 9),
+        axis.text.x = element_text(size = 10),
+        plot.title = element_text(hjust = 0.5,face = "bold"),
+        plot.caption = element_text(size = 11),
+        axis.title.y = element_blank(),
+        plot.title.position = "plot",
+        panel.grid = element_blank()
+      ) +
+      geom_text(
+        data = a |> filter(response_upr == "Supported"),
+        aes(label = paste0(n_tot_theme, " ", n_sup), x = perc_theme),
+        hjust = -0.05,
+        size = 3, color = "#1c164d"
+        # vjust = 0.25
+      )
+```
+
 ```{r}
 #| fig-height: 9.5
 #| fig-width: 8
@@ -1092,7 +1204,6 @@ theme_plot <- a |>
 # )
 
 ```
-
 
 ```{r}
 #| fig-width: 13
