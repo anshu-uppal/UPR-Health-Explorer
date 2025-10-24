@@ -10,7 +10,7 @@ theme_labels <- tribble(
   "SOCED", "Social and economic determinants of health",
   "GBV", "Gender-based violence",
   "women", "Women's health",
-  "MCAH", "Child, and adolescent health",
+  "MCAH", "Child and adolescent health",
   "maternal_health", "Maternal health",
   "abortion", "Abortion",
   "contraception", "Family planning",
@@ -26,6 +26,6 @@ theme_labels <- tribble(
   "nutrition", "Nutrition",
   "incarcerated", "Health of incarcerated persons",
   "occupational_health", "Occupational health",
-  "migrant_health", "Migrant health",
+  "migrant_health", "Refugee and migrant health",
   "other_health_related", "Other health-related"
 )

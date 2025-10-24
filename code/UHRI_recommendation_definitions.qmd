@@ -499,9 +499,9 @@ nutrition_keywords_comb1b <- ""
 occupational_health_keywords <- "health of workers|workers' health|occupational health"
 ```
 
-#### Migrant health
+#### Refugee and Migrant health
 ```{r}
-migrant_health_keywords_comb1a <- "migrant"
+migrant_health_keywords_comb1a <- "migrant|refugee|asylum"
 migrant_health_keywords_comb1b <- "health"
 ```
 
@@ -904,6 +904,15 @@ sdg_data <- uhri_upr |>
 saveRDS(sdg_data, file = here("output", "UHRI_UPR_enhanced.rds"))
 ```
 
+```{r}
+sdg_data <- sdg_data |>
+  mutate(response_upr = fct_recode(response_upr, 
+                                   "Noted" = "Partially supported"),
+         response_upr = fct_relevel(response_upr, "Noted")) |> 
+  droplevels()
+```
+
+
 ### Number of recommendations
 ```{r}
 #| message: false
@@ -996,7 +1005,7 @@ sdg_data |>
 ```
 
 #### By theme
-```{r}
+```{r, message=FALSE}
 a_1 <- sdg_data |>
   select(cycle, health_related:other_health_related, response_upr) |>
   group_by(response_upr) |>
@@ -1049,7 +1058,6 @@ a <- left_join(a_1, a_2) |>
 
 max_a <- max(a$perc_theme, na.rm = TRUE)
 a |>
-  mutate(response_upr = fct_rev(response_upr)) |> 
   ggplot(aes(x = perc, y = fct_rev(theme_label))) +
   geom_col(aes(fill = response_upr)) +
   labs(
@@ -1272,7 +1280,7 @@ p1<-a |>
 
 #### Recommending countries
 See <https://mattherman.info/blog/fix-facet-width/>
-```{r}
+```{r, message=FALSE}
 c<-sdg_data |> 
   # filter(state_under_review == "Brazil") |> 
   # filter(maternal_health != "Other") |> 
@@ -1293,7 +1301,7 @@ c<-sdg_data |>
   distinct()
 
 c_plot <- c |> 
-  filter(state_under_review == "Tonga") |>
+  # filter(state_under_review == "Tonga") |>
   filter(variable %in% c("abortion", "maternal_health", "contraception")) |> 
   select(-cycle, -state_under_review) |> 
   group_by(recommending_state_upr, theme) |> 
@@ -1314,7 +1322,7 @@ ccp <- c_plot |>
   group_by(theme) |> 
   # select(recommending_state_upr, n_tot) |> distinct() |>
   # arrange(-n_tot) |> 
-  slice_head(n=10)
+  slice_head(n=15)
 
 c_plot |> 
   filter(recommending_state_upr %in% c(ccp |> pull(recommending_state_upr))) |> 
@@ -1324,12 +1332,12 @@ c_plot |>
   # scale_fill_brewer(palette = "Dark2") +
   scale_fill_manual(values = c(
     "Maternal health" = "#7570b3",
-    "Family Planning" = "#1b9e77",
+    "Family planning" = "#1b9e77",
     "Abortion" = "#d95f02"
   ))+
   scale_y_continuous(
     expand = c(0, 0.1), 
-    breaks = c(0:max(c_plot$n_tot))
+    # breaks = c(0:max(c_plot$n_tot))
   ) +
   tidytext::scale_x_reordered() +
   coord_flip()+
@@ -1357,13 +1365,13 @@ c_plot |>
        fill=NULL)
 ```
 
-```{r}
+```{r, message=FALSE}
 d <- c |> 
   filter(variable %in% c("abortion", "maternal_health", "contraception")) |> 
   group_by(recommending_state_upr, variable) |> 
   summarise(n = sum(n)) |>
   arrange(variable, -n) |> 
-  group_by(variable) |> slice_head(n=10) |> 
+  group_by(variable) |> slice_head(n=15) |> 
   ungroup() |> 
   left_join(theme_labels)
 
