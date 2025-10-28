@@ -290,7 +290,7 @@ ui <- page_navbar(
     ### PDF downloader ------------------------
     downloadButton(
       outputId = "download_report",
-      label = "Download Report (functionality under active development)"
+      label = "Download Report (under development)"
       # ,style = "width: 100%;" # Make the button full-width
     ),
     
@@ -490,7 +490,7 @@ The platform is intended to empower diplomats, policymakers, decision-makers acr
            nav_panel(title = "By State", icon = icon("flag"),
                      markdown("UPR Recommendations **by State**"),
                      layout_column_wrap(
-                       style = css(grid_template_columns = "3fr 1fr"),
+                       style = css(grid_template_columns = "2fr 1fr"),
                        navset_card_tab(
                          full_screen = TRUE,
                          # title = "SUR Recommendation Details",
@@ -1891,7 +1891,11 @@ server <- function(input, output, session) {
       paste0("UPR-recommendations-", input$selected_SUR, ".xlsx")
     },
     content = function(file) {
-      wb <- createWorkbook()
+      withProgress(message = 'Generating xlsx file...', value = 0, {
+        
+        incProgress(0.1, detail = "Formatting....")
+      
+        wb <- createWorkbook()
       addWorksheet(wb, "recommendations")
       writeDataTable(wb, "recommendations", 
                      DT_table_object() |> filter(`State under Review` == input$selected_SUR), 
@@ -1939,7 +1943,11 @@ server <- function(input, output, session) {
         firstActiveCol = 2  # The second column is the first one that moves
       )
       
+      incProgress(0.7, detail = "Saving output (this may take a moment)")
       saveWorkbook(wb, file)
+      
+      incProgress(1, detail = "Done!")
+      })
     }
   )
   
