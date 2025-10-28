@@ -303,7 +303,7 @@ hss_keywords <- "health worker|healthcare worker|health-care worker|uhc|universa
 hss_other_keywords <- "data"
 
 hss_keywords_comb1a <- "health"
-hss_keywords_comb1b <- "capacity-building|coverage|infrastructure|human resources|universal access|affordab|facilities| access | public "
+hss_keywords_comb1b <- "capacity-building|coverage|infrastructure|human resources|universal access|affordab|facilities| access | public |budget"
 
 hss_keywords_comb2a <- "health"
 hss_keywords_comb2b <- "sector|system"
@@ -407,7 +407,7 @@ May need to move this to end of the definitions, so that we can use the health_r
 women_keywords <- "cedaw|elimination of all forms of discrimination against women|menstrua"
 
 women_keywords_comb1a <- "woman|women"
-women_keywords_comb1b <- "death|mortality|health"
+women_keywords_comb1b <- "mortality|health"
 ```
 #### Child, and adolescent health
 > This category covers issues relating to maternal, foetal, newborn, infant, child and adolescent health. Also included in this category are recommendations relating to the ratification of the Convention on the Rights of the Child (CRC) and its optional protocol regarding the sale of children.
@@ -678,6 +678,15 @@ sdg_data <- uhri_upr |>
   ) |> 
   
   # Essential medicines and health products
+  mutate(
+    essential_medicines = factor(case_when(
+      str_detect(tolower(text_2), essential_medicines_keywords) ~ "Essential medicines",
+      # # Combo 1
+      # str_detect(tolower(text_2), disabilities_keywords_comb1a)&
+      #   str_detect(tolower(text_2), disabilities_keywords_comb1b)~ "Essential medicines",
+      .default = "Other"), 
+      levels = c("Other", "essential_medicines_keywords"))
+  ) |> 
   
   # Disabilities and health
   mutate(

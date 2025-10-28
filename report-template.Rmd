@@ -391,13 +391,13 @@ A CeHDI analysis of recommendations from all cycles of the UPR was used to ident
 a_1 <- 
   sdg_data |>    
   filter(state_under_review == params$country_name) |> 
-  select(cycle, state_under_review, health_related:maternal_health, response_upr) |>
+  select(cycle, state_under_review, health_related:other_health_related, response_upr) |>
   group_by(response_upr) |>
-  summarise(across(c(health_related:maternal_health), ~ sum(.x != "Other"))) |>
+  summarise(across(c(health_related:other_health_related), ~ sum(.x != "Other"))) |>
   ungroup() |>
   filter(response_upr %in% c("Supported", "Noted")) |>
   pivot_longer(
-    cols = health_related:maternal_health,
+    cols = health_related:other_health_related,
     names_to = "theme",
     values_to = "n"
   )
@@ -405,13 +405,13 @@ a_1 <-
 a_2 <- 
   sdg_data |>    
   filter(state_under_review == params$country_name) |> 
-  select(cycle, state_under_review, health_related:maternal_health, response_upr) |>
+  select(cycle, state_under_review, health_related:other_health_related, response_upr) |>
   group_by(response_upr) |>
-  summarise(across(c(health_related:maternal_health), ~ sum(.x == "Other"))) |>
+  summarise(across(c(health_related:other_health_related), ~ sum(.x == "Other"))) |>
   ungroup() |>
   filter(response_upr %in% c("Supported", "Noted")) |>
   pivot_longer(
-    cols = health_related:maternal_health,
+    cols = health_related:other_health_related,
     names_to = "theme",
     values_to = "n_other"
   )
@@ -468,6 +468,7 @@ a |>
     legend.text = element_text(size = 9, color = "#1c164d"),
     legend.title = element_text(size = 11, color = "#1c164d"),
     legend.background = element_blank(),
+    legend.key.size = unit(10,"pt"),
     axis.text.y = element_text(size = 9, color = "#1c164d"),
     axis.text.x = element_text(size = 10, color = "#1c164d"),
     plot.title = element_text(hjust = 0.5, face = "bold", color = "#1c164d"),

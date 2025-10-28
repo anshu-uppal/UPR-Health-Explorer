@@ -1139,25 +1139,25 @@ server <- function(input, output, session) {
   output$upr_themes_cycle_global <- renderPlot({
     req(nrow(filtered_upr_region()) > 0)
     a_1 <- filtered_upr_region() |>
-      select(cycle, health_related:maternal_health, response_upr) |>
+      select(cycle, health_related:other_health_related, response_upr) |>
       group_by(cycle, response_upr) |>
-      summarise(across(c(health_related:maternal_health), ~ sum(.x != "Other"))) |>
+      summarise(across(c(health_related:other_health_related), ~ sum(.x != "Other"))) |>
       ungroup() |>
       filter(response_upr %in% c("Supported", "Noted")) |>
       pivot_longer(
-        cols = health_related:maternal_health,
+        cols = health_related:other_health_related,
         names_to = "theme",
         values_to = "n"
       )
     
     a_2 <- filtered_upr_region() |>
-      select(cycle, health_related:maternal_health, response_upr) |>
+      select(cycle, health_related:other_health_related, response_upr) |>
       group_by(cycle, response_upr) |>
-      summarise(across(c(health_related:maternal_health), ~ sum(.x == "Other"))) |>
+      summarise(across(c(health_related:other_health_related), ~ sum(.x == "Other"))) |>
       ungroup() |>
       filter(response_upr %in% c("Supported", "Noted")) |>
       pivot_longer(
-        cols = health_related:maternal_health,
+        cols = health_related:other_health_related,
         names_to = "theme",
         values_to = "n_other"
       )
@@ -1252,25 +1252,25 @@ server <- function(input, output, session) {
   upr_themes_all_global_object <- reactive({
     req(nrow(filtered_upr_region()) > 0)
     a_1 <- filtered_upr_region() |>
-      select(cycle, health_related:maternal_health, response_upr) |>
+      select(cycle, health_related:other_health_related, response_upr) |>
       group_by(response_upr) |>
-      summarise(across(c(health_related:maternal_health), ~ sum(.x != "Other"))) |>
+      summarise(across(c(health_related:other_health_related), ~ sum(.x != "Other"))) |>
       ungroup() |>
       filter(response_upr %in% c("Supported", "Noted")) |>
       pivot_longer(
-        cols = health_related:maternal_health,
+        cols = health_related:other_health_related,
         names_to = "theme",
         values_to = "n"
       )
     
     a_2 <- filtered_upr_region() |>
-      select(cycle, health_related:maternal_health, response_upr) |>
+      select(cycle, health_related:other_health_related, response_upr) |>
       group_by(response_upr) |>
-      summarise(across(c(health_related:maternal_health), ~ sum(.x == "Other"))) |>
+      summarise(across(c(health_related:other_health_related), ~ sum(.x == "Other"))) |>
       ungroup() |>
       filter(response_upr %in% c("Supported", "Noted")) |>
       pivot_longer(
-        cols = health_related:maternal_health,
+        cols = health_related:other_health_related,
         names_to = "theme",
         values_to = "n_other"
       )
@@ -1552,25 +1552,25 @@ server <- function(input, output, session) {
   output$upr_themes_cycle <- renderPlot({
     req(nrow(filtered_upr()) > 0)
     a_1 <- filtered_upr() |>
-      select(cycle, state_under_review, health_related:maternal_health, response_upr) |>
+      select(cycle, state_under_review, health_related:other_health_related, response_upr) |>
       group_by(cycle, response_upr) |>
-      summarise(across(c(health_related:maternal_health), ~ sum(.x != "Other"))) |>
+      summarise(across(c(health_related:other_health_related), ~ sum(.x != "Other"))) |>
       ungroup() |>
       filter(response_upr %in% c("Supported", "Noted")) |>
       pivot_longer(
-        cols = health_related:maternal_health,
+        cols = health_related:other_health_related,
         names_to = "theme",
         values_to = "n"
       )
     
     a_2 <- filtered_upr() |>
-      select(cycle, state_under_review, health_related:maternal_health, response_upr) |>
+      select(cycle, state_under_review, health_related:other_health_related, response_upr) |>
       group_by(cycle, response_upr) |>
-      summarise(across(c(health_related:maternal_health), ~ sum(.x == "Other"))) |>
+      summarise(across(c(health_related:other_health_related), ~ sum(.x == "Other"))) |>
       ungroup() |>
       filter(response_upr %in% c("Supported", "Noted")) |>
       pivot_longer(
-        cols = health_related:maternal_health,
+        cols = health_related:other_health_related,
         names_to = "theme",
         values_to = "n_other"
       )
@@ -1660,25 +1660,25 @@ server <- function(input, output, session) {
   upr_themes_all_object <- reactive({
     req(nrow(filtered_upr()) > 0)
     a_1 <- filtered_upr() |>
-      select(cycle, state_under_review, health_related:maternal_health, response_upr) |>
+      select(cycle, state_under_review, health_related:other_health_related, response_upr) |>
       group_by(response_upr) |>
-      summarise(across(c(health_related:maternal_health), ~ sum(.x != "Other"))) |>
+      summarise(across(c(health_related:other_health_related), ~ sum(.x != "Other"))) |>
       ungroup() |>
       filter(response_upr %in% c("Supported", "Noted")) |>
       pivot_longer(
-        cols = health_related:maternal_health,
+        cols = health_related:other_health_related,
         names_to = "theme",
         values_to = "n"
       )
     
     a_2 <- filtered_upr() |>
-      select(cycle, state_under_review, health_related:maternal_health, response_upr) |>
+      select(cycle, state_under_review, health_related:other_health_related, response_upr) |>
       group_by(response_upr) |>
-      summarise(across(c(health_related:maternal_health), ~ sum(.x == "Other"))) |>
+      summarise(across(c(health_related:other_health_related), ~ sum(.x == "Other"))) |>
       ungroup() |>
       filter(response_upr %in% c("Supported", "Noted")) |>
       pivot_longer(
-        cols = health_related:maternal_health,
+        cols = health_related:other_health_related,
         names_to = "theme",
         values_to = "n_other"
       )
@@ -1788,7 +1788,7 @@ server <- function(input, output, session) {
       # filter(state_under_review == input$selected_SUR)
       mutate(state_under_review = factor(state_under_review)) |>
       select(
-        # text, cycle, response_upr, health_related:maternal_health,
+        # text, cycle, response_upr, health_related:other_health_related,
         # state_under_review,recommending_state_upr_comma, document_code, paragraph
         
         text_2, cycle, response_upr,
