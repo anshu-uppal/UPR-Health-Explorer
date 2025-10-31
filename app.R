@@ -1905,7 +1905,7 @@ server <- function(input, output, session) {
         wb,
         sheet = "recommendations",
         cols = 1,      # Target the first column
-        widths = 50    # Set its width
+        widths = 70    # Set its width
       )
       setColWidths(
         wb,
