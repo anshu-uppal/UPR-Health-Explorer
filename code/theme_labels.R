@@ -5,7 +5,7 @@ theme_labels <- tribble(
   "emergencies", "Health security, emergencies, and disaster relief",
   "ncd", "Non-communicable diseases",
   "communicable", "Communicable diseases",
-  "SRHR", "Other SRHR (sexual health and education)",
+  "SRHR", "Other SRHR (sexual health/wellbeing/education)",
   "mental_health", "Mental health",
   "SOCED", "Social and economic determinants of health",
   "GBV", "Gender-based violence and harmful practices",
