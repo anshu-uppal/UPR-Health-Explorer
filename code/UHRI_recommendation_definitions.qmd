@@ -102,7 +102,7 @@ The direct download of the excel file is: <https://dataex.ohchr.org/uhri/export-
 #     # text = str_replace(text, ",.", ":"),
 #     text = str_remove_all(text, "\\[...\\]"),
 #     # text = str_replace_all(text, "([A-Za-z]+)'s([A-Za-z]+)", "\\1's \\2")
-#     # text = str_replace_all(text, "non- communicable", "non-communicable")
+#     text = str_replace_all(text, "non- communicable", "non-communicable")
 #   ) |>
 #   arrange(countries_concerned, reccomending_body, document_publication_date) |>
 #   rename(document = document_symbol, body = reccomending_body) |>
