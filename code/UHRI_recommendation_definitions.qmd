@@ -77,8 +77,8 @@ The direct download of the excel file is: <https://dataex.ohchr.org/uhri/export-
 #     text = str_replace_all(text, "”", "'"),
 #     text = str_replace_all(text, "\\( ", "\\("),
 #     text = str_replace_all(text, " \\)", "\\)"),
-#     text = str_replace_all(text, " ' s ", "'s"),
-#     text = str_replace_all(text, "' s ", "'s"),
+#     text = str_replace_all(text, " ' s ", "'s "),
+#     text = str_replace_all(text, "' s ", "'s "),
 #     text = str_replace_all(text, "&nbsp;", " "),
 #     text = str_replace_all(text, "&nbsp", " "),
 #     text = str_replace_all(text, "&rsquo;", "'"),
@@ -93,14 +93,16 @@ The direct download of the excel file is: <https://dataex.ohchr.org/uhri/export-
 #     text = str_replace_all(text, "&egrave;", "è"),
 #     text = str_replace_all(text, "&lrm;", ""),
 #     text = str_replace_all(text, "&iacute;", "í"),
-#     
+# 
 #     text = str_squish(text),
 #     text = case_when(str_starts(text, "R ") ~ str_remove(text, "R "),
 #                      .default = text),
 #     # text = str_replace(text, " . ", ". "),
 #     # text = str_replace(text, ":.", ":"),
 #     # text = str_replace(text, ",.", ":"),
-#     text = str_remove_all(text, "\\[...\\]")
+#     text = str_remove_all(text, "\\[...\\]"),
+#     # text = str_replace_all(text, "([A-Za-z]+)'s([A-Za-z]+)", "\\1's \\2")
+#     # text = str_replace_all(text, "non- communicable", "non-communicable")
 #   ) |>
 #   arrange(countries_concerned, reccomending_body, document_publication_date) |>
 #   rename(document = document_symbol, body = reccomending_body) |>
@@ -122,25 +124,25 @@ The direct download of the excel file is: <https://dataex.ohchr.org/uhri/export-
 #         matches <- str_match(text, "para\\.\\s*(\\d+).*?(\\d+)\\.")
 #         paste(matches[, 2], matches[, 3], sep = ".")
 #       },
-#       
+# 
 #       # NEW CASE: The text starts with "Recommendations contained in para."
 #       # str_detect(text, "^Recommendations contained in para") ~ str_match(text, "para\\.\\s*(\\d+)")[, 2],
 #       # str_detect(text, "^Recommendation(s)? contained in para(graph)?") ~ str_match(text, "[Pp]ara(?:graph)?\\s*(\\d+\\(?[a-z]?\\)?)")[, 2],
 #       str_detect(text, "^Recommendation(s)? (?:contained in|from) para(graph)?") ~ str_match(text, "[Pp]ara(?:graph)?\\s*(.*?):")[, 2],
 #       str_detect(text, "^Recommendation(s)? contained in ") ~ str_match(text, "contained in\\s*(\\d+\\(?[a-z]?\\)?)")[, 2],
-#       
+# 
 #       # CASE 2: The text starts with "para" or "paragraph"
 #       # This is the new case to handle paragraph-only identifiers.
 #       str_detect(text, "^[Pp]ara") ~ str_match(text, "[Pp]ara(?:graph)?\\.?\\s*(\\d+)")[, 2],
-#       
+# 
 #       # CASE 3: The text starts with a "number.number" format (e.g., "136.1 ...")
 #       # This must come before the single-number check to be matched correctly.
 #       str_detect(text, "^\\d+\\.\\d+") ~ str_extract(text, "^\\d+\\.\\d+"),
-#       
+# 
 #       # CASE 4: The text starts with just one number (e.g., "1 ...")
 #       # This is the new case to handle single leading numbers.
 #       str_detect(text, "^\\d+") ~ str_extract(text, "^\\d+"),
-#       
+# 
 #       # If none of the above patterns match, return NA
 #       TRUE ~ NA_character_
 #     ),
@@ -198,7 +200,7 @@ The direct download of the excel file is: <https://dataex.ohchr.org/uhri/export-
 #       # str_detect(text, "^Recommendations contained in para") ~ str_remove(text, "^Recommendations contained in para\\.\\s*\\d+:\\s*"),
 #       str_detect(text, "^Recommendation(s)? contained in para(graph)?") ~ str_remove(text, "^Recommendation(?:s)? contained in para(?:graph)?.*?\\:\\s*"),
 #       str_detect(text, "^Recommendation(s)? contained in ") ~ str_remove(text, "^Recommendation(?:s)? contained in .*?\\:\\s*"),
-#       
+# 
 #       # CASE 2: Remove "para. ..." prefix
 #       str_detect(text, "^[Pp]ara") ~ str_remove(text, "^[Pp]ara(?:graph)?\\.?\\s*(\\d+\\.?)\\s*"),
 #       # CASE 3: Remove "number.number" prefix
@@ -230,7 +232,7 @@ The direct download of the excel file is: <https://dataex.ohchr.org/uhri/export-
 #   filter(!str_starts(text, "Response of "),
 #          response_upr != "Concerns/Observations") |>
 #   rowid_to_column() |>
-#   
+# 
 #   # Create a new column that lists recommending states by commas
 #   mutate(recommending_state_upr_comma = recommending_state_upr) |>
 #   separate_wider_delim(recommending_state_upr_comma, delim = "-", names_sep = "_", too_few = "align_start") |>
@@ -274,7 +276,7 @@ I then created a set of keywords to assign recommendations as being related to t
 Need to review inclusion of remaining recommendations with reference to CEDAW (~400 entries)
 ```{r}
 # Define keywords to use to identify recommendations related to the right to health
-health_keywords <- "health|sanitation|sanitary|safe water|clean water|right to water|disease|sick|infectio|nutrition|tuberculosis|malaria|with hiv| hiv |hiv/aids|hiv-aids|hiv and aids|hiv-positive| sti | tb |hospital|clinic|vaccin|immunisation|immunization|virus|viral|medic|doctor|nurse|nursing|maternal|contracep|abortion|reproductive|pregnan|prenatal|postnatal|neonatal|breastfe|obstetric|fertility|medic|diabetes|cancer|blood|hypertension|respiratory|prophyla|violence against women|violence against children|domestic violence|family violence|violence in the family|gender-based violence|sexual violence|marital violence|gender violence| rape|virginity|hunger|malnutrition|obesity|sexual abuse|mortality|leprosy|famine|drought|food|tobacco|smoking|child marriage|forced marriage|early marriage|infanticide|mutilation|honor crime|honor killing|honour crime|honour killing|breast ironing|harmful practices|harmful traditional practices|epidem|sterilization|contracept|sex education|suicide|cedaw|femicide|polygam|covid|pandemic|corona|palliative"
+health_keywords <- "health|sanitation|sanitary|safe water|clean water|right to water|disease|sick|infectio|nutrition|tuberculosis|malaria|with hiv| hiv |hiv/aids|hiv-aids|hiv and aids|hiv-positive| sti | tb |hospital|clinic|vaccin|immunisation|immunization|virus|viral|medic|doctor|nurse|nursing|maternal|contracep|abortion|reproductive|pregnan|prenatal|postnatal|neonatal|breastfe|obstetric|fertility|medic|diabetes|cancer|blood|hypertension|respiratory|prophyla|violence against women|violence against children|domestic violence|family violence|violence in the family|gender-based violence|sexual violence|marital violence|gender violence| rape|virginity|hunger|malnutrition|obesity|sexual abuse|mortality|leprosy|famine|drought|food|tobacco|smoking|child marriage|forced marriage|early marriage|infanticide|mutilation|honor crime|honor killing|honour crime|honour killing|breast ironing|harmful practices|harmful traditional practices|epidem|sterilization|contracept|sex education|suicide|cedaw|femicide|polygam|covid|pandemic|corona|palliative|lead poisoning"
 
 # "well-being|wellbeing|disaster|disabled|disabili"
 
@@ -299,7 +301,7 @@ keywords_comb3b <- "surgery|sterili"
 When applying these definitions, I think we will need to first more generally define health-related recommendations, and then within that context we can apply the keywords below to define health systems and services.
 
 ```{r}
-hss_keywords <- "health worker|healthcare worker|health-care worker|uhc|universal health|health system|healthcare system|health-care system|health care system|health service|healthcare service|health-care service|health care service| oral health|health and education|health coverage|public health|free health|access to health|quality health|strenghthen health|right to health|rights to health|guarantee health|guarantee the rights of life, education and health|guarantee the right of health|guarantee the rights to education and health|rights of the Palestinian people, inter alia, to housing, education, health|improve its health - care service|guaranteeing the provision of health|guarantee health care and education|guarantee health assistance to all|achieving health-related goals|highest level of health possible|strengthen its policies in the fields of education and health|programmes aimed at guaranteeing the rights to education, health|programmes to guarantee the rights to education, health|guarantee essential health care for all citizens"
+hss_keywords <- "health worker|healthcare worker|health workforce|health-care worker|uhc|universal health|health system|healthcare system|health-care system|health care system|health service|healthcare service|health-care service|health care service| oral health|health and education|health coverage|public health|free health|access to health|quality health|strenghthen health|right to health|rights to health|guarantee health|guarantee the rights of life, education and health|guarantee the right of health|guarantee the rights to education and health|rights of the Palestinian people, inter alia, to housing, education, health|improve its health - care service|guaranteeing the provision of health|guarantee health care and education|guarantee health assistance to all|achieving health-related goals|highest level of health possible|strengthen its policies in the fields of education and health|programmes aimed at guaranteeing the rights to education, health|programmes to guarantee the rights to education, health|guarantee essential health care for all citizens|digital health|emergency care|critical care|healthy environment|health promotion polic|large scale public health"
 hss_other_keywords <- "data"
 
 hss_keywords_comb1a <- "health"
@@ -320,7 +322,7 @@ emergencies_keywords <- "covid|pandemic|epidemic|drought"
 emergencies_keywords_comb1a <- "disaster"
 emergencies_keywords_comb1b <- "health|life"
 
-emergencies_keywords_comb2a <- "earthquake|flood|drought"
+emergencies_keywords_comb2a <- "earthquake|flood|drought|tsunami|hurricane"
 emergencies_keywords_comb2b <- "relief"
 ```
 
@@ -328,7 +330,7 @@ emergencies_keywords_comb2b <- "relief"
 > The four main types of noncommunicable diseases (NCD) are cardiovascular diseases (like heart attacks and stroke); cancers; chronic respiratory diseases (such as chronic obstructed pulmonary disease and asthma); diabetes; alcohol and drug use. But this category also includes other types of NCD.
 
 ```{r}
-ncd_keywords <- "non-communicable|cardiovascular|stroke|cancer|neoplasm|chronic diseas|hypertension|diabet|alcohol|tobacco|smoking|kidney| liver |air pollution|drug dependence|polluted air"
+ncd_keywords <- "non-communicable|cardiovascular|stroke|cancer|neoplasm|chronic diseas|hypertension|diabet|alcohol|tobacco|smoking|kidney| liver |air pollution|drug dependence|polluted air|leukaemia|leukemia|dementia"
 
 ncd_keywords_comb1a <- " drug"
 ncd_keywords_comb1b <- "addict|abuse| use |harm"
@@ -342,7 +344,7 @@ ncd_exclusion <- ""
 > Communicable diseases comprise both infectious diseases and zoonotic diseases. Infectious diseases are caused by pathogenic microorganisms, such as bacteria, viruses, parasites or fungi; the diseases can be spread, directly or indirectly, from one person to another. Zoonotic diseases are infectious diseases of animals that can cause disease when transmitted to humans.
 
 ```{r}
-communicable_keywords <- " communicable|infectious|zoonotic|pathogen|parasit|fungal|ebola|measles|influenza|polio|norovirus|vector|water-borne|trachoma"
+communicable_keywords <- " communicable|infectious|zoonotic|pathogen|parasit|fungal|ebola|measles|yellow fever|influenza|polio|norovirus|vector|water-borne|trachoma| one health| one-health|zika|mpox"
 
 communicable_keywords_comb1a <- "virus"
 # In this instance, exempt combinations with the following (these will fall purely under HIV/AIDs):
@@ -358,7 +360,8 @@ communicable_exclusion <- ""
 
 May need to first define "Health of LGBTI persons", and then add logic so that other issues related to LGBTI rights, and not included in the health of LGBTI classification, will fall under SRHR.
 ```{r}
-srhr_keywords <- "reproductive|sex education|sexuality education|education on sexual|breastfe|fertility|sterilization|sexual health| sexual education"
+srhr_keywords <- "reproductive|sex education|sexuality education|education on sexual|breastfe|access to fertility services|sexual health| sexual education"
+# "fertility|sterilization"
 
 srhr_keywords_comb1a <- "sex|gender|civil identity|transgender"
 srhr_keywords_comb1b <- "sterili"
@@ -388,7 +391,7 @@ SOCED_keywords <- "social determinants|migrant|poverty| poor|destitut|inequality
 > This category includes any violence which has been perpetrated against another based on their sex, gender identity and expression, or their sexual orientation, as well as harmful practices such as female genital mutilation (FGM), female infanticide, sex-selective abortions, forced and early marriage, honour crimes or killings, polygamy, wife inheritance, virginity tests, breast ironing and similar practices.
 
 ```{r}
-GBV_keywords <- "child marriage|early marriage|forced marriage|marriage of children|minimum age of marriage|minimum age for marriage|marriage for girls and boys under the age |mutilation| fgm |honor crime|honor killing|honour crime|honour killing|breast ironing|harmful practices|harmful traditional practices|violence against women|domestic violence|family violence|violence in the family|gender-based violence|sexual violence|marital violence|partner violence|gender violence| rape|virginity|sexual abuse|femicide|polygam|sex selection|prenatal selection|prenatal genetic|dowry|bride kidnap|child bride|forced steril|istanbul convention| conversion therap|sexual harassment"
+GBV_keywords <- "child marriage|early marriage|forced marriage|marriage of children|minimum age of marriage|minimum age for marriage|marriage for girls and boys under the age |mutilation| fgm |honor crime|honor killing|honour crime|honour killing|breast ironing|harmful practices|harmful traditional practices|violence against women|domestic violence|family violence|violence in the family|gender-based violence|sexual violence|marital violence|partner violence|gender violence| rape|virginity|sexual abuse|femicide|polygam|sex selection|prenatal selection|prenatal genetic|dowry|bride kidnap|child bride|forced steril|coerced steril|istanbul convention| conversion therap|sexual harassment|levirate"
 
 GBV_keywords_comb1a <- "forced|minimum|under the age of"
 GBV_keywords_comb1b <- "marriage|pregnancy"
@@ -404,22 +407,24 @@ GBV_keywords_comb3b <- "select|forced|coercive"
 
 May need to move this to end of the definitions, so that we can use the health_related definition and exclude those already included under SRHR or GBV
 ```{r}
-women_keywords <- "cedaw|elimination of all forms of discrimination against women|menstrua"
+women_keywords <- "menstrua|breast cancer|cervical cancer"
 
-women_keywords_comb1a <- "woman|women"
+women_keywords_comb1a <- "woman|women|cedaw"
 women_keywords_comb1b <- "mortality|health"
 ```
 #### Child, and adolescent health
 > This category covers issues relating to maternal, foetal, newborn, infant, child and adolescent health. Also included in this category are recommendations relating to the ratification of the Convention on the Rights of the Child (CRC) and its optional protocol regarding the sale of children.
 
 ```{r}
-MCAH_keywords <- "newborn| infant|neonatal|new-born|breastfe|rights of the child| crc|sale of children|trafficking of children|child traffic|protection of women and children|trafficking of minor|exploitation of child|ill-treatment of girl|bacha bazi|violence against children"
+MCAH_keywords <- "newborn| infant|neonatal|new-born|breastfe|protection of women and children|exploitation of child|bacha bazi|violence against children|childhood cancer|early pregnancy|killing of children|maiming of children"
 
-MCAH_keywords_comb1a <- "child|infant|adolescent| teen|boy|girl"
-MCAH_keywords_comb1b <- "death|mortality|pregnan|corporal punishment|health|traffic|violen|prostitut|smuggling|sexual abuse|exploitation"
+MCAH_keywords_comb1a <- "child|infant|adolescent| teen| boy| girl| crc"
+MCAH_keywords_comb1b <- "death|mortality|pregnan|corporal punishment|health|violen|prostitut|sexual abuse|exploitation|ill-treatment|cancer"
 
 # MCAH_keywords_comb2a <- "marriage"
 # MCAH_keywords_comb2b <- "under the age of"
+
+# rights of the child| crc|sale of children|trafficking of children|child traffic|trafficking of minor
 ```
 
 #### Essential medicines and health products
@@ -434,10 +439,10 @@ essential_medicines_keywords <- "medicine|antibiotic|antimicrobial"
 > Disability is an umbrella term for impairments, activity limitations and participation restrictions. This category includes any issue that relates to persons with disabilities and their right to access health services. Recommendations to ratify the Convention on the Rights of Persons with Disabilities fall in this category.
 
 ```{r}
-disabilities_keywords <- "crpd|rights of persons with disabilities| deaf"
+# disabilities_keywords <- " deaf"
 
-disabilities_keywords_comb1a <- "health"
-disabilities_keywords_comb1b <- "disabil|disabled"
+disabilities_keywords_comb1a <- "health|hospital|clinic|medical|psychiat|doctor|nurs|disorder|illness|diabet|disease"
+disabilities_keywords_comb1b <- "disabil|disabled|crpd|handicap"
 ```
 
 #### Health of LGBTI persons
@@ -447,9 +452,9 @@ Difficult to tease this category out of SRHR based only on keywords - need to lo
 
 Also need to refine for health-related rights vs rights in general
 ```{r}
-LGBTI_keywords <- "lgbti|reassignment|intersex|same sex|same-sex"
+LGBTI_keywords <- "hormone therapy|sex reassignment|requirement of infertility|requirement of sterilisation|requirement of sterilization|requirement for infertility|requirement for sterilisation|requirement for sterilization|need for sterilization"
 
-LGBTI_keywords_comb1a <- "lgbt|lgtb| gay|lesbian|transgender|intersex|same sex|same-sex|gender"
+LGBTI_keywords_comb1a <- "lgbt|lgtb| gay|lesbian|transgender|intersex|same sex|same-sex"
 LGBTI_keywords_comb1b <- "health|surgery|reassignment|forced"
 ```
 
@@ -503,7 +508,7 @@ nutrition_keywords_comb1b <- ""
 
 #### Occupational health
 ```{r}
-occupational_health_keywords <- "health of workers|workers' health|occupational health|safe and healthy work environment|safe work environment|healthy work environment"
+occupational_health_keywords <- "health of workers|workers' health|occupational health|safe and healthy work environment|safe work environment|healthy work environment|occupational cancer"
 ```
 
 #### Refugee and Migrant health
@@ -519,6 +524,13 @@ Recommendations related to the health and well-being of incarcerated persons. On
 incarcerated_keywords <- " prison|imprison|detention|detaine|incarcer"
 ```
 
+#### Abortion
+```{r}
+abortion_keywords <- "abortion|foetal impairment|fetal impairment"
+
+abortion_keywords_comb1a <- "interrup|terminat"
+abortion_keywords_comb1b <- "pregnan"
+```
 
 #### Maternal health
 ```{r}
@@ -531,14 +543,13 @@ NOT_maternal_keywords <- "miscarriage of justice|miscarriages of justice"
 
 ```
 
-#### Abortion
-
 #### Family planning/Contraception
 ```{r}
-contraception_keywords <- "contracept|birth control| iud |condom|family planning"
+contraception_keywords <- "contracept|birth control| iud |condom|family planning|regulation of fertility"
 
-contraception_keywords_comb1a <- "unintended pregnan"
-contraception_keywords_comb1b <- "prevent|protect"
+contraception_keywords_comb1a <- "uninten"
+contraception_keywords_comb1b <- "pregn"
+contraception_keywords_comb1c <- "prevent|protect"
 ```
 
 
@@ -694,7 +705,7 @@ sdg_data <- uhri_upr |>
   # Disabilities and health
   mutate(
     disabilities = factor(case_when(
-      str_detect(tolower(text_2), disabilities_keywords) ~ "Disabilities and health",
+      # str_detect(tolower(text_2), disabilities_keywords) ~ "Disabilities and health",
       # Combo 1
       str_detect(tolower(text_2), disabilities_keywords_comb1a)&
         str_detect(tolower(text_2), disabilities_keywords_comb1b)~ "Disabilities and health",
@@ -799,10 +810,10 @@ sdg_data <- uhri_upr |>
   # Abortion
   mutate(
     abortion = factor(case_when(
-      str_detect(tolower(text_2), "abortion|foetal impairment|fetal impairment") ~ "Abortion",
+      str_detect(tolower(text_2), abortion_keywords) ~ "Abortion",
       # Combo 1
-      str_detect(tolower(text_2), "interrup|terminat")&
-        str_detect(tolower(text_2), "pregnan")~ "Abortion",
+      str_detect(tolower(text_2), abortion_keywords_comb1a)&
+        str_detect(tolower(text_2), abortion_keywords_comb1b)~ "Abortion",
       .default = "Other"),
       levels = c("Other", "Abortion"))) |> 
   
@@ -812,7 +823,8 @@ sdg_data <- uhri_upr |>
       str_detect(tolower(text_2), contraception_keywords) ~ "Contraception",
       # Combo 1
       str_detect(tolower(text_2), contraception_keywords_comb1a)&
-        str_detect(tolower(text_2), contraception_keywords_comb1b)~ "Contraception",
+        str_detect(tolower(text_2), contraception_keywords_comb1b)&
+        str_detect(tolower(text_2), contraception_keywords_comb1c)~ "Contraception",
       .default = "Other"), 
       levels = c("Other", "Contraception"))
   ) |> 
@@ -851,6 +863,9 @@ sdg_data <- uhri_upr |>
   mutate(
     maternal_health = factor(case_when(
       str_detect(tolower(text_2), NOT_maternal_keywords) ~ "Other",
+      abortion != "Other" & 
+        str_detect(text_2, "risk|health of the pregnant woman|health of pregnant women|life of the pregnant woman|mother's life|mother's health|life of the mother|health of the mother|incompatible with extrauterine life|physical integrity of women|maternal mortality|health of the woman|life of the woman|woman's health|woman's life|women's rights to life|women's rights to health|women's right to both life and health|women's right to health|health for all women|life is endangered as a result of pregnancy|physical integrity of women|women's universal right to life|woman's or a girl's life|rape, incest and life endangerment|rape, life or health endangerment|life-saving abortion") ~ "Maternal health",
+      abortion != "Other" ~ "Other",
       str_detect(tolower(text_2), maternal_keywords) ~ "Maternal health",
       # Combo 1
       str_detect(tolower(text_2), maternal_keywords_comb1a)&
@@ -883,13 +898,13 @@ sdg_data <- uhri_upr |>
     women = factor(case_when(
       str_detect(tolower(text_2), women_keywords) ~ "Women's health",
       # Exclude recommendations related to GBV or SRHR
-      if_any(c(GBV, SRHR, maternal_health), ~ .x != "Other") ~ "Other",
+      if_any(c(GBV, SRHR, maternal_health, contraception, abortion), ~ .x != "Other") ~ "Other",
       # Combo 1
       str_detect(tolower(text_2), women_keywords_comb1a)&
         str_detect(tolower(text_2), women_keywords_comb1b)~ "Women's health",
       # Assign health-related topics that relate to women
       health_related == "Health-related" & 
-        str_detect(tolower(text_2), "women|woman") ~ "Women's health",
+        str_detect(tolower(text_2), "women|woman|cedaw") ~ "Women's health",
       .default = "Other"
     ), levels = c("Other", "Women's health"))
   ) |> 
@@ -918,7 +933,7 @@ sdg_data <- uhri_upr |>
   )|> 
   
   # Reorder columns
-  relocate(health_systems:maternal_health, other_health_related, .after = text) |> 
+  relocate(health_systems:maternal_health, other_health_related, .after = text) |>
   relocate(health_related, .after = text)
 
 saveRDS(sdg_data, file = here("output", "UHRI_UPR_enhanced.rds"))
