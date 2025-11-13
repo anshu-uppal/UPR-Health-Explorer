@@ -12,7 +12,7 @@ theme_labels <- tribble(
   "SOCED", "Social and economic determinants of health",
   "GBV", "Gender-based violence and harmful practices",
   "women", "Women's health",
-  "MCAH", "Child and adolescent health",
+  "CAH", "Child and adolescent health",
   "maternal_health", "Maternal health",
   "abortion", "Abortion",
   "contraception", "Family planning",
