@@ -9,7 +9,7 @@ format:
                 code-fold: true
                 toc: true
                 toc-location: left  # Place TOC on the left side
-                toc-depth: 5        # Include headers up to level 3 (###)
+                toc-depth: 5        # Include headers up to level 5 (#####)
                 toc-title: "On this page" # Custom title for the TOC
                 smooth-scroll: true # Enable smooth scrolling
                 embed-resources: true # Make the html file self contained
