@@ -6286,7 +6286,7 @@
       "checksum": "d733f76fc64828988bbfc86704f34d29"
     },
     "app.R": {
-      "checksum": "89a5305a6f29c588c13c8e958adea01c"
+      "checksum": "11b3ea74427e873c6f2abcee77518af2"
     },
     "code/.gitkeep": {
       "checksum": "81051bcc2cf1bedf378224b0a93e2877"
@@ -6316,7 +6316,7 @@
       "checksum": "09f9189f7a29b6c71650fb829803b073"
     },
     "code/MLM_alt.R": {
-      "checksum": "f769e52a01d1c37bcf8d0919507932bf"
+      "checksum": "4e88d4ec5281cefcf69c0484eb20d511"
     },
     "code/MMR_70.R": {
       "checksum": "4de8fb6715dc7419c65773715fb071cb"
@@ -6346,16 +6346,16 @@
       "checksum": "38f6c6eee213b8773cee2852e99b3a50"
     },
     "code/output/figures/unnamed-chunk-35-1.svg": {
-      "checksum": "17205d5c108574a4509b9b85fbb99069"
+      "checksum": "274ce68e505d805a0a09871633824fac"
     },
     "code/output/figures/unnamed-chunk-36-1.svg": {
-      "checksum": "8c30b6880313f763a9214fe326c88ad6"
+      "checksum": "1f22b9a901152ba900297a6ed88c07f3"
     },
     "code/output/figures/unnamed-chunk-37-1.svg": {
-      "checksum": "da99eff87fa8c46c92c10ac4f5817b8b"
+      "checksum": "c83194554c84bf0958857c23a9ea491a"
     },
     "code/output/figures/unnamed-chunk-38-1.svg": {
-      "checksum": "596f9d1732213fc801a11c9b7916fa71"
+      "checksum": "55bc7c6f9a7216f4119854ae9c746bd8"
     },
     "code/output/figures/unnamed-chunk-39-1.svg": {
       "checksum": "b75b724d8ea040b9b1abe78dbef6f257"
@@ -6382,10 +6382,10 @@
       "checksum": "819bdff2e8b8a41b94ad1f057c3bb03c"
     },
     "code/UHRI_recommendation_definitions.html": {
-      "checksum": "0b35c4ae0abd74e4ae4a993eb2f0279d"
+      "checksum": "e8c6535dc692360cf3e78e4a23570058"
     },
     "code/UHRI_recommendation_definitions.qmd": {
-      "checksum": "0abbce246f34280f02150bb1c403acca"
+      "checksum": "f49499dcca9e898aaca160ae88ba729f"
     },
     "code/UPR_extract.R": {
       "checksum": "d23f3d21a0afc6fda8bb8d93489803f3"
@@ -7537,7 +7537,7 @@
       "checksum": "1107c4ab403da639c65d311cc4153bc6"
     },
     "output/UHRI_UPR_enhanced.rds": {
-      "checksum": "88ecea51205a0e6e4813fbabd56793b6"
+      "checksum": "661eb528f666f40e122c9fa678594d77"
     },
     "output/validation/UPR_validation_2510302222.rds": {
       "checksum": "b5238d4333c3dc01e9f640386836f828"
@@ -7687,7 +7687,7 @@
       "checksum": "1160c7dacb22688b3c0a93588d39da95"
     },
     "www/full_plot.png": {
-      "checksum": "c8b11b91866218c7b0d0d8b30521f040"
+      "checksum": "a83afc088c45de3358841972f741511b"
     },
     "www/full_plot_institutionalbirths.png": {
       "checksum": "6923a1f94c2729ff348f2254e53db06c"
