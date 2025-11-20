@@ -306,7 +306,7 @@ keywords_comb3b <- "surgery|sterili"
 When applying these definitions, I think we will need to first more generally define health-related recommendations, and then within that context we can apply the keywords below to define health systems and services.
 
 ```{r}
-hss_keywords <- "health worker|healthcare worker|health workforce|health-care worker|uhc|universal health|health system|healthcare system|health-care system|health care system|health service|healthcare service|health-care service|health care service| oral health|health and education|health coverage|public health|free health|access to health|quality health|strenghthen health|right to health|rights to health|guarantee health|right to a health|guarantee the rights of life, education and health|guarantee the right of health|guarantee the rights to education and health|rights of the Palestinian people, inter alia, to housing, education, health|improve its health - care service|guaranteeing the provision of health|guarantee health care and education|guarantee health assistance to all|achieving health-related goals|highest level of health possible|strengthen its policies in the fields of education and health|programmes aimed at guaranteeing the rights to education, health|programmes to guarantee the rights to education, health|guarantee essential health care for all citizens|digital health|emergency care|critical care|healthy environment|health promotion polic|large scale public health|effective poverty reduction and health strategies|improve the level of education and health|free basic healthcare"
+hss_keywords <- "health worker|healthcare worker|health workforce|health-care worker|uhc|universal health|health system|healthcare system|health-care system|health care system|health service|healthcare service|health-care service|health care service| oral health|health and education|health coverage|public health|free health|access to health|quality health|strenghthen health|right to health|rights to health|guarantee health|right to a health|guarantee the rights of life, education and health|guarantee the right of health|guarantee the rights to education and health|rights of the Palestinian people, inter alia, to housing, education, health|improve its health - care service|guaranteeing the provision of health|guarantee health care and education|guarantee health assistance to all|achieving health-related goals|highest level of health possible|strengthen its policies in the fields of education and health|programmes aimed at guaranteeing the rights to education, health|programmes to guarantee the rights to education, health|guarantee essential health care for all citizens|digital health|emergency care|critical care|healthy environment|health promotion polic|large scale public health|effective poverty reduction and health strategies|improve the level of education and health|free basic healthcare|national census on health care"
 hss_other_keywords <- "data"
 
 hss_keywords_comb1a <- "health"
@@ -325,7 +325,7 @@ hss_keywords_comb2c <- "financ"
 emergencies_keywords <- "covid|pandemic|epidemic|drought|humanitarian emergency|health emergency"
 
 emergencies_keywords_comb1a <- "disaster"
-emergencies_keywords_comb1b <- "health|life"
+emergencies_keywords_comb1b <- "health|life|wellbeing|well-being"
 
 emergencies_keywords_comb2a <- "earthquake|flood|drought|tsunami|hurricane"
 emergencies_keywords_comb2b <- "relief"
@@ -380,7 +380,7 @@ Sexual health and wellbeing (including infertility)
 ```{r}
 sexual_health_keywords <- "reproductive health|reproductive rights|reproductive medicine|reproductive human rights|reproductive services|access to fertility services|sexual health|reproductive and mental health|reproductive, maternal|reproductive and maternal|reproductive life skills|sexual, reproductive and child health services|sexual and reproductive and health|reproductive and family planning services|reproductive information and services| srhr|regulate assisted reproductive methods"
 
-sexual_health_keywords_comb1a <- "sexual relation|sexual conduct|same-sex|gay|lesbian|same sex|homosexual"
+sexual_health_keywords_comb1a <- "sexual relation|sexual conduct|same-sex|gay|lesbian|same sex|homosexual|sexual activit"
 sexual_health_keywords_comb1b <- "criminal"#|prohibit"
 
 sexual_health_keywords_comb2a <- "sex|gender|civil identity|transgender"
@@ -417,13 +417,13 @@ SOCED_keywords <- "social determinants|migrant|poverty| poor|destitut|inequality
 > This category includes any violence which has been perpetrated against another based on their sex, gender identity and expression, or their sexual orientation, as well as harmful practices such as female genital mutilation (FGM), female infanticide, sex-selective abortions, forced and early marriage, honour crimes or killings, polygamy, wife inheritance, virginity tests, breast ironing and similar practices.
 
 ```{r}
-GBV_keywords <- "child marriage|early marriage|forced marriage|marriage of children|minimum age of marriage|minimum age for marriage|marriage for girls and boys under the age |mutilation|fgm|honor crime|honor killing|honour crime|honour killing|breast ironing|harmful practices|harmful traditional practices|violence against women|domestic violence|family violence|violence in the family|gender-based violence|sexual violence|marital violence|partner violence|gender violence| rape|virginity|sexual abuse|femicide|polygam|sex selection|prenatal selection|prenatal genetic|dowry|bride kidnap|child bride|forced steril|coerced steril|istanbul convention| conversion therap|sexual harassment|levirate|sexual exploit|sexually exploit|child prostitution|forced prostitution|invasive pregnancy test|domestic violence|domestic abuse|domestic maltreatment|forced anal exam"
+GBV_keywords <- "child marriage|early marriage|forced marriage|marriage of children|minimum age of marriage|minimum age for marriage|marriage for girls and boys under the age |mutilation|fgm|excision|honor crime|honor killing|honour crime|honour killing|breast ironing|harmful practices|harmful traditional practices|violence against women|domestic violence|family violence|violence in the family|gender-based violence|sexual violence|marital violence|partner violence|gender violence| rape|^rape|virginity|sexual abuse|femicide|polygam|sex selection|prenatal selection|prenatal genetic|dowry|bride kidnap|child bride|forced steril|coerced steril|istanbul convention| conversion therap|sexual harassment|levirate|sexual exploit|sexually exploit|sexual and labour exploitation|child prostitution|forced prostitution|invasive pregnancy test|domestic violence|domestic abuse|domestic maltreatment|forced anal exam"
 
 GBV_keywords_comb1a <- " forced|minimum|under the age of"
 GBV_keywords_comb1b <- "marriage|pregnancy"
 
 GBV_keywords_comb2a <- "girl|women|sexual|gender|marital|lgbt|lgtb|same-sex|intersex"
-GBV_keywords_comb2b <- "abuse|maltreatment|violence|harassment|intimidation"
+GBV_keywords_comb2b <- "abuse|maltreatment|violence" #harassment|intimidation
 
 GBV_keywords_comb3a <- "abort"
 GBV_keywords_comb3b <- "select| forced|coercive"
@@ -431,6 +431,9 @@ GBV_keywords_comb3b <- "select| forced|coercive"
 GBV_keywords_comb4a <- "lgbt|lgtb| gay|lesbian|transgender|intersex|same sex|same-sex|bisexual"
 GBV_keywords_comb4b <- "surg|medical"
 GBV_keywords_comb4c <- "unnecessary| forced|consent|non-consensual|irreversible"
+
+GBV_keywords_comb5a <- "child|infant|adolescent| teen| boy| girl| crc| minors "
+GBV_keywords_comb5b <- "victims of abuse|corporal punishment|violen|prostitut|sexual abuse|sexual exploitation| rape|^rape"
 ```
 #### Women's health
 > This category is concerned with any health recommendation relating to women’s health, which was not linked to violence or SRHR, but rather addresses general health through a gendered lens. Recommendations classified here include the ratification of CEDAW.
@@ -451,7 +454,7 @@ CAH_keywords <- "newborn| infant|neonatal|new-born|breastfe|protection of women 
 # !! Need to exclude capital punishment/death sentence etc.
 
 CAH_keywords_comb1a <- "child|infant|adolescent| teen| boy| girl| crc| minors "
-CAH_keywords_comb1b <- "death|mortality|pregnan|corporal punishment|health|violen|prostitut|sexual abuse|sexual exploitation|ill-treatment|cancer| rape"
+CAH_keywords_comb1b <- "victims of abuse|death|mortality|pregnan|corporal punishment|health|violen|prostitut|sexual abuse|sexual exploitation|ill-treatment|cancer| rape|with hiv| hiv |hiv/aids|hiv-aids|hiv and aids|hiv & aids|hiv-positive| hiv,| hiv-|prevention of aids|fight against aids|combating aids| sti | std | stds | stis |sti,| std,| stds,| stis,|chlamydia|gonorrhea|syphilis|herpes|papillomavirus| hpv | hpv,|trichomoniasis|sexually transm|sexual transm|antiretroviral|anti-retroviral"
 NOT_CAH_keywords_comb1c <- "death penalty|death sentence|capital punishment"
 
 
@@ -535,7 +538,7 @@ WASH_keywords_comb1b <- ""
 > Recommendations relating to food were included when they referred to nutrition or diet-related concerns such as obesity, malnutrition or micronutrient supplementation.
 
 ```{r}
-nutrition_keywords <- "nutrition|nutritious|diet|obesity|nutrient"
+nutrition_keywords <- "nutrition|nutritious|diet|obesity|nutrient|food insecurit|food securit"
 # "hunger|food|famine" # removing these cuts out 600 
 
 nutrition_keywords_comb1a <- ""
@@ -812,10 +815,14 @@ sdg_data <- uhri_upr |>
       str_detect(tolower(text_2), GBV_keywords_comb3a)&
         str_detect(tolower(text_2), GBV_keywords_comb3b)~ "GBV",
       
-      # Combo 3
+      # Combo 4
       str_detect(tolower(text_2), GBV_keywords_comb4a)&
         str_detect(tolower(text_2), GBV_keywords_comb4b)&
         str_detect(tolower(text_2), GBV_keywords_comb4c) ~ "GBV",
+      
+      # Combo 5
+      str_detect(tolower(text_2), GBV_keywords_comb5a)&
+        str_detect(tolower(text_2), GBV_keywords_comb5b)~ "GBV",
       
       .default = "Other"
     ), levels = c("Other", "GBV"))
