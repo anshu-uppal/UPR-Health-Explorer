@@ -1646,6 +1646,38 @@
         "Built": "R 4.5.1; ; 2025-08-04 01:49:54 UTC; windows"
       }
     },
+    "effectsize": {
+      "Source": "CRAN",
+      "Repository": "https://cran.rstudio.com",
+      "description": {
+        "Type": "Package",
+        "Package": "effectsize",
+        "Title": "Indices of Effect Size",
+        "Version": "1.0.1",
+        "Authors@R": "\n    c(person(given = \"Mattan S.\",\n             family = \"Ben-Shachar\",\n             role = c(\"aut\", \"cre\"),\n             email = \"mattansb@msbstats.info\",\n             comment = c(ORCID = \"0000-0002-4287-4801\")),\n      person(given = \"Dominique\",\n             family = \"Makowski\",\n             role = \"aut\",\n             email = \"dom.makowski@gmail.com\",\n             comment = c(ORCID = \"0000-0001-5375-9967\")),\n      person(given = \"Daniel\",\n             family = \"Lüdecke\",\n             role = \"aut\",\n             email = \"d.luedecke@uke.de\",\n             comment = c(ORCID = \"0000-0002-8895-3206\")),\n      person(given = \"Indrajeet\",\n             family = \"Patil\",\n             role = \"aut\",\n             email = \"patilindrajeet.science@gmail.com\",\n             comment = c(ORCID = \"0000-0003-1995-6531\")),\n      person(given = \"Brenton M.\",\n             family = \"Wiernik\",\n             role = \"aut\",\n             email = \"brenton@wiernik.org\",\n             comment = c(ORCID = \"0000-0001-9560-6336\")),\n      person(given = \"Rémi\",\n             family = \"Thériault\",\n             role = \"aut\",\n             email = \"remi.theriault@mail.mcgill.ca\",\n             comment = c(ORCID = \"0000-0003-4315-6788\")),\n      person(given = \"Ken\",\n             family = \"Kelley\",\n             role = \"ctb\"),\n      person(given = \"David\",\n             family = \"Stanley\",\n             role = \"ctb\"),\n      person(given = \"Aaron\",\n             family = \"Caldwell\",\n             role = \"ctb\",\n             email = \"arcaldwell49@gmail.com\",\n             comment = c(ORCID = \"0000-0002-4541-6283\")),\n      person(given = \"Jessica\",\n             family = \"Burnett\",\n             role = \"rev\",\n             email = \"jburnett@usgs.gov\",\n             comment = c(ORCID = \"0000-0002-0896-5099\")),\n      person(given = \"Johannes\",\n             family = \"Karreth\",\n             role = \"rev\",\n             email = \"jkarreth@ursinus.edu\",\n             comment = c(ORCID = \"0000-0003-4586-7153\")),\n      person(given = \"Philip\",\n             family = \"Waggoner\",\n             role = c(\"aut\", \"ctb\"),\n             email = \"philip.waggoner@gmail.com\",\n             comment = c(ORCID = \"0000-0002-7825-7573\")))",
+        "Maintainer": "Mattan S. Ben-Shachar <mattansb@msbstats.info>",
+        "Description": "Provide utilities to work with indices of effect size for a wide\n    variety of models and hypothesis tests (see list of supported models using\n    the function 'insight::supported_models()'), allowing computation of and\n    conversion between indices such as Cohen's d, r, odds, etc.\n    References: Ben-Shachar et al. (2020) <doi:10.21105/joss.02815>.",
+        "License": "MIT + file LICENSE",
+        "URL": "https://easystats.github.io/effectsize/",
+        "BugReports": "https://github.com/easystats/effectsize/issues/",
+        "Depends": "R (>= 4.0)",
+        "Imports": "bayestestR (>= 0.16.0), insight (>= 1.3.0), parameters (>=\n0.26.0), performance (>= 0.14.0), datawizard (>= 1.1.0), stats,\nutils",
+        "Suggests": "correlation (>= 0.8.7), see (>= 0.11.0), afex, BayesFactor,\nboot, brms, car, emmeans, gt, knitr, lavaan, lme4, lmerTest,\nmgcv, parsnip, pwr, rmarkdown, rms, rstanarm, rstantools,\ntestthat (>= 3.1.0)",
+        "VignetteBuilder": "knitr",
+        "Encoding": "UTF-8",
+        "Language": "en-US",
+        "RoxygenNote": "7.3.2",
+        "Config/testthat/edition": "3",
+        "Config/testthat/parallel": "true",
+        "Config/Needs/website": "rstudio/bslib, r-lib/pkgdown,\neasystats/easystatstemplate",
+        "NeedsCompilation": "no",
+        "Packaged": "2025-05-25 11:16:14 UTC; user",
+        "Author": "Mattan S. Ben-Shachar [aut, cre] (ORCID:\n    <https://orcid.org/0000-0002-4287-4801>),\n  Dominique Makowski [aut] (ORCID:\n    <https://orcid.org/0000-0001-5375-9967>),\n  Daniel Lüdecke [aut] (ORCID: <https://orcid.org/0000-0002-8895-3206>),\n  Indrajeet Patil [aut] (ORCID: <https://orcid.org/0000-0003-1995-6531>),\n  Brenton M. Wiernik [aut] (ORCID:\n    <https://orcid.org/0000-0001-9560-6336>),\n  Rémi Thériault [aut] (ORCID: <https://orcid.org/0000-0003-4315-6788>),\n  Ken Kelley [ctb],\n  David Stanley [ctb],\n  Aaron Caldwell [ctb] (ORCID: <https://orcid.org/0000-0002-4541-6283>),\n  Jessica Burnett [rev] (ORCID: <https://orcid.org/0000-0002-0896-5099>),\n  Johannes Karreth [rev] (ORCID: <https://orcid.org/0000-0003-4586-7153>),\n  Philip Waggoner [aut, ctb] (ORCID:\n    <https://orcid.org/0000-0002-7825-7573>)",
+        "Repository": "CRAN",
+        "Date/Publication": "2025-05-27 13:10:02 UTC",
+        "Built": "R 4.5.2; ; 2025-11-08 03:27:20 UTC; windows"
+      }
+    },
     "emmeans": {
       "Source": "CRAN",
       "Repository": "https://cran.rstudio.com",
@@ -5287,6 +5319,119 @@
         "Built": "R 4.5.2; ; 2025-11-01 02:19:31 UTC; windows"
       }
     },
+    "sjPlot": {
+      "Source": "CRAN",
+      "Repository": "https://cran.rstudio.com",
+      "description": {
+        "Package": "sjPlot",
+        "Type": "Package",
+        "Encoding": "UTF-8",
+        "Title": "Data Visualization for Statistics in Social Science",
+        "Version": "2.9.0",
+        "Authors@R": "c(\n    person(\"Daniel\", \"Lüdecke\", email = \"d.luedecke@uke.de\", role = c(\"aut\", \"cre\"), comment = c(ORCID = \"0000-0002-8895-3206\")),\n    person(\"Alexander\", \"Bartel\", role = \"ctb\", comment = c(ORCID = \"0000-0002-1280-6138\")),\n    person(\"Carsten\", \"Schwemmer\", email = \"carsten.schwemmer@uni-bamberg.de\", role = \"ctb\"),\n    person(given = \"Chuck\", family = \"Powell\", role = \"ctb\", email = \"ibecav@gmail.com\", comment = c(ORCID = \"0000-0002-3606-2188\")),\n    person(given = \"Amir\", family = \"Djalovski\", role = \"ctb\", email = \"Amir.DJV@gmail.com\"),\n    person(given = \"Johannes\", family = \"Titz\", role = \"ctb\", email = \"johannes@titz.science\", comment = c(ORCID = \"0000-0002-1102-5719\")))",
+        "Maintainer": "Daniel Lüdecke <d.luedecke@uke.de>",
+        "Description": "Collection of plotting and table output functions for data\n    visualization. Results of various statistical analyses (that are commonly used\n    in social sciences) can be visualized using this package, including simple and\n    cross tabulated frequencies, histograms, box plots, (generalized) linear models,\n    mixed effects models, principal component analysis and correlation matrices,\n    cluster analyses, scatter plots, stacked scales, effects plots of regression\n    models (including interaction terms) and much more. This package supports\n    labelled data.",
+        "License": "GPL-3",
+        "Depends": "R (>= 4.1)",
+        "Imports": "graphics, grDevices, stats, utils, bayestestR (>= 0.16.1),\ndatawizard (>= 1.1.0), dplyr, ggeffects, ggplot2 (>= 3.2.0),\nknitr, insight (>= 1.3.1), parameters (>= 0.27.0), performance\n(>= 0.15.0), purrr, rlang, scales, sjlabelled (>= 1.1.2),\nsjmisc (>= 2.8.2), sjstats (>= 0.17.8), tidyr (>= 1.0.0)",
+        "Suggests": "brms, car, clubSandwich, cluster, cowplot, effects, haven,\nGPArotation, ggrepel, glmmTMB, gridExtra, ggridges, httr, lme4,\nMASS, nFactors, pscl, psych, rmarkdown, rstanarm, sandwich,\nsplines, survey, TMB, testthat",
+        "URL": "https://strengejacke.github.io/sjPlot/",
+        "BugReports": "https://github.com/strengejacke/sjPlot/issues",
+        "RoxygenNote": "7.3.2",
+        "VignetteBuilder": "knitr",
+        "NeedsCompilation": "no",
+        "Packaged": "2025-07-10 18:10:34 UTC; DL",
+        "Author": "Daniel Lüdecke [aut, cre] (ORCID:\n    <https://orcid.org/0000-0002-8895-3206>),\n  Alexander Bartel [ctb] (ORCID: <https://orcid.org/0000-0002-1280-6138>),\n  Carsten Schwemmer [ctb],\n  Chuck Powell [ctb] (ORCID: <https://orcid.org/0000-0002-3606-2188>),\n  Amir Djalovski [ctb],\n  Johannes Titz [ctb] (ORCID: <https://orcid.org/0000-0002-1102-5719>)",
+        "Repository": "CRAN",
+        "Date/Publication": "2025-07-10 19:00:05 UTC",
+        "Built": "R 4.5.2; ; 2025-11-08 04:19:37 UTC; windows"
+      }
+    },
+    "sjlabelled": {
+      "Source": "CRAN",
+      "Repository": "https://cran.rstudio.com",
+      "description": {
+        "Package": "sjlabelled",
+        "Type": "Package",
+        "Encoding": "UTF-8",
+        "Title": "Labelled Data Utility Functions",
+        "Version": "1.2.0",
+        "Authors@R": "c(\n    person(\"Daniel\", \"Lüdecke\", role = c(\"aut\", \"cre\"), email = \"d.luedecke@uke.de\", comment = c(ORCID = \"0000-0002-8895-3206\")),\n    person(\"avid\", \"Ranzolin\", role = \"ctb\", email = \"daranzolin@gmail.com\"),\n    person(\"Jonathan\", \"De Troye\", role = \"ctb\", email = \"detroyejr@outlook.com\")\n    )",
+        "Maintainer": "Daniel Lüdecke <d.luedecke@uke.de>",
+        "Description": "Collection of functions dealing with labelled data, like reading and \n    writing data between R and other statistical software packages like 'SPSS',\n    'SAS' or 'Stata', and working with labelled data. This includes easy ways \n    to get, set or change value and variable label attributes, to convert \n    labelled vectors into factors or numeric (and vice versa), or to deal with \n    multiple declared missing values.",
+        "License": "GPL-3",
+        "Depends": "R (>= 3.4)",
+        "Imports": "insight, datawizard, stats, tools, utils",
+        "Suggests": "dplyr, haven (>= 1.1.2), magrittr, sjmisc, sjPlot, knitr,\nrlang, rmarkdown, snakecase, testthat",
+        "URL": "https://strengejacke.github.io/sjlabelled/",
+        "BugReports": "https://github.com/strengejacke/sjlabelled/issues",
+        "RoxygenNote": "7.1.2",
+        "VignetteBuilder": "knitr",
+        "NeedsCompilation": "no",
+        "Packaged": "2022-04-10 09:09:11 UTC; DL",
+        "Author": "Daniel Lüdecke [aut, cre] (<https://orcid.org/0000-0002-8895-3206>),\n  avid Ranzolin [ctb],\n  Jonathan De Troye [ctb]",
+        "Repository": "CRAN",
+        "Date/Publication": "2022-04-10 09:30:02 UTC",
+        "Built": "R 4.5.2; ; 2025-11-08 02:51:59 UTC; windows"
+      }
+    },
+    "sjmisc": {
+      "Source": "CRAN",
+      "Repository": "https://cran.rstudio.com",
+      "description": {
+        "Package": "sjmisc",
+        "Type": "Package",
+        "Encoding": "UTF-8",
+        "Title": "Data and Variable Transformation Functions",
+        "Version": "2.8.11",
+        "Authors@R": "c(person(\"Daniel\", \"Lüdecke\", role = c(\"aut\", \"cre\"), email = \"d.luedecke@uke.de\", comment = c(ORCID = \"0000-0002-8895-3206\")),\n    person(\"Iago\", \"Giné-Vázquez\", role = c(\"ctb\"), email = \"i.gine@pssjd.org\"),\n    person(\"Alexander\", \"Bartel\", role = \"ctb\", email = \"alexander.bartel@fu-berlin.de\", comment = c(ORCID = \"0000-0002-1280-6138\")))",
+        "Maintainer": "Daniel Lüdecke <d.luedecke@uke.de>",
+        "Description": "Collection of miscellaneous utility functions, supporting data\n    transformation tasks like recoding, dichotomizing or grouping variables,\n    setting and replacing missing values. The data transformation functions\n    also support labelled data, and all integrate seamlessly into a\n    'tidyverse'-workflow.",
+        "License": "GPL-3",
+        "Depends": "R (>= 3.4)",
+        "Imports": "dplyr, insight, datawizard, magrittr, methods, purrr, rlang,\nsjlabelled (>= 1.1.1), stats, tidyselect, utils",
+        "Suggests": "ggplot2, graphics, haven (>= 2.0.0), mice, nnet, sjPlot,\nsjstats, knitr, rmarkdown, stringdist, testthat, tidyr",
+        "URL": "https://strengejacke.github.io/sjmisc/",
+        "BugReports": "https://github.com/strengejacke/sjmisc/issues",
+        "RoxygenNote": "7.3.2",
+        "VignetteBuilder": "knitr",
+        "NeedsCompilation": "no",
+        "Packaged": "2025-07-30 09:59:14 UTC; Daniel",
+        "Author": "Daniel Lüdecke [aut, cre] (ORCID:\n    <https://orcid.org/0000-0002-8895-3206>),\n  Iago Giné-Vázquez [ctb],\n  Alexander Bartel [ctb] (ORCID: <https://orcid.org/0000-0002-1280-6138>)",
+        "Repository": "CRAN",
+        "Date/Publication": "2025-07-30 10:50:02 UTC",
+        "Built": "R 4.5.2; ; 2025-11-08 03:55:01 UTC; windows"
+      }
+    },
+    "sjstats": {
+      "Source": "CRAN",
+      "Repository": "https://cran.rstudio.com",
+      "description": {
+        "Package": "sjstats",
+        "Type": "Package",
+        "Encoding": "UTF-8",
+        "Title": "Collection of Convenient Functions for Common Statistical\nComputations",
+        "Version": "0.19.1",
+        "Authors@R": "person(\"Daniel\", \"Lüdecke\", role = c(\"aut\", \"cre\"), email = \"d.luedecke@uke.de\", comment = c(ORCID = \"0000-0002-8895-3206\"))",
+        "Maintainer": "Daniel Lüdecke <d.luedecke@uke.de>",
+        "Description": "Collection of convenient functions for common statistical computations,\n             which are not directly provided by R's base or stats packages.\n             This package aims at providing, first, shortcuts for statistical measures,\n             which otherwise could only be calculated with additional effort\n             (like Cramer's V, Phi, or effect size statistics like Eta or Omega squared),\n             or for which currently no functions available. Second, another focus\n             lies on weighted variants of common statistical measures and tests\n             like weighted standard error, mean, t-test, correlation, and more.",
+        "License": "GPL-3",
+        "Depends": "R (>= 4.0), utils",
+        "Imports": "datawizard, effectsize (>= 0.8.8), insight, parameters,\nperformance, stats",
+        "Suggests": "brms, car, coin, ggplot2, lme4, MASS, pscl, pwr, survey,\ntestthat",
+        "URL": "https://strengejacke.github.io/sjstats/",
+        "BugReports": "https://github.com/strengejacke/sjstats/issues",
+        "RoxygenNote": "7.3.2",
+        "Config/testthat/edition": "3",
+        "Config/testthat/parallel": "true",
+        "NeedsCompilation": "no",
+        "Packaged": "2025-06-13 08:50:49 UTC; mail",
+        "Author": "Daniel Lüdecke [aut, cre] (ORCID:\n    <https://orcid.org/0000-0002-8895-3206>)",
+        "Repository": "CRAN",
+        "Date/Publication": "2025-06-13 09:10:02 UTC",
+        "Built": "R 4.5.2; ; 2025-11-08 03:29:25 UTC; windows"
+      }
+    },
     "snakecase": {
       "Source": "CRAN",
       "Repository": "https://cran.rstudio.com",
@@ -6286,7 +6431,7 @@
       "checksum": "d733f76fc64828988bbfc86704f34d29"
     },
     "app.R": {
-      "checksum": "11b3ea74427e873c6f2abcee77518af2"
+      "checksum": "87027059d9f8d08e56b10aacac74b58a"
     },
     "code/.gitkeep": {
       "checksum": "81051bcc2cf1bedf378224b0a93e2877"
@@ -6296,6 +6441,9 @@
     },
     "code/01_recommendation_definitions_ALT.qmd": {
       "checksum": "d6d5e7c968e8e0c247246c2455cd26a3"
+    },
+    "code/app2.R": {
+      "checksum": "3a96817ecb6fb4514f4954834b5c39b7"
     },
     "code/external_data_GBD.R": {
       "checksum": "8952ddc95bdef9346124d5d4d53f6a37"
@@ -6316,10 +6464,19 @@
       "checksum": "09f9189f7a29b6c71650fb829803b073"
     },
     "code/MLM_alt.R": {
-      "checksum": "4e88d4ec5281cefcf69c0484eb20d511"
+      "checksum": "bd81f712ddcbeec27215d74114556859"
+    },
+    "code/MLM_alt_other.R": {
+      "checksum": "2f85f68ac733e2e0c80fc30f37b8f983"
+    },
+    "code/MLM_NEW.R": {
+      "checksum": "16234403dc9a40cb48eea0823a7efc2b"
     },
     "code/MMR_70.R": {
-      "checksum": "4de8fb6715dc7419c65773715fb071cb"
+      "checksum": "e1b71b0759d54685e00a013b4f5ab2c9"
+    },
+    "code/MMR_log change.R": {
+      "checksum": "8f1da8898deb31cf5b2583fc2140e841"
     },
     "code/my_api.R": {
       "checksum": "5329bfcc330d61882fc5010ba4517958"
@@ -6385,7 +6542,10 @@
       "checksum": "e8c6535dc692360cf3e78e4a23570058"
     },
     "code/UHRI_recommendation_definitions.qmd": {
-      "checksum": "f49499dcca9e898aaca160ae88ba729f"
+      "checksum": "a313f15ba8123c2ee2bc9866d56c4b55"
+    },
+    "code/UHRI_recommendation_definitions.rmarkdown": {
+      "checksum": "2c3286b0cc1bc4b03c8ccffaab9916b1"
     },
     "code/UPR_extract.R": {
       "checksum": "d23f3d21a0afc6fda8bb8d93489803f3"
@@ -6637,7 +6797,7 @@
       "checksum": "e386fc68f31948dcb7f27754087e2527"
     },
     "data/UHRI_full.rds": {
-      "checksum": "ba3b251a834f9f25faa660db32247aa7"
+      "checksum": "ac626f7230136184582c31f79145d5b4"
     },
     "data/UHRI_full_2025-09-29.rds": {
       "checksum": "b6e218bdb25c43f424f8d9386e79b0ca"
@@ -6675,11 +6835,14 @@
     "data/UHRI_full_2025-11-13.rds": {
       "checksum": "ba3b251a834f9f25faa660db32247aa7"
     },
+    "data/UHRI_full_2025-11-21.rds": {
+      "checksum": "ac626f7230136184582c31f79145d5b4"
+    },
     "data/UHRI_full_export_20250929.xlsx": {
       "checksum": "402572ee1298d3d825943591c0a73928"
     },
     "data/UHRI_UPR.rds": {
-      "checksum": "a32663cb06adc0bde01b4322d1bf47a3"
+      "checksum": "e321bdaac087deda251652dc5dc3c07a"
     },
     "data/UHRI_UPR_2025-10-16.rds": {
       "checksum": "4efb3edf84e0e609e676554e73a3f443"
@@ -7518,6 +7681,9 @@
     "MMR_70-2025-11-12.xlsx": {
       "checksum": "492b964c5f04b1ce5ac42a1550ce71df"
     },
+    "mmr_70.png": {
+      "checksum": "00e6ece8b7cd5ca9ffb10353110c960c"
+    },
     "MMR_70.xlsx": {
       "checksum": "867abee215a3bb4cd30230a6b7f29b98"
     },
@@ -7687,7 +7853,7 @@
       "checksum": "1160c7dacb22688b3c0a93588d39da95"
     },
     "www/full_plot.png": {
-      "checksum": "a83afc088c45de3358841972f741511b"
+      "checksum": "3bca12d8b12f4c9c6564fe3e2fbae5c6"
     },
     "www/full_plot_institutionalbirths.png": {
       "checksum": "6923a1f94c2729ff348f2254e53db06c"
