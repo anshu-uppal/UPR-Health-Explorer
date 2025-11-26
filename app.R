@@ -1020,9 +1020,9 @@ server <- function(input, output, session) {
     },
     
     content = function(file) {
-      withProgress(message = 'Generating your report...', value = 0, {
+      withProgress(message = 'Generating your report', value = 0, {
         
-        incProgress(0.1, detail = "Preparing template...")
+        # incProgress(0.1, detail = "--> Preparing template")
         
         # Logic to dynamically get flag image. Flags downloaded from:
         # https://stefangabos.github.io/world_countries/#custom-download
@@ -1051,7 +1051,7 @@ server <- function(input, output, session) {
         file.rename(file.path(temp_dir, flag_filename), 
                     file.path(temp_dir, "countryflag.png"))
         
-        incProgress(0.6, detail = "Rendering PDF... (this may take a moment)")
+        incProgress(0.6, detail = "--> Rendering PDF (this may take a moment)")
         # Render the document inside the temporary directory.
         rmarkdown::render(
           input = temp_report_path,
