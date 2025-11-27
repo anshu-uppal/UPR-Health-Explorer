@@ -304,12 +304,12 @@ ui <- page_navbar(
                   pull(country),
                 multiple = FALSE),
     
-    ### PDF downloader ------------------------
-    downloadButton(
-      outputId = "download_report",
-      label = "Download Country Profile"
-      # ,style = "width: 100%;" # Make the button full-width
-    ),
+    # ### PDF downloader ------------------------
+    # downloadButton(
+    #   outputId = "download_report",
+    #   label = "Download Country Profile"
+    #   # ,style = "width: 100%;" # Make the button full-width
+    # ),
     
     #### qmd --------------------------
     # downloadButton(
