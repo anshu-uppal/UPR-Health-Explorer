@@ -834,6 +834,21 @@ Under the Right to Health, States have the following obligations:
             )
   ),
   
+  ## Constitutions  ------------------
+  nav_panel(title = "Constitutions", icon = icon("people-group"),
+            # "Family planning",
+            layout_column_wrap(
+              full_screen = TRUE,
+              style = css(grid_template_columns = "1fr 1fr"),
+              card(
+                fill = FALSE,
+                full_screen = TRUE,
+                card_header("Constitution"),
+                plotOutput("constitution_const_health")
+              )
+            )
+  ),
+  
   nav_spacer(),
   nav_item(
     tags$a(
@@ -4244,6 +4259,70 @@ server <- function(input, output, session) {
       p_caption_text = if(is.na(country_estimate)){paste0(input$selected_SUR, ": No available data")} 
       else{paste0(input$selected_SUR, ": ",country_estimate, "% in ", country_year)},
       p_title_text = "Women of reproductive age (aged 15-49 years) who have their need for family planning satisfied with modern methods (%), latest year",
+      bbox_SUR_region_dynamic = bbox_SUR_region_dynamic(), 
+      bbox_sur = bbox_selected_SUR(), 
+      sur_area =sur_area()
+    )
+  })
+  
+  ## Constitutions ---------
+  output$constitution_const_health <- renderPlot({
+    constitution_dat <- constitutions |>
+      select(-country) |> 
+      right_join(state_geo_reactive(), by = c("iso3" = "iso3")) |>
+      mutate(selected_sur = factor(case_when(
+        country == input$selected_SUR ~ input$selected_SUR,
+        .default = "Other"
+      ),
+      levels = c(input$selected_SUR, "Other")
+      ))
+    
+    country_estimate <- constitution_dat |> 
+      filter(country == input$selected_SUR) |> 
+      pull(const_health)
+    country_year <- "20202020"
+    
+    p1 <- constitution_dat |> 
+      ggplot(aes(geometry = polygon, fill = const_health, color = const_health)) +
+      geom_sf(
+        color = "transparent"
+      ) +
+      # scale_linewidth_manual(values = c(1, 0)) +
+      # scale_color_manual(values = c("blue3", "grey90")) +
+      # scale_fill_fermenter(
+      #   n.breaks = 10,
+      #   palette = "RdYlBu", direction = 1,
+      #   na.value = "grey80",
+      #   labels = relabel_na
+      # ) +
+      # theme_void()+
+      theme_bw() +
+      theme(
+        panel.grid = element_blank(),
+        axis.text = element_blank(), axis.ticks = element_blank(),
+        legend.position = "right",
+        legend.text = element_text(size=12),
+        legend.key.size = unit(25,"pt"),
+        legend.background = element_blank(),
+        axis.title = element_blank(),
+        plot.caption = element_text(size=16),
+        plot.title = ggtext::element_textbox_simple(
+          margin = margin(t = 5, b = 10, r=0, l=0, unit = "pt")
+        )
+      ) +
+      labs(
+        # title = p_title,
+        fill = NULL,
+        # caption = paste0(input$selected_SUR, ": ",country_estimate, "% in ", country_year),
+        color = NULL, lwd = NULL
+      ) +
+      guides(color = "none", lwd = "none", label = "none")
+    
+    map_insetting(
+      p1, plot_dat=constitution_dat,
+      p_caption_text = if(is.na(country_estimate)){paste0(input$selected_SUR, ": No available data")} 
+      else{paste0(input$selected_SUR, ": ",country_estimate, "% in ", country_year)},
+      p_title_text = "Does the constitution explicitly guarantee citizens’ right to health?",
       bbox_SUR_region_dynamic = bbox_SUR_region_dynamic(), 
       bbox_sur = bbox_selected_SUR(), 
       sur_area =sur_area()
