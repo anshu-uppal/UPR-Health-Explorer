@@ -839,11 +839,11 @@ Under the Right to Health, States have the following obligations:
             # "Family planning",
             layout_column_wrap(
               full_screen = TRUE,
-              style = css(grid_template_columns = "1fr 1fr"),
+              style = css(grid_template_columns = "1fr"),
               card(
-                fill = FALSE,
+                # fill = FALSE,
                 full_screen = TRUE,
-                card_header("Constitution"),
+                card_header("Does the constitution explicitly guarantee citizens’ right to health? (as of June 2024)"),
                 plotOutput("constitution_const_health")
               )
             )
@@ -4321,8 +4321,8 @@ server <- function(input, output, session) {
     map_insetting(
       p1, plot_dat=constitution_dat,
       p_caption_text = if(is.na(country_estimate)){paste0(input$selected_SUR, ": No available data")} 
-      else{paste0(input$selected_SUR, ": ",country_estimate, "% in ", country_year)},
-      p_title_text = "Does the constitution explicitly guarantee citizens’ right to health?",
+      else{paste0(input$selected_SUR, ": ",country_estimate)},
+      p_title_text = NULL,
       bbox_SUR_region_dynamic = bbox_SUR_region_dynamic(), 
       bbox_sur = bbox_selected_SUR(), 
       sur_area =sur_area()
