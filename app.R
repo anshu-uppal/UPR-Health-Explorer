@@ -2749,7 +2749,13 @@ server <- function(input, output, session) {
       ungroup() |> 
       distinct() |> 
       arrange(theme, -n) |> 
-      mutate(recommending_state_upr = str_wrap(recommending_state_upr, 20)) |> 
+      mutate(
+        recommending_state_upr = case_when(
+          recommending_state_upr == "Iran (Islamic Republic of)" ~  "Islamic Republic of Iran",
+          .default = recommending_state_upr
+          )
+        # recommending_state_upr = str_wrap(recommending_state_upr, 20)
+        ) |> 
       group_by(recommending_state_upr) |> 
       mutate(n_tot = sum(n)) |> 
       ungroup() |> 
