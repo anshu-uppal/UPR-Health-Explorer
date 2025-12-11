@@ -181,7 +181,8 @@ map_insetting <- function(
   }
 }
 
-leaflet_function <- function(data, pal_object, fill_outcome, hover_labels, legend_title = "Legend text", coord_selected_SUR, zoom_level){
+leaflet_function <- function(data, pal_object, fill_outcome, hover_labels, legend_title = "Legend text", 
+                             coord_selected_SUR, zoom_level, legend_type = "factor", bins_num = 10){
   leaflet(data = data) |>
     setView(lng = coord_selected_SUR[[1]][1], lat = coord_selected_SUR[[1]][2], zoom = zoom_level) %>%
     addPolygons(
@@ -207,21 +208,42 @@ leaflet_function <- function(data, pal_object, fill_outcome, hover_labels, legen
         direction = "auto"
       )
     ) |> 
+    # Add border around the selected SUR
     addPolygons(
       data = data |> filter(selected_sur == TRUE),
       fill = FALSE,          # No fill (transparent), so the layer below shows through
-      color = "red",         # The red border you requested
+      color = "red",         # Red border
       weight = 3,            # Thicker than the base layer
       opacity = 1,
       options = pathOptions(clickable = FALSE) # Make it "click-through" so hover works on layer below
-    ) |> 
+    )|> 
     addLegend(
       pal = pal_object,
       values = ~data[[fill_outcome]],
       opacity = 0.7,
+      bins=bins_num,
       title = legend_title,
       position = "bottomright"
     )
+  
+  # if(legend_type == "factor"){
+  #   p2 <- p1 |> addLegend(
+  #     pal = pal_object,
+  #     values = ~data[[fill_outcome]],
+  #     opacity = 0.7,
+  #     title = legend_title,
+  #     position = "bottomright"
+  #   )
+  # } else{
+  #   p2 <- p1 |> addLegendNumeric(
+  #     pal = pal_object,
+  #     values = ~data[[fill_outcome]],
+  #     opacity = 0.7,
+  #     title = legend_title,
+  #     position = "bottomright",
+  #     bins = bins_num
+  #   )
+  # }
 }
 
 ## Plot resolutions ------------------------------------------
@@ -569,11 +591,11 @@ Under the Right to Health, States have the following obligations:
                                    )
                          ),
                          nav_panel("Health-Related Recommendations",
-                           card(
-                                full_screen = TRUE,
-                                fill = FALSE,
-                                card_body(plotOutput("global_plot"))
-                           )
+                                   card(
+                                     full_screen = TRUE,
+                                     fill = FALSE,
+                                     card_body(plotOutput("global_plot"))
+                                   )
                          ),
                          nav_panel("Recommending states",
                                    card(
@@ -584,7 +606,7 @@ Under the Right to Health, States have the following obligations:
                                        # markdown("(Themes of maternal health, family planning, and abortion)"),
                                        plotlyOutput("plotly_UPR_regional_recommending")
                                        # plotOutput("recommending_states_REGION")
-                                       )
+                                     )
                                    )
                          )
                        ),
@@ -675,11 +697,11 @@ Under the Right to Health, States have the following obligations:
                                      fill = FALSE,
                                      card_body(plotOutput("plot")),
                                      card_footer(
-                                           downloadButton(
-                                             outputId = "download_rec_plot_object",
-                                             label = "Download as PNG"
-                                           )
-                                         )
+                                       downloadButton(
+                                         outputId = "download_rec_plot_object",
+                                         label = "Download as PNG"
+                                       )
+                                     )
                                    )
                          ),
                          nav_panel("Data Table", 
@@ -748,13 +770,23 @@ Under the Right to Health, States have the following obligations:
   ),
   
   ### UHC ---------------------
-  nav_panel(title = "UHC", icon = icon("umbrella"),
-            markdown("UHC: Universal Health Coverage"),
+  nav_panel(title = "Universal Health Coverage", icon = icon("umbrella"),
+            # markdown("UHC: Universal Health Coverage"),
             layout_column_wrap(
               layout_column_wrap(
                 width=1,
-                card(full_screen = TRUE,card_header("UHC Service Coverage Index (2021)"), plotOutput("UHC_map")),
-                card(full_screen = TRUE,card_header("UHC sub-index on RMNCH (2021)"), plotOutput("UHC_RMNCH_map"))
+                # card(full_screen = TRUE,card_header("UHC Service Coverage Index (2021)"), plotOutput("UHC_map")),
+                card(full_screen = TRUE, 
+                     fill=FALSE,
+                     card_header("UHC Service Coverage Index (2021)"),
+                     markdown("Data: <a href='https://www.who.int/data/gho/data/indicators/indicator-details/GHO/uhc-index-of-service-coverage' target='_blank'>WHO</a>"),
+                     leafletOutput("UHC_map_interactive")),
+                card(full_screen = TRUE, 
+                     fill=FALSE,
+                     card_header("UHC sub-index on reproductive, maternal, newborn, and child health (2021)"),
+                     markdown("Data: <a href='https://www.who.int/data/gho/data/indicators/indicator-details/GHO/uhc-sci-components-reproductive-maternal-newborn-and-child-health' target='_blank'>WHO</a>"),
+                     leafletOutput("UHC_RMNCH_map_interactive"))
+                # card(full_screen = TRUE,card_header("UHC sub-index on RMNCH (2021)"), plotOutput("UHC_RMNCH_map"))
               ),
               card(full_screen = TRUE, card_header("UHC indices over time"), plotOutput("UHC_trend"))
             )
@@ -763,7 +795,7 @@ Under the Right to Health, States have the following obligations:
   nav_menu(title = "Maternal health", icon = icon("person-pregnant"),
            #### Maternal mortality -----------------------
            nav_panel(title = "Maternal Mortality", icon = icon("house-medical"),
-                     "Maternal Mortality Ratio (MMR): Number of maternal deaths per 100,000 live births.",
+                     markdown("<strong>Maternal Mortality Ratio (MMR):</strong> Number of maternal deaths per 100,000 live births."),
                      layout_column_wrap(
                        full_screen = TRUE,
                        style = css(grid_template_columns = "1fr 1fr"),
@@ -771,8 +803,14 @@ Under the Right to Health, States have the following obligations:
                          width=1,
                          style = css(grid_template_rows = "6fr 5fr"),
                          # card(full_screen = TRUE,card_header("MMR Estimate Map (2023)"), plotOutput("mmr_map")),
-                         card(full_screen = TRUE,card_header("MMR Estimate Map (2023)"), leafletOutput("mmr_map_interactive")),
-                         card(full_screen = TRUE,card_header("MMR Trends vs. Neighbors"), plotOutput("mmr_time_plot_neighbors"))
+                         card(
+                           full_screen = TRUE,
+                           # fill=FALSE,
+                           card_header("MMR estimates in 2023"), 
+                           markdown("Data: <a href='https://www.who.int/data/gho/data/indicators/indicator-details/GHO/maternal-mortality-ratio-(per-100-000-live-births)' target='_blank'>WHO</a>"),
+                           leafletOutput("mmr_map_interactive")
+                         ),
+                         card(full_screen = TRUE,card_header("MMR trends"), plotOutput("mmr_time_plot_neighbors"))
                        ),
                        navset_card_tab(
                          # title = "Causes of Maternal Death",
@@ -870,12 +908,17 @@ Under the Right to Health, States have the following obligations:
             layout_column_wrap(
               full_screen = TRUE,
               style = css(grid_template_columns = "1fr 1fr"),
-              card(
-                fill = FALSE,
-                full_screen = TRUE,
-                card_header("Met Need for Family planning (%)"),
-                plotOutput("family_planning")
-              )
+              # card(
+              #   fill = FALSE,
+              #   full_screen = TRUE,
+              #   card_header("Met Need for Family planning (%)"),
+              #   plotOutput("family_planning")
+              # )
+              card(full_screen = TRUE, 
+                   fill=FALSE,
+                   card_header("Met Need for Family planning (%, latest year available)"),
+                   markdown("Women of reproductive age (aged 15-49 years) who have their need for family planning satisfied with modern methods (%). Data: <a href='https://www.who.int/data/gho/data/indicators/indicator-details/GHO/proportion-of-women-of-reproductive-age-who-have-their-need-for-family-planning-satisfied-with-modern-methods' target='_blank'>WHO</a>"),
+                   leafletOutput("family_planning_map_interactive"))
             )
   ),
   
@@ -889,9 +932,8 @@ Under the Right to Health, States have the following obligations:
                 fill = FALSE,
                 full_screen = TRUE,
                 card_header("Does the constitution explicitly guarantee an approach to the right to health? (as of June 2024)"),
-                "(Approaches to health include the right to health, public health, or medical care)",
-                plotOutput("constitution_const_anyhealth"),
-                markdown("Data: <a href='https://www.worldpolicycenter.org/policies/does-the-constitution-explicitly-guarantee-an-approach-to-the-right-to-health' target='_blank'>World Policy Center</a>")
+                markdown("Approaches to health include the right to health, public health, or medical care. Data: <a href='https://www.worldpolicycenter.org/policies/does-the-constitution-explicitly-guarantee-an-approach-to-the-right-to-health' target='_blank'>World Policy Center</a>"),
+                plotOutput("constitution_const_anyhealth")
               )
             )
   ),
@@ -1658,7 +1700,7 @@ server <- function(input, output, session) {
       ggplot(aes(x = perc, y = fct_rev(cycle2), 
                  customdata = paste(theme_label, response_upr, cycle, sep = "|"),
                  text = paste0(cycle, " - ", response_upr,  ": n = ", n, " ", n_sup,"\n(click to view text of recommendations)")
-                 ))+
+      ))+
       geom_col(aes(fill = response_upr), alpha = 0.8, width = 0.95)+
       facet_grid(
         rows = vars(theme_label), switch = "y"
@@ -1778,7 +1820,7 @@ server <- function(input, output, session) {
   })
   
   #### Recommending States  ---------------
-
+  
   ##### Plot object -------------------
   plotly_UPR_regional_recommending_object <- reactive({
     req(nrow(filtered_upr_region()) > 0)
@@ -1807,7 +1849,7 @@ server <- function(input, output, session) {
                              "contraception",
                              "sexual_health",
                              "sexual_education"
-                             )) |> 
+      )) |> 
       select(-cycle) |> 
       group_by(recommending_state_upr, theme) |> 
       mutate(n=sum(n)) |> 
@@ -1831,7 +1873,7 @@ server <- function(input, output, session) {
       ggplot(aes(x= reorder(recommending_state_upr, n_tot), y=n,fill=theme_label
                  ,customdata = paste(theme_label, "Supported", NA, recommending_state_upr_raw, sep = "|"),
                  text = paste0(recommending_state_upr, " - ", theme_label,  ": n = ", n,"\n(click to view text of recommendations)")
-                 ))+
+      ))+
       geom_col(alpha = 1, width = 0.8)+
       scale_fill_manual(values = c(
         "Maternal health" = "#8dd3c7",
@@ -1857,12 +1899,12 @@ server <- function(input, output, session) {
         legend.background = element_blank(),
         plot.background = element_rect(color = "#1c164d", fill = NA),
         panel.background = element_blank()
-        )+
+      )+
       labs(y="Supported recommendations (N)", x=NULL,
            fill=NULL)
-
+    
   })
-
+  
   ##### Plot output --------------------
   output$plotly_UPR_regional_recommending <- renderPlotly({
     
@@ -1933,20 +1975,20 @@ server <- function(input, output, session) {
     clicked_recommending <- clicked_info[4]
     
     if(is.na(clicked_cycle) | clicked_cycle == "NA"){
-    res <- plot_data |> 
-      filter(
-        theme_label == clicked_theme, 
-        response_upr == clicked_response
-      ) |> 
-      select(text_2, state_under_review, cycle, response_upr, recommending_state_upr, recommending_state_upr_comma) |> 
-      mutate(state_under_review = factor(state_under_review)) |> 
-      rename(
-        # !! paste0("Recommendation: ", clicked_theme) := text_2,
-        `Recommendation text` = text_2,
-        SUR = state_under_review, 
-        Cycle = cycle, 
-        Response = response_upr
-      )
+      res <- plot_data |> 
+        filter(
+          theme_label == clicked_theme, 
+          response_upr == clicked_response
+        ) |> 
+        select(text_2, state_under_review, cycle, response_upr, recommending_state_upr, recommending_state_upr_comma) |> 
+        mutate(state_under_review = factor(state_under_review)) |> 
+        rename(
+          # !! paste0("Recommendation: ", clicked_theme) := text_2,
+          `Recommendation text` = text_2,
+          SUR = state_under_review, 
+          Cycle = cycle, 
+          Response = response_upr
+        )
     } else{
       res <- plot_data |> 
         filter(
@@ -2748,7 +2790,7 @@ server <- function(input, output, session) {
                              "contraception",
                              "sexual_health",
                              "sexual_education"
-                             )) |> 
+      )) |> 
       select(-cycle) |> 
       group_by(recommending_state_upr, theme) |> 
       mutate(n=sum(n)) |> 
@@ -2759,10 +2801,10 @@ server <- function(input, output, session) {
         recommending_state_upr = case_when(
           recommending_state_upr == "Iran (Islamic Republic of)" ~  "Islamic Republic of Iran",
           .default = recommending_state_upr
-          ),
+        ),
         recommending_state_upr_raw = recommending_state_upr,
         recommending_state_upr = str_wrap(recommending_state_upr, 20)
-        ) |> 
+      ) |> 
       group_by(recommending_state_upr) |> 
       mutate(n_tot = sum(n)) |> 
       ungroup() |> 
@@ -2915,14 +2957,14 @@ server <- function(input, output, session) {
     if(is.na(clicked_recommending)|clicked_recommending == "NA"){
       res2 <- res |> 
         select(-recommending_state_upr, -recommending_state_upr_comma)
-      }else{
-        res2 <- res |> filter(
-          str_detect(`Recommendation text`, clicked_recommending)
-          | str_detect(recommending_state_upr, clicked_recommending)
-          | str_detect(recommending_state_upr_comma, clicked_recommending)
-          ) |> 
-          select(-recommending_state_upr, -recommending_state_upr_comma)
-      }
+    }else{
+      res2 <- res |> filter(
+        str_detect(`Recommendation text`, clicked_recommending)
+        | str_detect(recommending_state_upr, clicked_recommending)
+        | str_detect(recommending_state_upr_comma, clicked_recommending)
+      ) |> 
+        select(-recommending_state_upr, -recommending_state_upr_comma)
+    }
     
     DT::datatable(res2,
                   filter = "top",
@@ -3532,6 +3574,7 @@ server <- function(input, output, session) {
   })
   
   ## UHC Outputs ----------------------------------------------------------
+  ### UHC Index --------------------
   output$UHC_map <- renderPlot({
     UHC_estimate_2021 = UHC_all |>
       filter(country_name == input$selected_SUR, YEAR == 2021, 
@@ -3589,6 +3632,39 @@ server <- function(input, output, session) {
     )
   })
   
+  #### Map - interactive ---------------------
+  output$UHC_map_interactive <- renderLeaflet({
+    
+    UHC_dat <- UHC_all |>
+      filter(YEAR == 2021) |> 
+      filter(SpatialDimType == "COUNTRY") |> 
+      filter(IndicatorCode == "UHC_INDEX_REPORTED") |> 
+      right_join(state_geo_reactive(), by = c("COUNTRY" = "iso3")) |>
+      mutate(selected_sur = case_when(country == input$selected_SUR ~ TRUE, 
+                                      .default = FALSE)) |> 
+      st_as_sf() |> 
+      st_set_geometry("polygon")
+    
+    pal <- colorNumeric(
+      palette = "RdYlBu"
+      , domain = NULL
+    )
+    
+    hover_labels <- sprintf(
+      "<strong>%s</strong><br/>%s",
+      UHC_dat$country,
+      format(UHC_dat$Value, big.mark = ",", scientific = FALSE)
+    ) %>% lapply(htmltools::HTML)
+    
+    leaflet_function(data =  UHC_dat, pal_object = pal, hover_labels = hover_labels, 
+                     legend_title = "%",
+                     coord_selected_SUR = coord_selected_SUR(),
+                     zoom_level = m_zoom(),
+                     fill_outcome =  "NumericValue")
+    
+  })
+  
+  ### RMNCH sub-index ---------------
   output$UHC_RMNCH_map <- renderPlot({
     UHC_estimate_2021 = UHC_all |>
       filter(country_name == input$selected_SUR, YEAR == 2021, 
@@ -3647,6 +3723,40 @@ server <- function(input, output, session) {
     )
     
   })
+  
+  #### Map - interactive ---------------------
+  output$UHC_RMNCH_map_interactive <- renderLeaflet({
+    
+    UHC_RMNCH_dat <- UHC_all |>
+      filter(YEAR == 2021) |> 
+      filter(SpatialDimType == "COUNTRY") |> 
+      filter(IndicatorCode == "UHC_SCI_RMNCH") |> 
+      right_join(state_geo_reactive(), by = c("COUNTRY" = "iso3")) |>
+      mutate(selected_sur = case_when(country == input$selected_SUR ~ TRUE, 
+                                      .default = FALSE)) |> 
+      st_as_sf() |> 
+      st_set_geometry("polygon")
+    
+    pal <- colorNumeric(
+      palette = "RdYlBu"
+      , domain = NULL
+    )
+    
+    hover_labels <- sprintf(
+      "<strong>%s</strong><br/>%s",
+      UHC_RMNCH_dat$country,
+      format(UHC_RMNCH_dat$Value, big.mark = ",", scientific = FALSE)
+    ) %>% lapply(htmltools::HTML)
+    
+    leaflet_function(data =  UHC_RMNCH_dat, pal_object = pal, hover_labels = hover_labels, 
+                     legend_title = "%",
+                     coord_selected_SUR = coord_selected_SUR(),
+                     zoom_level = m_zoom(),
+                     fill_outcome =  "NumericValue")
+    
+  })
+  
+  ### UHC trend ---------------
   
   output$UHC_trend <- renderPlot({
     # Set a default number of columns
@@ -3721,7 +3831,7 @@ server <- function(input, output, session) {
     pal <- colorFactor(
       palette = "YlOrRd"
       , domain = NULL
-      )
+    )
     
     hover_labels_mmr <- sprintf(
       "<strong>%s</strong><br/>MMR in 2023: %s",
@@ -3730,6 +3840,7 @@ server <- function(input, output, session) {
     ) %>% lapply(htmltools::HTML)
     
     leaflet_function(data =  mmr_data, pal_object = pal, hover_labels = hover_labels_mmr, 
+                     legend_title = "MMR",
                      coord_selected_SUR = coord_selected_SUR(),
                      zoom_level = m_zoom(),
                      fill_outcome =  "mmr_cat")
@@ -4406,6 +4517,40 @@ server <- function(input, output, session) {
       bbox_sur = bbox_selected_SUR(), 
       sur_area =sur_area()
     )
+  })
+  
+  #### Map - interactive ---------------------
+  output$family_planning_map_interactive <- renderLeaflet({
+    
+    family_planning_dat <- family_planning |>
+      filter(!is.na(COUNTRY)) |>
+      group_by(COUNTRY) |>
+      slice_max(order_by = year, n = 1) |>
+      ungroup() |>
+      right_join(state_geo_reactive(), by = c("COUNTRY" = "iso3")) |>
+      mutate(selected_sur = case_when(country == input$selected_SUR ~ TRUE, 
+                                      .default = FALSE)) |> 
+      st_as_sf() |> 
+      st_set_geometry("polygon")
+    
+    pal <- colorNumeric(
+      palette = "RdYlBu"
+      , domain = NULL
+    )
+    
+    hover_labels <- sprintf(
+      "<strong>%s</strong><br/>%s&#37; in %s",
+      family_planning_dat$country,
+      format(family_planning_dat$Value, big.mark = ",", scientific = FALSE),
+      family_planning_dat$YEAR
+    ) %>% lapply(htmltools::HTML)
+    
+    leaflet_function(data =  family_planning_dat, pal_object = pal, hover_labels = hover_labels, 
+                     legend_title = "%",
+                     coord_selected_SUR = coord_selected_SUR(),
+                     zoom_level = m_zoom(),
+                     fill_outcome =  "NumericValue")
+    
   })
   
   ## Constitutions ---------
