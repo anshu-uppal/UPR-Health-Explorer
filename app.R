@@ -777,12 +777,12 @@ Under the Right to Health, States have the following obligations:
                 width=1,
                 # card(full_screen = TRUE,card_header("UHC Service Coverage Index (2021)"), plotOutput("UHC_map")),
                 card(full_screen = TRUE, 
-                     fill=FALSE,
+                     # fill=FALSE,
                      card_header("UHC Service Coverage Index (2021)"),
                      markdown("Data: <a href='https://www.who.int/data/gho/data/indicators/indicator-details/GHO/uhc-index-of-service-coverage' target='_blank'>WHO</a>"),
                      leafletOutput("UHC_map_interactive")),
                 card(full_screen = TRUE, 
-                     fill=FALSE,
+                     # fill=FALSE,
                      card_header("UHC sub-index on reproductive, maternal, newborn, and child health (2021)"),
                      markdown("Data: <a href='https://www.who.int/data/gho/data/indicators/indicator-details/GHO/uhc-sci-components-reproductive-maternal-newborn-and-child-health' target='_blank'>WHO</a>"),
                      leafletOutput("UHC_RMNCH_map_interactive"))
@@ -852,8 +852,9 @@ Under the Right to Health, States have the following obligations:
                          width=1,
                          card(
                            full_screen = TRUE,
-                           card_header("Births attended by skilled health personnel")
-                           ,plotOutput("skilled_birth")
+                           card_header("Births attended by skilled health personnel (%), latest year")
+                           , leafletOutput("skilled_birth_map_interactive")
+                           # ,plotOutput("skilled_birth")
                          ),
                          card(
                            full_screen = TRUE,
@@ -865,8 +866,9 @@ Under the Right to Health, States have the following obligations:
                          width=1,
                          card(
                            full_screen = TRUE,
-                           card_header("Proportion of births delivered in a health facility")
-                           ,plotOutput("births_facility")
+                           card_header("Proportion of births delivered in a health facility (%), latest year")
+                           , leafletOutput("institutional_birth_map_interactive")
+                           # ,plotOutput("births_facility")
                          ),
                          card(
                            full_screen = TRUE,
@@ -880,23 +882,28 @@ Under the Right to Health, States have the following obligations:
            #### Abortion ------------------------
            nav_panel(title = "Abortion", icon = icon("prescription-bottle-medical"),
                      layout_column_wrap(
-                       card(fill = FALSE,
+                       card(
+                         # fill = FALSE,
                             full_screen = TRUE,
-                            card_header("Abortion Laws (June 2023)"),
-                            plotOutput("abortion_map_sur"),
+                            card_header("Abortion Laws (evaluated June 2023)"),
+                            leafletOutput("abortion_laws_map_interactive"),
+                            # plotOutput("abortion_map_sur"),
                             markdown("Data: <a href='https://reproductiverights.org/maps/worlds-abortion-laws/' target='_blank'>Center for Reproductive Rights</a>")
                        ),
                        layout_column_wrap(
                          width = 1,
                          card(
                            full_screen = TRUE,
-                           card_header("Estimated Abortion Rate (2015-2019)"),
-                           plotOutput("abortion_rate")
+                           card_header("Estimated abortion rate, per 1,000 (annual estimate for the period 2015-2019)"),
+                           leafletOutput("abortion_rate_map_interactive")
+                           # plotOutput("abortion_rate")
                          ),
                          card(
                            full_screen = TRUE,
-                           card_header("Estimated Unintended Pregnancy Rate (2015-2019)"),
-                           plotOutput("unintended_pregnancy")
+                           card_header("Estimated unintended pregnancy rate, per 1,000 (annual estimate for the period 2015-2019)"),
+                           leafletOutput("unintended_pregnancy_map_interactive")
+                           # card_header("Estimated Unintended Pregnancy Rate (2015-2019)"),
+                           # plotOutput("unintended_pregnancy")
                          )
                        )
                      )
@@ -1132,11 +1139,11 @@ server <- function(input, output, session) {
     req(input$selected_SUR)
     if(sur_area()<10^8){8} else if(
       sur_area()<10^9){7} else if(
-        sur_area() < 10^10){6} else if(
-          sur_area() < 10^11){5} else if(
-            sur_area() < 10^12){4} else if(
-              sur_area() < 10^13){4} else if(
-                sur_area() < 10^15){3} else{2}
+        sur_area() < 10^10){5} else if(
+          sur_area() < 10^11){4} else if(
+            sur_area() < 10^12){3} else if(
+              sur_area() < 10^13){2} else if(
+                sur_area() < 10^15){2} else{1}
   }) 
   
   bbox_selected_SUR <- reactive({
@@ -3575,63 +3582,7 @@ server <- function(input, output, session) {
   })
   
   ## UHC Outputs ----------------------------------------------------------
-  ### UHC Index --------------------
-  output$UHC_map <- renderPlot({
-    UHC_estimate_2021 = UHC_all |>
-      filter(country_name == input$selected_SUR, YEAR == 2021, 
-             IndicatorCode == "UHC_INDEX_REPORTED") |>
-      pull(NumericValue) |>
-      round(0)
-    
-    uhc_estimate_data <- UHC_all |> 
-      filter(YEAR == 2021) |> 
-      # group_by(country_name, IndicatorCode) |> slice_max(order_by = YEAR, n=1) |> ungroup() |> 
-      filter(SpatialDimType == "COUNTRY") |> 
-      filter(IndicatorCode == "UHC_INDEX_REPORTED") |> 
-      right_join(state_geo |> select(iso3), join_by(COUNTRY==iso3)) |> 
-      mutate(selected_sur = factor(case_when(
-        country_name == input$selected_SUR ~ input$selected_SUR,
-        .default = "Other"
-      ),
-      levels = c(input$selected_SUR, "Other")
-      ))
-    
-    p1 <- uhc_estimate_data |> 
-      ggplot(aes(geometry = polygon, fill = NumericValue)) +
-      geom_sf(color="transparent")+
-      # scale_linewidth_manual(values = c(0.8, 0.3)) +
-      # scale_color_manual(values = c("blue3", "grey90")) +
-      scale_fill_stepsn(n.breaks = 10, na.value = "grey80", 
-                        colors = hcl.colors(n = 10, palette = "RdYlBu"))+
-      theme_bw() +
-      theme(
-        panel.grid = element_blank(),
-        axis.text = element_blank(), axis.ticks = element_blank(),
-        legend.position = "right",
-        legend.background = element_blank(),
-        legend.text = element_text(size = 12),
-        legend.key.size = unit(25, "pt"),
-        plot.title = ggtext::element_textbox_simple(
-          width=grid::unit(1,"npc"),
-          halign=0.5,
-          margin = margin(t = 5, b = 10, r=0, l=0, unit = "pt")
-        )
-      )+
-      labs(
-        # title = paste0(input$selected_SUR, ": ", UHC_estimate_2021),
-        fill = NULL
-      )+
-      guides(color = "none", lwd = "none")
-    
-    map_insetting(
-      p1, plot_dat = uhc_estimate_data,
-      p_caption_text = paste0(input$selected_SUR, ": ", UHC_estimate_2021),
-      p_title_text = "UHC Service Coverage Index (2021)",
-      bbox_SUR_region_dynamic = bbox_SUR_region_dynamic(), 
-      bbox_sur = bbox_selected_SUR(), 
-      sur_area =sur_area()
-    )
-  })
+  ### UHC Index -------------------
   
   #### Map - interactive ---------------------
   output$UHC_map_interactive <- renderLeaflet({
@@ -3666,64 +3617,6 @@ server <- function(input, output, session) {
   })
   
   ### RMNCH sub-index ---------------
-  output$UHC_RMNCH_map <- renderPlot({
-    UHC_estimate_2021 = UHC_all |>
-      filter(country_name == input$selected_SUR, YEAR == 2021, 
-             IndicatorCode == "UHC_SCI_RMNCH") |>
-      pull(NumericValue) |>
-      round(0)
-    
-    uhc_rmnch_data <- UHC_all |> 
-      filter(YEAR == 2021) |> 
-      # group_by(country_name, IndicatorCode) |> slice_max(order_by = YEAR, n=1) |> ungroup() |> 
-      filter(SpatialDimType == "COUNTRY") |> 
-      filter(IndicatorCode == "UHC_SCI_RMNCH") |> 
-      right_join(state_geo |> select(iso3), join_by(COUNTRY==iso3)) |> 
-      mutate(selected_sur = factor(case_when(
-        country_name == input$selected_SUR ~ input$selected_SUR,
-        .default = "Other"
-      ),
-      levels = c(input$selected_SUR, "Other")
-      ))
-    
-    p1 <- uhc_rmnch_data |> 
-      ggplot(aes(geometry = polygon, fill = NumericValue)) +
-      geom_sf(color="transparent")+
-      # scale_linewidth_manual(values = c(0.8, 0.3)) +
-      # scale_color_manual(values = c("blue3", "grey90")) +
-      scale_fill_stepsn(n.breaks = 10, na.value = "grey80", 
-                        colors = hcl.colors(n = 10, palette = "RdYlBu"))+
-      theme_bw() +
-      theme(
-        panel.grid = element_blank(),
-        axis.text = element_blank(), axis.ticks = element_blank(),
-        legend.position = "right",
-        legend.background = element_blank(),
-        legend.text = element_text(size = 12),
-        legend.key.size = unit(25, "pt"),
-        plot.title = ggtext::element_textbox_simple(
-          width=grid::unit(1,"npc"),
-          halign=0.5,
-          margin = margin(t = 10, b = 15, r=0, l=0, unit = "pt")
-        )
-      )+
-      labs(
-        # title = paste0(input$selected_SUR, ": ", UHC_estimate_2021),
-        # caption = "RMNCH: reproductive, maternal, newborn and child health",
-        fill = NULL
-      )+
-      guides(color = "none", lwd = "none")
-    
-    map_insetting(
-      p1, plot_dat = uhc_rmnch_data,
-      p_caption_text = paste0(input$selected_SUR, ": ", UHC_estimate_2021),
-      p_title_text = "UHC sub-index on reproductive, maternal, newborn, and child health (2021)",
-      bbox_SUR_region_dynamic = bbox_SUR_region_dynamic(), 
-      bbox_sur = bbox_selected_SUR(), 
-      sur_area =sur_area()
-    )
-    
-  })
   
   #### Map - interactive ---------------------
   output$UHC_RMNCH_map_interactive <- renderLeaflet({
@@ -3835,102 +3728,18 @@ server <- function(input, output, session) {
       , domain = NULL
     )
     
-    hover_labels_mmr <- sprintf(
+    hover_labels <- sprintf(
       "<strong>%s</strong><br/>MMR in 2023: %s",
       mmr_data$country,
       format(mmr_data$Value, big.mark = ",", scientific = FALSE)
     ) %>% lapply(htmltools::HTML)
     
-    leaflet_function(data =  mmr_data, pal_object = pal, hover_labels = hover_labels_mmr, 
+    leaflet_function(data =  mmr_data, pal_object = pal, hover_labels = hover_labels, 
                      legend_title = "MMR",
                      coord_selected_SUR = coord_selected_SUR(),
                      zoom_level = m_zoom(),
                      fill_outcome =  "mmr_cat")
     
-  })
-  
-  #### Map ----------------------------------
-  output$mmr_map <- renderPlot({
-    
-    mmr_estimate_2023 = mmr_map_object()@data |>
-      filter(country_name == input$selected_SUR, 
-             YEAR == "2023") |>
-      pull(NumericValue) |>
-      round(0)
-    
-    map_insetting(
-      p1 = mmr_map_object(), 
-      p_caption_text = paste0(input$selected_SUR, ": ", mmr_estimate_2023, " per 100,000 live births"),
-      p_title_text = "Maternal mortality ratio (MMR) estimates in 2023",
-      bbox_SUR_region_dynamic = bbox_SUR_region_dynamic(), 
-      bbox_sur = bbox_selected_SUR(), 
-      sur_area =sur_area()
-    )
-  })
-  
-  mmr_map_object <- reactive({
-    mmr_estimate_2023 = MMR |>
-      filter(country_name == input$selected_SUR, YEAR == "2023") |>
-      pull(NumericValue) |>
-      round(0)
-    
-    mmr_dat <- MMR |>
-      filter(TimeDimensionValue == 2023, !is.na(country_name)) |>
-      right_join(state_geo_reactive(), 
-                 by = c("COUNTRY" = "iso3")) |> 
-      mutate(selected_sur = factor(case_when(
-        country_name == input$selected_SUR ~ input$selected_SUR,
-        .default = "Other"
-      ),
-      levels = c(input$selected_SUR, "Other")
-      )) # |> filter(!is.na(selected_sur))
-    
-    p1<-mmr_dat |> 
-      ggplot(aes(geometry = polygon, fill = mmr_cat)) +
-      geom_sf(color="transparent") +
-      # scale_linewidth_manual(values = c(0.8, 0.3)) +
-      # scale_color_manual(values = c("blue3", "grey90")) +
-      scale_fill_brewer(palette = "YlOrRd", na.value = "grey80", labels = relabel_na) +
-      theme_void() +
-      theme(
-        # panel.grid = element_blank(),
-        panel.background = element_rect(color="#1c164d"),
-        plot.background = element_rect(color = "#1c164d"),
-        # axis.text = element_blank(), axis.ticks = element_blank(),
-        legend.position = "right",
-        legend.background = element_blank()
-      ) +
-      labs(
-        # title = paste0("Maternal mortality ratio (MMR) estimates in 2023\n", input$selected_SUR, ": ", mmr_estimate_2023, " per 100,000 live births"),
-        fill = NULL,
-        color = NULL, lwd = NULL
-      ) +
-      guides(color = "none", lwd = "none")
-    # coord_sf(
-    #   xlim = c(max(-180, bbox_selected_SUR()[[1]] - 20), min(180, bbox_selected_SUR()[[3]] + 20)),
-    #   ylim = c(max(-55.67295, bbox_selected_SUR()[[2]] - 20), min(83.6341, bbox_selected_SUR()[[4]] + 20))
-    # )
-    
-    
-    # if(sur_area() > 10^11){p2<-p1} else{p2<-p1+geom_rect(
-    #   aes(
-    #     xmin = bbox_selected_SUR()["xmin"]-1,
-    #     xmax = bbox_selected_SUR()["xmax"]+1,
-    #     ymin = bbox_selected_SUR()["ymin"]-1,
-    #     ymax = bbox_selected_SUR()["ymax"]+1
-    #   ),
-    #   fill = "transparent",      # Make the rectangle hollow
-    #   color = "red",             # Set the border color
-    #   linewidth = 0.5            # Set the border thickness
-    # )}
-    # 
-    # p3<-p1+
-    #   scale_linewidth_manual(values = c(0.2, 0.1))+
-    #   coord_sf(
-    #     xlim = c(bbox_selected_SUR()[[1]], bbox_selected_SUR()[[3]]), 
-    #     ylim = c(bbox_selected_SUR()[[2]], bbox_selected_SUR()[[4]]))+guides(fill = "none")+labs(title = NULL)
-    # 
-    # if(sur_area() > 10^11){p2} else{p2+p3}
   })
   
   #### Neighbors comparison over time -------------------------
@@ -4063,66 +3872,41 @@ server <- function(input, output, session) {
   ### Skilled birth outputs --------------------------------------------
   
   #### Skilled birth attendance ----------------
-  output$skilled_birth <- renderPlot({
+  ##### Map - interactive ---------------------
+  output$skilled_birth_map_interactive <- renderLeaflet({
+    
     skilled_birth_dat <- skilled_birth |>
       filter(!is.na(COUNTRY)) |>
       group_by(COUNTRY) |>
       slice_max(order_by = year, n = 1) |>
       ungroup() |>
-      right_join(state_geo, by = c("COUNTRY" = "iso3")) |>
-      mutate(selected_sur = factor(case_when(
-        country == input$selected_SUR ~ input$selected_SUR,
-        .default = "Other"
-      ),
-      levels = c(input$selected_SUR, "Other")
-      ))
+      right_join(state_geo_reactive(), by=join_by(COUNTRY==iso3)) |> 
+      mutate(selected_sur = case_when(country == input$selected_SUR ~ TRUE, .default = FALSE)) |> 
+      st_as_sf() |> 
+      st_set_geometry("polygon")
     
-    country_estimate <- skilled_birth_dat |> 
-      filter(country == input$selected_SUR) |> 
-      pull(Value)
-    country_year <- skilled_birth_dat |> 
-      filter(country == input$selected_SUR) |> 
-      pull(YEAR)
-    
-    p1<-skilled_birth_dat |> 
-      ggplot(aes(geometry = polygon, fill = NumericValue)) +
-      geom_sf(color="transparent") +
-      # scale_linewidth_manual(values = c(0.8, 0.3)) +
-      # scale_color_manual(values = c("blue3", "grey90")) +
-      scale_fill_fermenter(
-        n.breaks = 10,
-        palette = "RdYlBu", direction = 1,
-        na.value = "grey80",
-        labels = relabel_na
-      ) +
-      theme_bw() +
-      theme(
-        panel.grid = element_blank(),
-        axis.text = element_blank(), axis.ticks = element_blank(),
-        legend.position = "right",
-        legend.text = element_text(size=12),
-        legend.key.size = unit(25,"pt"),
-        legend.background = element_blank(),
-        axis.title = element_blank(),
-        plot.title = ggtext::element_textbox_simple(
-          margin = margin(t = 5, b = 10, r=0, l=0, unit = "pt")
-        )
-      ) +
-      labs(
-        fill = NULL,
-        color = NULL, lwd = NULL
-      )+guides(color="none", lwd="none")
-    
-    map_insetting(
-      p1,plot_dat = skilled_birth_dat,
-      p_caption_text = if(is.na(country_estimate)){paste0(input$selected_SUR, ": No available data")} 
-      else{paste0(input$selected_SUR, ": ",country_estimate, "% in ", country_year)},
-      p_title_text = "Births attended by skilled health personnel (%), latest year",
-      bbox_SUR_region_dynamic = bbox_SUR_region_dynamic(),
-      bbox_sur = bbox_selected_SUR(),
-      sur_area =sur_area()
+    pal <- colorNumeric(
+      palette = "RdYlBu"
+      # , reverse = TRUE
+      , domain = NULL
     )
+    
+    hover_labels <- sprintf(
+      "<strong>%s</strong><br/>%s&#37; in %s",
+      skilled_birth_dat$country,
+      format(skilled_birth_dat$Value, big.mark = ",", scientific = FALSE),
+      skilled_birth_dat$YEAR
+    ) %>% lapply(htmltools::HTML)
+    
+    leaflet_function(data =  skilled_birth_dat, pal_object = pal, hover_labels = hover_labels, 
+                     legend_title = "%",
+                     coord_selected_SUR = coord_selected_SUR(),
+                     zoom_level = m_zoom(),
+                     fill_outcome =  "NumericValue")
+    
   })
+  
+  
   
   ##### Neighbors --------------
   output$skilled_birth_plot_neighbors <- renderPlot({
@@ -4180,65 +3964,38 @@ server <- function(input, output, session) {
   })
   
   #### Proportion of births delivered in a health facility ----------------
-  output$births_facility <- renderPlot({
+  ##### Map - interactive ---------------------
+  output$institutional_birth_map_interactive <- renderLeaflet({
+    
     institutional_birth_dat <- institutional_birth |>
       filter(!is.na(COUNTRY)) |>
       group_by(COUNTRY) |>
       slice_max(order_by = year, n = 1) |>
       ungroup() |>
-      right_join(state_geo, by = c("COUNTRY" = "iso3")) |>
-      mutate(selected_sur = factor(case_when(
-        country == input$selected_SUR ~ input$selected_SUR,
-        .default = "Other"
-      ),
-      levels = c(input$selected_SUR, "Other")
-      ))
+      right_join(state_geo_reactive(), by=join_by(COUNTRY==iso3)) |> 
+      mutate(selected_sur = case_when(country == input$selected_SUR ~ TRUE, .default = FALSE)) |> 
+      st_as_sf() |> 
+      st_set_geometry("polygon")
     
-    country_estimate <- institutional_birth_dat |> 
-      filter(country == input$selected_SUR) |> 
-      pull(Value)
-    country_year <- institutional_birth_dat |> 
-      filter(country == input$selected_SUR) |> 
-      pull(YEAR)
-    
-    p1<-institutional_birth_dat |> 
-      ggplot(aes(geometry = polygon, fill = NumericValue)) +
-      geom_sf(color="transparent") +
-      # scale_linewidth_manual(values = c(0.8, 0.3)) +
-      # scale_color_manual(values = c("blue3", "grey90")) +
-      scale_fill_fermenter(
-        n.breaks = 10,
-        palette = "RdYlBu", direction = 1,
-        na.value = "grey80",
-        labels = relabel_na
-      ) +
-      theme_bw() +
-      theme(
-        panel.grid = element_blank(),
-        axis.text = element_blank(), axis.ticks = element_blank(),
-        legend.position = "right",
-        legend.text = element_text(size=12),
-        legend.key.size = unit(25,"pt"),
-        legend.background = element_blank(),
-        axis.title = element_blank(),
-        plot.title = ggtext::element_textbox_simple(
-          margin = margin(t = 5, b = 10, r=0, l=0, unit = "pt")
-        )
-      ) +
-      labs(
-        fill = NULL,
-        color = NULL, lwd = NULL
-      )+guides(color="none", lwd="none")
-    
-    map_insetting(
-      p1, plot_dat = institutional_birth_dat,
-      p_caption_text = if(is.na(country_estimate)){paste0(input$selected_SUR, ": No available data")} 
-      else{paste0(input$selected_SUR, ": ",country_estimate, "% in ", country_year)},
-      p_title_text = "Proportion of births delivered in a health facility (%), latest year",
-      bbox_SUR_region_dynamic = bbox_SUR_region_dynamic(),
-      bbox_sur = bbox_selected_SUR(),
-      sur_area =sur_area()
+    pal <- colorNumeric(
+      palette = "RdYlBu"
+      # , reverse = TRUE
+      , domain = NULL
     )
+    
+    hover_labels <- sprintf(
+      "<strong>%s</strong><br/>%s&#37; in %s",
+      institutional_birth_dat$country,
+      format(institutional_birth_dat$Value, big.mark = ",", scientific = FALSE),
+      institutional_birth_dat$YEAR
+    ) %>% lapply(htmltools::HTML)
+    
+    leaflet_function(data =  institutional_birth_dat, pal_object = pal, hover_labels = hover_labels, 
+                     legend_title = "%",
+                     coord_selected_SUR = coord_selected_SUR(),
+                     zoom_level = m_zoom(),
+                     fill_outcome =  "NumericValue")
+    
   })
   
   ##### Neighbors --------------
@@ -4297,229 +4054,101 @@ server <- function(input, output, session) {
   })
   
   ### Abortion Outputs -------------------------------------------------
-  
-  output$abortion_map_sur <- renderPlot({
+  #### Laws ----
+  ##### Map - interactive ---------------------
+  output$abortion_laws_map_interactive <- renderLeaflet({
     
     world_abortion_laws_data <- world_abortion_laws |>
       right_join(state_geo_reactive()) |>
-      mutate(selected_sur = factor(case_when(
-        country == input$selected_SUR ~ input$selected_SUR,
-        .default = "Other"
-      ),
-      levels = c(input$selected_SUR, "Other")
-      ))
+      mutate(selected_sur = case_when(country == input$selected_SUR ~ TRUE, .default = FALSE)) |> 
+      st_as_sf() |> 
+      st_set_geometry("polygon")
     
-    p1<-world_abortion_laws_data |> 
-      ggplot(aes(geometry = polygon, fill = category)) +
-      geom_sf(color="transparent") +
-      # scale_linewidth_manual(values = c(0.8, 0.3)) +
-      # scale_color_manual(values = c("blue3", "grey90")) +
-      scale_fill_manual(
-        values = c("chartreuse4", "cyan3", "gold", "chocolate1", "red3", "purple"),
-        na.value = "grey90", labels = relabel_na
-      ) +
-      labs(
-        # title = "Abortion laws by State (current as of June 2023)", 
-        fill = NULL) +
-      theme_bw() +
-      theme(
-        panel.grid = element_blank(),
-        axis.text = element_blank(), axis.ticks = element_blank(),
-        axis.title = element_blank(),
-        legend.position = "right",
-        legend.key.size = unit(15, "pt"),
-        # legend.key.height = unit(1,"cm"),
-        legend.text = element_text(size = 11)
-      ) +
-      guides(color = "none", lwd = "none", label = "none")
-    
-    map_insetting(
-      p1, plot_dat = world_abortion_laws_data,
-      p_caption_text = paste0(input$selected_SUR),
-      p_title_text = "Abortion laws by State (current as of June 2023)",
-      bbox_SUR_region_dynamic = bbox_SUR_region_dynamic(), 
-      bbox_sur = bbox_selected_SUR(), 
-      sur_area =sur_area()
+    pal <- colorFactor(
+      # palette = "YlOrRd"
+      palette = c("chartreuse4", "cyan3", "gold", "chocolate1", "red3", "purple")
+      , domain = NULL
     )
+    
+    hover_labels <- sprintf(
+      "<strong>%s</strong><br/>%s",
+      world_abortion_laws_data$country,
+      world_abortion_laws_data$category
+    ) %>% lapply(htmltools::HTML)
+    
+    leaflet_function(data =  world_abortion_laws_data, pal_object = pal, hover_labels = hover_labels, 
+                     legend_title = NULL,
+                     coord_selected_SUR = coord_selected_SUR(),
+                     zoom_level = m_zoom(),
+                     fill_outcome =  "category")
+    
   })
   
-  output$abortion_rate <- renderPlot({
+  #### Rate ----
+  ##### Map - interactive ---------------------
+  output$abortion_rate_map_interactive <- renderLeaflet({
+    
     abortion_rate_data <- abortion_rate |>
       filter(!is.na(COUNTRY)) |>
       filter(Dim1 == "UNCERTAINTY_INTERVAL_UI95") |>
-      right_join(state_geo_reactive(), by = c("COUNTRY" = "iso3")) |>
-      mutate(selected_sur = factor(case_when(
-        country == input$selected_SUR ~ input$selected_SUR,
-        .default = "Other"
-      ),
-      levels = c(input$selected_SUR, "Other")
-      ))
+      right_join(state_geo_reactive(), by=join_by(COUNTRY==iso3)) |> 
+      mutate(selected_sur = case_when(country == input$selected_SUR ~ TRUE, .default = FALSE)) |> 
+      st_as_sf() |> 
+      st_set_geometry("polygon")
     
-    country_estimate <- abortion_rate_data |> 
-      filter(country == input$selected_SUR) |> 
-      pull(Value)
-    
-    p1<- abortion_rate_data |> 
-      ggplot(aes(geometry = polygon, fill = NumericValue)) +
-      geom_sf(color="transparent") +
-      # scale_linewidth_manual(values = c(0.8, 0.3)) +
-      # scale_color_manual(values = c("blue3", "grey90")) +
-      scale_fill_stepsn(
-        n.breaks = 8, na.value = "grey80",
-        colors = hcl.colors(n = 8, palette = "RdYlBu", rev = TRUE)
-      ) +
-      theme_bw() +
-      theme(
-        panel.grid = element_blank(),
-        axis.text = element_blank(), axis.ticks = element_blank(),
-        legend.position = "right",
-        legend.text = element_text(size=12),
-        legend.key.size = unit(20, "pt"),
-        legend.background = element_blank(),
-        axis.title = element_blank()
-      ) +
-      labs(
-        # title = "Abortion rate (model-estimated), 2015-2019",
-        fill = "Annual estimate\n(per 1,000)",
-        color = NULL, lwd = NULL
-      ) +
-      guides(color = "none", lwd = "none", label = "none")
-    
-    map_insetting(
-      p1, plot_dat = abortion_rate_data,
-      p_caption_text = paste0(input$selected_SUR, if(is.na(country_estimate)){": No available data"} 
-                              else{paste0(": ",country_estimate, " per 1,000")}),
-      p_title_text = "Abortion rate (model-estimated), 2015-2019",
-      bbox_SUR_region_dynamic = bbox_SUR_region_dynamic(), 
-      bbox_sur = bbox_selected_SUR(), 
-      sur_area =sur_area()
+    pal <- colorNumeric(
+      palette = "RdYlBu"
+      , reverse = TRUE
+      , domain = NULL
     )
+    
+    hover_labels <- sprintf(
+      "<strong>%s</strong><br/>%s",
+      abortion_rate_data$country,
+      format(abortion_rate_data$Value, big.mark = ",", scientific = FALSE)
+    ) %>% lapply(htmltools::HTML)
+    
+    leaflet_function(data =  abortion_rate_data, pal_object = pal, hover_labels = hover_labels, 
+                     legend_title = NULL,
+                     coord_selected_SUR = coord_selected_SUR(),
+                     zoom_level = m_zoom(),
+                     fill_outcome =  "NumericValue")
+    
   })
   
-  output$unintended_pregnancy <- renderPlot({
+  #### Unintended pregnancy ----
+  ##### Map - interactive ---------------------
+  output$unintended_pregnancy_map_interactive <- renderLeaflet({
+    
     unintended_pregnancy_data <- unintended_pregnancy |>
       filter(!is.na(COUNTRY)) |>
       filter(Dim1 == "UNCERTAINTY_INTERVAL_UI95") |>
-      right_join(state_geo_reactive(), by = c("COUNTRY" = "iso3")) |>
-      mutate(selected_sur = factor(case_when(
-        country == input$selected_SUR ~ input$selected_SUR,
-        .default = "Other"
-      ),
-      levels = c(input$selected_SUR, "Other")
-      ))
+      right_join(state_geo_reactive(), by=join_by(COUNTRY==iso3)) |> 
+      mutate(selected_sur = case_when(country == input$selected_SUR ~ TRUE, .default = FALSE)) |> 
+      st_as_sf() |> 
+      st_set_geometry("polygon")
     
-    country_estimate <- unintended_pregnancy_data |> 
-      filter(country == input$selected_SUR) |> 
-      pull(Value)
-    
-    p1<- unintended_pregnancy_data |> 
-      ggplot(aes(geometry = polygon, fill = NumericValue)) +
-      geom_sf(color="transparent") +
-      # scale_linewidth_manual(values = c(0.8, 0.3)) +
-      # scale_color_manual(values = c("blue3", "grey90")) +
-      scale_fill_fermenter(
-        n.breaks = 10,
-        palette = "RdYlBu", direction = -1,
-        na.value = "grey80",
-        labels = relabel_na
-      ) +
-      theme_bw() +
-      theme(
-        panel.grid = element_blank(),
-        axis.text = element_blank(), axis.ticks = element_blank(),
-        legend.position = "right",
-        # legend.key.height = unit(1,"cm"),
-        legend.key.size = unit(20, "pt"),
-        legend.text = element_text(size=12),
-        legend.background = element_blank(),
-        axis.title = element_blank()
-      ) +
-      labs(
-        # title = "Unintended pregnancy (model-estimated), 2015-2019",
-        fill = "Annual estimate\n(per 1,000)",
-        color = NULL, lwd = NULL
-      ) +
-      guides(color = "none", lwd = "none", label = "none")
-    
-    map_insetting(
-      p1, plot_dat = unintended_pregnancy_data,
-      p_caption_text = paste0(input$selected_SUR, if(is.na(country_estimate)){": No available data"} 
-                              else{paste0(": ",country_estimate, " per 1,000")}),
-      p_title_text = "Unintended pregnancy (model-estimated), 2015-2019",
-      bbox_SUR_region_dynamic = bbox_SUR_region_dynamic(), 
-      bbox_sur = bbox_selected_SUR(), 
-      sur_area =sur_area()
+    pal <- colorNumeric(
+      palette = "RdYlBu"
+      , reverse = TRUE
+      , domain = NULL
     )
+    
+    hover_labels <- sprintf(
+      "<strong>%s</strong><br/>%s",
+      unintended_pregnancy_data$country,
+      format(unintended_pregnancy_data$Value, big.mark = ",", scientific = FALSE)
+    ) %>% lapply(htmltools::HTML)
+    
+    leaflet_function(data =  unintended_pregnancy_data, pal_object = pal, hover_labels = hover_labels, 
+                     legend_title = NULL,
+                     coord_selected_SUR = coord_selected_SUR(),
+                     zoom_level = m_zoom(),
+                     fill_outcome =  "NumericValue")
+    
   })
   
   ## Family planning outputs -------------------------------------
-  output$family_planning <- renderPlot({
-    family_planning_dat <- family_planning |>
-      filter(!is.na(COUNTRY)) |>
-      group_by(COUNTRY) |>
-      slice_max(order_by = year, n = 1) |>
-      ungroup() |>
-      right_join(state_geo_reactive(), by = c("COUNTRY" = "iso3")) |>
-      mutate(selected_sur = factor(case_when(
-        country == input$selected_SUR ~ input$selected_SUR,
-        .default = "Other"
-      ),
-      levels = c(input$selected_SUR, "Other")
-      ))
-    
-    country_estimate <- family_planning_dat |> 
-      filter(country == input$selected_SUR) |> 
-      pull(Value)
-    country_year <- family_planning_dat |> 
-      filter(country == input$selected_SUR) |> 
-      pull(YEAR)
-    
-    p1 <- family_planning_dat |> 
-      ggplot(aes(geometry = polygon, fill = NumericValue, color = NumericValue)) +
-      geom_sf(
-        color = "transparent"
-      ) +
-      # scale_linewidth_manual(values = c(1, 0)) +
-      # scale_color_manual(values = c("blue3", "grey90")) +
-      scale_fill_fermenter(
-        n.breaks = 10,
-        palette = "RdYlBu", direction = 1,
-        na.value = "grey80",
-        labels = relabel_na
-      ) +
-      # theme_void()+
-      theme_bw() +
-      theme(
-        panel.grid = element_blank(),
-        axis.text = element_blank(), axis.ticks = element_blank(),
-        legend.position = "right",
-        legend.text = element_text(size=12),
-        legend.key.size = unit(25,"pt"),
-        legend.background = element_blank(),
-        axis.title = element_blank(),
-        plot.caption = element_text(size=16),
-        plot.title = ggtext::element_textbox_simple(
-          margin = margin(t = 5, b = 10, r=0, l=0, unit = "pt")
-        )
-      ) +
-      labs(
-        # title = p_title,
-        fill = NULL,
-        # caption = paste0(input$selected_SUR, ": ",country_estimate, "% in ", country_year),
-        color = NULL, lwd = NULL
-      ) +
-      guides(color = "none", lwd = "none", label = "none")
-    
-    map_insetting(
-      p1, plot_dat=family_planning_dat,
-      p_caption_text = if(is.na(country_estimate)){paste0(input$selected_SUR, ": No available data")} 
-      else{paste0(input$selected_SUR, ": ",country_estimate, "% in ", country_year)},
-      p_title_text = "Women of reproductive age (aged 15-49 years) who have their need for family planning satisfied with modern methods (%), latest year",
-      bbox_SUR_region_dynamic = bbox_SUR_region_dynamic(), 
-      bbox_sur = bbox_selected_SUR(), 
-      sur_area =sur_area()
-    )
-  })
   
   #### Map - interactive ---------------------
   output$family_planning_map_interactive <- renderLeaflet({
@@ -4557,132 +4186,6 @@ server <- function(input, output, session) {
   
   ## Constitutions ---------
   ## Right to health ----------
-  output$constitution_const_health <- renderPlot({
-    constitution_dat <- constitutions |>
-      select(-country) |> 
-      right_join(state_geo_reactive(), by = c("iso3" = "iso3")) |>
-      mutate(selected_sur = factor(case_when(
-        country == input$selected_SUR ~ input$selected_SUR,
-        .default = "Other"
-      ),
-      levels = c(input$selected_SUR, "Other")
-      ))
-    
-    country_estimate <- constitution_dat |> 
-      filter(country == input$selected_SUR) |> 
-      pull(const_health)
-    country_year <- "20202020"
-    
-    p1 <- constitution_dat |> 
-      ggplot(aes(geometry = polygon, fill = const_health, color = const_health)) +
-      geom_sf(
-        color = "transparent"
-      ) +
-      # scale_linewidth_manual(values = c(1, 0)) +
-      # scale_color_manual(values = c("blue3", "grey90")) +
-      # scale_fill_fermenter(
-      #   n.breaks = 10,
-      #   palette = "RdYlBu", direction = 1,
-      #   na.value = "grey80",
-      #   labels = relabel_na
-      # ) +
-      # theme_void()+
-      theme_bw() +
-      theme(
-        panel.grid = element_blank(),
-        axis.text = element_blank(), axis.ticks = element_blank(),
-        legend.position = "right",
-        legend.text = element_text(size=12),
-        legend.key.size = unit(25,"pt"),
-        legend.background = element_blank(),
-        axis.title = element_blank(),
-        plot.caption = element_text(size=16),
-        plot.title = ggtext::element_textbox_simple(
-          margin = margin(t = 5, b = 10, r=0, l=0, unit = "pt")
-        )
-      ) +
-      labs(
-        # title = p_title,
-        fill = NULL,
-        # caption = paste0(input$selected_SUR, ": ",country_estimate, "% in ", country_year),
-        color = NULL, lwd = NULL
-      ) +
-      guides(color = "none", lwd = "none", label = "none")
-    
-    map_insetting(
-      p1, plot_dat=constitution_dat,
-      p_caption_text = if(is.na(country_estimate)){paste0(input$selected_SUR, ": No available data")} 
-      else{paste0(input$selected_SUR, ": ",country_estimate)},
-      p_title_text = NULL,
-      bbox_SUR_region_dynamic = bbox_SUR_region_dynamic(), 
-      bbox_sur = bbox_selected_SUR(), 
-      sur_area =sur_area()
-    )
-  })
-  
-  ## Approach to Right to health ----------
-  output$constitution_const_anyhealth <- renderPlot({
-    constitution_dat <- constitutions |>
-      select(-country) |> 
-      right_join(state_geo_reactive(), by = c("iso3" = "iso3")) |>
-      mutate(selected_sur = factor(case_when(
-        country == input$selected_SUR ~ input$selected_SUR,
-        .default = "Other"
-      ),
-      levels = c(input$selected_SUR, "Other")
-      ))
-    
-    country_estimate <- constitution_dat |> 
-      filter(country == input$selected_SUR) |> 
-      pull(const_anyhealth)
-    country_year <- "20202020"
-    
-    p1 <- constitution_dat |> 
-      ggplot(aes(geometry = polygon, fill = const_anyhealth, color = const_anyhealth)) +
-      geom_sf(
-        color = "transparent"
-      ) +
-      # scale_linewidth_manual(values = c(1, 0)) +
-      # scale_color_manual(values = c("blue3", "grey90")) +
-      # scale_fill_fermenter(
-      #   n.breaks = 10,
-      #   palette = "RdYlBu", direction = 1,
-      #   na.value = "grey80",
-      #   labels = relabel_na
-      # ) +
-      # theme_void()+
-      theme_bw() +
-      theme(
-        panel.grid = element_blank(),
-        axis.text = element_blank(), axis.ticks = element_blank(),
-        legend.position = "right",
-        legend.text = element_text(size=12),
-        legend.key.size = unit(25,"pt"),
-        legend.background = element_blank(),
-        axis.title = element_blank(),
-        plot.caption = element_text(size=16),
-        plot.title = ggtext::element_textbox_simple(
-          margin = margin(t = 5, b = 10, r=0, l=0, unit = "pt")
-        )
-      ) +
-      labs(
-        # title = p_title,
-        fill = NULL,
-        # caption = paste0(input$selected_SUR, ": ",country_estimate, "% in ", country_year),
-        color = NULL, lwd = NULL
-      ) +
-      guides(color = "none", lwd = "none", label = "none")
-    
-    map_insetting(
-      p1, plot_dat=constitution_dat,
-      p_caption_text = if(is.na(country_estimate)){paste0(input$selected_SUR, ": No available data")} 
-      else{paste0(input$selected_SUR, ": ",country_estimate)},
-      p_title_text = NULL,
-      bbox_SUR_region_dynamic = bbox_SUR_region_dynamic(), 
-      bbox_sur = bbox_selected_SUR(), 
-      sur_area =sur_area()
-    )
-  })
   
   ### Map - interactive ---------------------
   output$const_anyhealth_map_interactive <- renderLeaflet({
@@ -4714,69 +4217,6 @@ server <- function(input, output, session) {
     
   })
   
-  ## Right to medical care ----------
-  output$constitution_const_medcare <- renderPlot({
-    constitution_dat <- constitutions |>
-      select(-country) |> 
-      right_join(state_geo_reactive(), by = c("iso3" = "iso3")) |>
-      mutate(selected_sur = factor(case_when(
-        country == input$selected_SUR ~ input$selected_SUR,
-        .default = "Other"
-      ),
-      levels = c(input$selected_SUR, "Other")
-      ))
-    
-    country_estimate <- constitution_dat |> 
-      filter(country == input$selected_SUR) |> 
-      pull(const_medcare)
-    country_year <- "20202020"
-    
-    p1 <- constitution_dat |> 
-      ggplot(aes(geometry = polygon, fill = const_medcare, color = const_medcare)) +
-      geom_sf(
-        color = "transparent"
-      ) +
-      # scale_linewidth_manual(values = c(1, 0)) +
-      # scale_color_manual(values = c("blue3", "grey90")) +
-      # scale_fill_fermenter(
-      #   n.breaks = 10,
-      #   palette = "RdYlBu", direction = 1,
-      #   na.value = "grey80",
-      #   labels = relabel_na
-      # ) +
-      # theme_void()+
-      theme_bw() +
-      theme(
-        panel.grid = element_blank(),
-        axis.text = element_blank(), axis.ticks = element_blank(),
-        legend.position = "right",
-        legend.text = element_text(size=12),
-        legend.key.size = unit(25,"pt"),
-        legend.background = element_blank(),
-        axis.title = element_blank(),
-        plot.caption = element_text(size=16),
-        plot.title = ggtext::element_textbox_simple(
-          margin = margin(t = 5, b = 10, r=0, l=0, unit = "pt")
-        )
-      ) +
-      labs(
-        # title = p_title,
-        fill = NULL,
-        # caption = paste0(input$selected_SUR, ": ",country_estimate, "% in ", country_year),
-        color = NULL, lwd = NULL
-      ) +
-      guides(color = "none", lwd = "none", label = "none")
-    
-    map_insetting(
-      p1, plot_dat=constitution_dat,
-      p_caption_text = if(is.na(country_estimate)){paste0(input$selected_SUR, ": No available data")} 
-      else{paste0(input$selected_SUR, ": ",country_estimate)},
-      p_title_text = NULL,
-      bbox_SUR_region_dynamic = bbox_SUR_region_dynamic(), 
-      bbox_sur = bbox_selected_SUR(), 
-      sur_area =sur_area()
-    )
-  })
 }
 
 # 4. RUN APP ==================================================================
