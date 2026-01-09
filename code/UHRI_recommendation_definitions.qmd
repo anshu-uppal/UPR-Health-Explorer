@@ -55,207 +55,210 @@ Download the full UHRI dataset from <https://uhri.ohchr.org/en/our-data-api>
 The direct download of the excel file is: <https://dataex.ohchr.org/uhri/export-results/export-full-en.xlsx>
 
 ```{r}
-# state_geo <- readRDS(here("output", "state_geo_enhanced.rds"))
-# 
-# httr::GET("https://dataex.ohchr.org/uhri/export-results/export-full-en.xlsx", httr::write_disk(tf <- tempfile(fileext = ".xlsx")))
-# df_0 <-  readxl::read_xlsx(tf,
-#                    # Specify the column types, otherwise some show up as NA in R
-#                    col_types = c(
-#                      rep("text", 7), "date", rep("text", 7), "date")) |>
-#   janitor::clean_names();unlink(tf);rm(tf)
-# df<-df_0 |> janitor::clean_names() |>
-#   # Add the date that the dataset was accessed from the UHRI website
-#   mutate(date_accessed = ymd(Sys.Date())) |>
-#   mutate(countries_concerned = str_remove(countries_concerned, "- "),
-#          reccomending_body = str_remove(reccomending_body, "- ")
-#   ) |>
-#   mutate(
-#     text1 = text,
-#     # text = str_remove_all(text, "&nbsp;"),
-#     # text = str_remove_all(text, "&nbsp"),
-#     text = str_replace_all(text, "’", "'"),
-#     text = str_replace_all(text, "“", "'"),
-#     text = str_replace_all(text, "”", "'"),
-#     text = str_replace_all(text, "\\( ", "\\("),
-#     text = str_replace_all(text, " \\)", "\\)"),
-#     text = str_replace_all(text, " ' s ", "'s "),
-#     text = str_replace_all(text, "' s ", "'s "),
-#     text = str_replace_all(text, "&nbsp;", " "),
-#     text = str_replace_all(text, "&nbsp", " "),
-#     text = str_replace_all(text, "&rsquo;", "'"),
-#     text = str_replace_all(text, "&ndash;|&#8209;", "-"),
-#     text = str_replace_all(text, "&ocirc;", "ô"),
-#     text = str_replace_all(text, "&ldquo;|&rdquo;", "'"),
-#     text = str_replace_all(text, "&uacute;", "ú"),
-#     text = str_replace_all(text, "&uuml;", "ü"),
-#     text = str_replace_all(text, "&amp;", "&"),
-#     text = str_replace_all(text, "&deg;", "°"),
-#     text = str_replace_all(text, "&eacute;", "é"),
-#     text = str_replace_all(text, "&egrave;", "è"),
-#     text = str_replace_all(text, "&lrm;", ""),
-#     text = str_replace_all(text, "&iacute;", "í"),
-# 
-#     text = str_squish(text),
-#     text = case_when(str_starts(text, "R ") ~ str_remove(text, "R "),
-#                      .default = text),
-#     # text = str_replace(text, " . ", ". "),
-#     # text = str_replace(text, ":.", ":"),
-#     # text = str_replace(text, ",.", ":"),
-#     text = str_remove_all(text, "\\[...\\]"),
-#     # text = str_replace_all(text, "([A-Za-z]+)'s([A-Za-z]+)", "\\1's \\2")
-#     text = str_replace_all(text, "non- communicable", "non-communicable"),
-#     text = str_replace_all(text, "l aw s on trans i tional", "laws on transitional"),
-#     text = str_replace_all(text, "sexual a buse", "sexual abuse")
-#   ) |>
-#   arrange(countries_concerned, reccomending_body, document_publication_date) |>
-#   rename(document = document_symbol, body = reccomending_body) |>
-#   mutate(
-#     paragraph = case_when(
-#       # CASE 1: The text starts with "Recommendation No."
-#       # This detects the first pattern you described.
-#       # str_detect(text, "^Recommendation No\\.") ~ {
-#       #   # str_match() lets us capture parts of the text.
-#       #   # We look for "para. [number]: [number]"
-#       #   matches <- str_match(text, "para\\.\\s*(\\d+):\\s*(\\d+)")
-#       #   # We then take the captured numbers (the 2nd and 3rd elements from the match)
-#       #   # and paste them together with a dot, creating the "96.21" format.
-#       #   paste(matches[, 2], matches[, 3], sep = ".")
-#       # },
-#       str_detect(text, "^Recommendation No") ~ {
-#         # This regex now finds the paragraph number, skips to the recommendation number, and captures both.
-#         # It works whether there is a colon or not.
-#         matches <- str_match(text, "para\\.\\s*(\\d+).*?(\\d+)\\.")
-#         paste(matches[, 2], matches[, 3], sep = ".")
-#       },
-# 
-#       # NEW CASE: The text starts with "Recommendations contained in para."
-#       # str_detect(text, "^Recommendations contained in para") ~ str_match(text, "para\\.\\s*(\\d+)")[, 2],
-#       # str_detect(text, "^Recommendation(s)? contained in para(graph)?") ~ str_match(text, "[Pp]ara(?:graph)?\\s*(\\d+\\(?[a-z]?\\)?)")[, 2],
-#       str_detect(text, "^Recommendation(s)? (?:contained in|from) para(graph)?") ~ str_match(text, "[Pp]ara(?:graph)?\\s*(.*?):")[, 2],
-#       str_detect(text, "^Recommendation(s)? contained in ") ~ str_match(text, "contained in\\s*(\\d+\\(?[a-z]?\\)?)")[, 2],
-# 
-#       # CASE 2: The text starts with "para" or "paragraph"
-#       # This is the new case to handle paragraph-only identifiers.
-#       str_detect(text, "^[Pp]ara") ~ str_match(text, "[Pp]ara(?:graph)?\\.?\\s*(\\d+)")[, 2],
-# 
-#       # CASE 3: The text starts with a "number.number" format (e.g., "136.1 ...")
-#       # This must come before the single-number check to be matched correctly.
-#       str_detect(text, "^\\d+\\.\\d+") ~ str_extract(text, "^\\d+\\.\\d+"),
-# 
-#       # CASE 4: The text starts with just one number (e.g., "1 ...")
-#       # This is the new case to handle single leading numbers.
-#       str_detect(text, "^\\d+") ~ str_extract(text, "^\\d+"),
-# 
-#       # If none of the above patterns match, return NA
-#       TRUE ~ NA_character_
-#     ),
-#     upr_session = str_remove(upr_session, "- "),
-#     upr_session = str_split_i(upr_session, " - ", 1),
-#     upr_session_number = as.numeric(str_extract(upr_session, "\\d+")),
-#     upr_cycle = case_when(
-#       upr_session_number <= 12 ~ "Cycle 1",
-#       upr_session_number <= 26 ~ "Cycle 2",
-#       upr_session_number <= 40 ~ "Cycle 3",
-#       upr_session_number <= 54 ~ "Cycle 4",
-#     ),
-#     type = str_remove(type, "- "),
-#     upr_position = str_remove(upr_position, "- "),
-#     title_a = str_split_i(paragraph,"\\.",1),
-#     title_a = case_when(is.na(as.numeric(title_a)) ~ str_extract(title_a, "^\\d+"),
-#                         .default = title_a),
-#     title_b = str_pad(str_split_i(paragraph,"\\.",2), , width = 3, side = "left", pad = "0"),
-#     title_b = case_when(is.na(title_b) | str_starts(title_b, "\\(") ~ "0",
-#                         .default = title_b),
-#     title_2 = as.numeric(paste(title_a, title_b,sep = "."))
-#   )|>
-#   arrange(upr_session_number) |>
-#   mutate(
-#     upr_session = fct_inorder(upr_session),
-#     upr_cycle = fct_inorder(upr_cycle)
-#   ) |>
-#   # select(-title_a, -title_b) |>
-#   relocate(paragraph, .after=document) |>
-#   relocate(title_2, upr_position, type, .after = paragraph) |>
-#   arrange(countries_concerned, body, document_publication_date, title_2, paragraph) |>
-#   rename(
-#     state_under_review = countries_concerned,
-#     document_code = document,
-#     session = upr_session,
-#     cycle = upr_cycle,
-#     recommending_state_upr = upr_reccomending_states,
-#     response_upr = upr_position
-#   ) |>
-#   left_join(state_geo |> select(country, iso3, iso2) |> st_drop_geometry(),
-#             by = join_by(state_under_review == country))
-# 
-# 
-# # Filter for only the UPR dataset
-# upr_df <- df |> filter(body == "UPR") |> droplevels() |>
-#   mutate(
-#     recommending_state_upr = str_remove(recommending_state_upr, "^- "),
-#     recommending_states_count = case_when(
-#       is.na(recommending_state_upr) ~ NA,
-#       .default = str_count(recommending_state_upr, "-") %>% coalesce(0L)+1
-#     ),
-#     text_2 = case_when(
-#       # CASE 1: Remove "Recommendation No. ..." prefix
-#       str_detect(text, "^Recommendation No") ~ str_remove(text, "^Recommendation No.*?\\d+\\.\\s*"),
-#       # str_detect(text, "^Recommendations contained in para") ~ str_remove(text, "^Recommendations contained in para\\.\\s*\\d+:\\s*"),
-#       str_detect(text, "^Recommendation(s)? contained in para(graph)?") ~ str_remove(text, "^Recommendation(?:s)? contained in para(?:graph)?.*?\\:\\s*"),
-#       str_detect(text, "^Recommendation(s)? contained in ") ~ str_remove(text, "^Recommendation(?:s)? contained in .*?\\:\\s*"),
-# 
-#       # CASE 2: Remove "para. ..." prefix
-#       str_detect(text, "^[Pp]ara") ~ str_remove(text, "^[Pp]ara(?:graph)?\\.?\\s*(\\d+\\.?)\\s*"),
-#       # CASE 3: Remove "number.number" prefix
-#       str_detect(text, "^\\d+\\.\\d+") ~ str_remove(text, "^\\d+\\.\\d+\\.?\\s*"),
-#       # CASE 4: Remove single number prefix
-#       str_detect(text, "^\\d+") ~ str_remove(text, "^\\d+\\.?\\s*"),
-#       # If no pattern matches, just keep the original text
-#       TRUE ~ text
-#     ),
-#     text_2 = case_when(
-#       str_detect(text_2, "^\\d+") ~ str_remove(text_2, "^\\d+\\.?\\s*"),
-#       TRUE ~ text_2
-#     ),
-#     text_2 = case_when(
-#       str_detect(text_2, "^\\d+") ~ str_remove(text_2, "^\\d+\\.?\\s*"),
-#       TRUE ~ text_2
-#     ),
-#     text_2 = str_remove(text_2,"^\\."),
-#     text_2 = str_remove(text_2,"^\\:"),
-#     text_2 = str_remove(text_2,"^\\;"),
-#     text_2 = str_squish(text_2),
-#     # text_2 = str_replace(text_2, ". visit", "a visit"),
-#     # text_2 = str_replace(text_2, ". standing", "a standing"),
-#     # text_2 = str_replace(text_2, ". method", "a method"),
-#     # text_2 = str_replace(text_2, ". dialogue", "a dialogue"),
-#     # text_2 = str_replace(text_2, ". comprehensive", "a comprehensive"),
-#     # text_2 = str_replace(text_2, ". national", "a national")
-#   ) |>
-#   filter(!str_starts(text, "Response of "),
-#          response_upr != "Concerns/Observations") |>
-#   rowid_to_column() |>
-# 
-#   # Create a new column that lists recommending states by commas
-#   mutate(recommending_state_upr_comma = recommending_state_upr) |>
-#   separate_wider_delim(recommending_state_upr_comma, delim = "-", names_sep = "_", too_few = "align_start") |>
-#   mutate(across(starts_with("recommending_state_upr_comma"), ~ str_squish(.))) |>
-#   unite(col = "recommending_state_upr_comma", sep = ", ", starts_with("recommending_state_upr_comma"), na.rm = TRUE) |>
-#   relocate(text1, text_2, .after = text) |>
-#   relocate(recommending_state_upr_comma, recommending_states_count, .after= recommending_state_upr) |>
-#   mutate(recommending_state_upr_comma = case_when(recommending_state_upr_comma == "" ~ NA, .default = recommending_state_upr_comma)) |>
-#   mutate(response_upr = factor(
-#     case_when(
-#       response_upr == "Supported/Noted" ~ "Partially supported",
-#       .default = response_upr),
-#     levels = c("Supported", "Partially supported", "Noted")
-#   )
-#   )
-# 
-# saveRDS(df, here("data", "UHRI_full.rds"))
-# saveRDS(df, here("data", paste0("UHRI_full_", Sys.Date(), ".rds")))
-# saveRDS(upr_df, here("data", "UHRI_UPR.rds"))
-# saveRDS(upr_df, here("data", paste0("UHRI_UPR_", Sys.Date(), ".rds")))
+state_geo <- readRDS(here("output", "state_geo_enhanced.rds"))
+
+httr::GET("https://dataex.ohchr.org/uhri/export-results/export-full-en.xlsx", httr::write_disk(tf <- tempfile(fileext = ".xlsx")))
+df_0 <-  readxl::read_xlsx(tf,
+                           # Specify the column types, otherwise some show up as NA in R
+                           col_types = c(
+                             rep("text", 7), "date", rep("text", 7), "date")) |>
+  janitor::clean_names();unlink(tf);rm(tf)
+df<-df_0 |> janitor::clean_names() |>
+  # Add the date that the dataset was accessed from the UHRI website
+  mutate(date_accessed = ymd(Sys.Date())) |>
+  mutate(countries_concerned = str_remove(countries_concerned, "- "),
+         reccomending_body = str_remove(reccomending_body, "- ")
+  ) |>
+  mutate(
+    text1 = text,
+    # text = str_remove_all(text, "&nbsp;"),
+    # text = str_remove_all(text, "&nbsp"),
+    text = str_replace_all(text, "’", "'"),
+    text = str_replace_all(text, "“", "'"),
+    text = str_replace_all(text, "”", "'"),
+    text = str_replace_all(text, "\\( ", "\\("),
+    text = str_replace_all(text, " \\)", "\\)"),
+    text = str_replace_all(text, " ' s ", "'s "),
+    text = str_replace_all(text, "' s ", "'s "),
+    text = str_replace_all(text, "&nbsp;", " "),
+    text = str_replace_all(text, "&nbsp", " "),
+    text = str_replace_all(text, "&rsquo;", "'"),
+    text = str_replace_all(text, "&ndash;|&#8209;", "-"),
+    text = str_replace_all(text, "&ocirc;", "ô"),
+    text = str_replace_all(text, "&ldquo;|&rdquo;", "'"),
+    text = str_replace_all(text, "&uacute;", "ú"),
+    text = str_replace_all(text, "&uuml;", "ü"),
+    text = str_replace_all(text, "&amp;", "&"),
+    text = str_replace_all(text, "&deg;", "°"),
+    text = str_replace_all(text, "&eacute;", "é"),
+    text = str_replace_all(text, "&egrave;", "è"),
+    text = str_replace_all(text, "&lrm;", ""),
+    text = str_replace_all(text, "&iacute;", "í"),
+    
+    text = str_squish(text),
+    text = case_when(str_starts(text, "R ") ~ str_remove(text, "R "),
+                     .default = text),
+    # text = str_replace(text, " . ", ". "),
+    # text = str_replace(text, ":.", ":"),
+    # text = str_replace(text, ",.", ":"),
+    text = str_remove_all(text, "\\[...\\]"),
+    # text = str_replace_all(text, "([A-Za-z]+)'s([A-Za-z]+)", "\\1's \\2")
+    text = str_replace_all(text, "non- communicable", "non-communicable"),
+    text = str_replace_all(text, "l aw s on trans i tional", "laws on transitional"),
+    text = str_replace_all(text, "sexual a buse", "sexual abuse"),
+    text = str_replace_all(text, "ex ploit", "exploit"),
+  ) |>
+  # Correct duplicated entries
+  mutate(
+    text = case_when(
+      text == "137.197 Improve the socioeconomic situation of the Roma national minority, also by ensuring adequate living conditions and access to education and health care (Germany);" ~ "137.197 Fully implement the right to equal usage of minority languages and scripts, in compliance with Croatia’s legal framework, with a special focus on those regions where this right especially applies (Germany);",
+      # text == ""
+      .default = text
+    )
+  ) |> 
+  arrange(countries_concerned, reccomending_body, document_publication_date) |>
+  rename(document = document_symbol, body = reccomending_body) |>
+  mutate(
+    paragraph = case_when(
+      # CASE 1: The text starts with "Recommendation No."
+      # This detects the first pattern you described.
+      # str_detect(text, "^Recommendation No\\.") ~ {
+      #   # str_match() lets us capture parts of the text.
+      #   # We look for "para. [number]: [number]"
+      #   matches <- str_match(text, "para\\.\\s*(\\d+):\\s*(\\d+)")
+      #   # We then take the captured numbers (the 2nd and 3rd elements from the match)
+      #   # and paste them together with a dot, creating the "96.21" format.
+      #   paste(matches[, 2], matches[, 3], sep = ".")
+      # },
+      str_detect(text, "^Recommendation No") ~ {
+        # This regex now finds the paragraph number, skips to the recommendation number, and captures both.
+        # It works whether there is a colon or not.
+        matches <- str_match(text, "para\\.\\s*(\\d+).*?(\\d+)\\.")
+        paste(matches[, 2], matches[, 3], sep = ".")
+      },
+      
+      # NEW CASE: The text starts with "Recommendations contained in para."
+      # str_detect(text, "^Recommendations contained in para") ~ str_match(text, "para\\.\\s*(\\d+)")[, 2],
+      # str_detect(text, "^Recommendation(s)? contained in para(graph)?") ~ str_match(text, "[Pp]ara(?:graph)?\\s*(\\d+\\(?[a-z]?\\)?)")[, 2],
+      str_detect(text, "^Recommendation(s)? (?:contained in|from) para(graph)?") ~ str_match(text, "[Pp]ara(?:graph)?\\s*(.*?):")[, 2],
+      str_detect(text, "^Recommendation(s)? contained in ") ~ str_match(text, "contained in\\s*(\\d+\\(?[a-z]?\\)?)")[, 2],
+      
+      # CASE 2: The text starts with "para" or "paragraph"
+      # This is the new case to handle paragraph-only identifiers.
+      str_detect(text, "^[Pp]ara") ~ str_match(text, "[Pp]ara(?:graph)?\\.?\\s*(\\d+)")[, 2],
+      
+      # CASE 3: The text starts with a "number.number" format (e.g., "136.1 ...")
+      # This must come before the single-number check to be matched correctly.
+      str_detect(text, "^\\d+\\.\\d+") ~ str_extract(text, "^\\d+\\.\\d+"),
+      
+      # CASE 4: The text starts with just one number (e.g., "1 ...")
+      # This is the new case to handle single leading numbers.
+      str_detect(text, "^\\d+") ~ str_extract(text, "^\\d+"),
+      
+      # If none of the above patterns match, return NA
+      TRUE ~ NA_character_
+    ),
+    upr_session = str_remove(upr_session, "- "),
+    upr_session = str_split_i(upr_session, " - ", 1),
+    upr_session_number = as.numeric(str_extract(upr_session, "\\d+")),
+    upr_cycle = case_when(
+      upr_session_number <= 12 ~ "Cycle 1",
+      upr_session_number <= 26 ~ "Cycle 2",
+      upr_session_number <= 40 ~ "Cycle 3",
+      upr_session_number <= 54 ~ "Cycle 4",
+    ),
+    type = str_remove(type, "- "),
+    upr_position = str_remove(upr_position, "- "),
+    title_a = str_split_i(paragraph,"\\.",1),
+    title_a = case_when(is.na(as.numeric(title_a)) ~ str_extract(title_a, "^\\d+"),
+                        .default = title_a),
+    title_b = str_pad(str_split_i(paragraph,"\\.",2), , width = 3, side = "left", pad = "0"),
+    title_b = case_when(is.na(title_b) | str_starts(title_b, "\\(") ~ "0",
+                        .default = title_b),
+    title_2 = as.numeric(paste(title_a, title_b,sep = "."))
+  )|>
+  arrange(upr_session_number) |>
+  mutate(
+    upr_session = fct_inorder(upr_session),
+    upr_cycle = fct_inorder(upr_cycle)
+  ) |>
+  # select(-title_a, -title_b) |>
+  relocate(paragraph, .after=document) |>
+  relocate(title_2, upr_position, type, .after = paragraph) |>
+  arrange(countries_concerned, body, document_publication_date, title_2, paragraph) |>
+  rename(
+    state_under_review = countries_concerned,
+    document_code = document,
+    session = upr_session,
+    cycle = upr_cycle,
+    recommending_state_upr = upr_reccomending_states,
+    response_upr = upr_position
+  ) |>
+  left_join(state_geo |> select(country, iso3, iso2) |> st_drop_geometry(),
+            by = join_by(state_under_review == country))
+
+
+# Filter for only the UPR dataset
+upr_df <- df |> filter(body == "UPR") |> droplevels() |>
+  mutate(
+    recommending_state_upr = str_remove(recommending_state_upr, "^- "),
+    recommending_states_count = case_when(
+      is.na(recommending_state_upr) ~ NA,
+      .default = str_count(recommending_state_upr, "-") %>% coalesce(0L)+1
+    ),
+    text_2 = case_when(
+      # CASE 1: Remove "Recommendation No. ..." prefix
+      str_detect(text, "^Recommendation No") ~ str_remove(text, "^Recommendation No.*?\\d+\\.\\s*"),
+      # str_detect(text, "^Recommendations contained in para") ~ str_remove(text, "^Recommendations contained in para\\.\\s*\\d+:\\s*"),
+      str_detect(text, "^Recommendation(s)? contained in para(graph)?") ~ str_remove(text, "^Recommendation(?:s)? contained in para(?:graph)?.*?\\:\\s*"),
+      str_detect(text, "^Recommendation(s)? contained in ") ~ str_remove(text, "^Recommendation(?:s)? contained in .*?\\:\\s*"),
+      
+      # CASE 2: Remove "para. ..." prefix
+      str_detect(text, "^[Pp]ara") ~ str_remove(text, "^[Pp]ara(?:graph)?\\.?\\s*(\\d+\\.?)\\s*"),
+      # CASE 3: Remove "number.number" prefix
+      str_detect(text, "^\\d+\\.\\d+") ~ str_remove(text, "^\\d+\\.\\d+\\.?\\s*"),
+      # CASE 4: Remove single number prefix
+      str_detect(text, "^\\d+") ~ str_remove(text, "^\\d+\\.?\\s*"),
+      # If no pattern matches, just keep the original text
+      TRUE ~ text
+    ),
+    text_2 = case_when(
+      str_detect(text_2, "^\\d+") ~ str_remove(text_2, "^\\d+\\.?\\s*"),
+      TRUE ~ text_2
+    ),
+    text_2 = case_when(
+      str_detect(text_2, "^\\d+") ~ str_remove(text_2, "^\\d+\\.?\\s*"),
+      TRUE ~ text_2
+    ),
+    text_2 = str_remove(text_2,"^\\."),
+    text_2 = str_remove(text_2,"^\\:"),
+    text_2 = str_remove(text_2,"^\\;"),
+    text_2 = str_squish(text_2)
+  ) |>
+  filter(!str_starts(text, "Response of "),
+         response_upr != "Concerns/Observations") |>
+  rowid_to_column() |>
+  
+  # Create a new column that lists recommending states by commas
+  mutate(recommending_state_upr_comma = recommending_state_upr) |>
+  separate_wider_delim(recommending_state_upr_comma, delim = "-", names_sep = "_", too_few = "align_start") |>
+  mutate(across(starts_with("recommending_state_upr_comma"), ~ str_squish(.))) |>
+  unite(col = "recommending_state_upr_comma", sep = ", ", starts_with("recommending_state_upr_comma"), na.rm = TRUE) |>
+  relocate(text1, text_2, .after = text) |>
+  relocate(recommending_state_upr_comma, recommending_states_count, .after= recommending_state_upr) |>
+  mutate(recommending_state_upr_comma = case_when(recommending_state_upr_comma == "" ~ NA, .default = recommending_state_upr_comma)) |>
+  mutate(response_upr = factor(
+    case_when(
+      response_upr == "Supported/Noted" ~ "Partially supported",
+      .default = response_upr),
+    levels = c("Supported", "Partially supported", "Noted")
+  )
+  )
+
+saveRDS(df, here("data", "UHRI_full.rds"))
+saveRDS(df, here("data", paste0("UHRI_full_", Sys.Date(), ".rds")))
+saveRDS(upr_df, here("data", "UHRI_UPR.rds"))
+saveRDS(upr_df, here("data", paste0("UHRI_UPR_", Sys.Date(), ".rds")))
 ```
 
 
@@ -306,7 +309,7 @@ keywords_comb3b <- "surgery|sterili"
 When applying these definitions, I think we will need to first more generally define health-related recommendations, and then within that context we can apply the keywords below to define health systems and services.
 
 ```{r}
-hss_keywords <- "health worker|healthcare worker|health workforce|health-care worker|uhc|universal health|health system|healthcare system|health-care system|health care system|health service|healthcare service|health-care service|health care service| oral health|health and education|health coverage|public health|free health|access to health|quality health|strenghthen health|right to health|rights to health|guarantee health|right to a health|guarantee the rights of life, education and health|guarantee the right of health|guarantee the rights to education and health|rights of the Palestinian people, inter alia, to housing, education, health|improve its health - care service|guaranteeing the provision of health|guarantee health care and education|guarantee health assistance to all|achieving health-related goals|highest level of health possible|strengthen its policies in the fields of education and health|programmes aimed at guaranteeing the rights to education, health|programmes to guarantee the rights to education, health|guarantee essential health care for all citizens|digital health|emergency care|critical care|healthy environment|health promotion polic|large scale public health|effective poverty reduction and health strategies|improve the level of education and health|free basic healthcare|national census on health care"
+hss_keywords <- "health worker|healthcare worker|health workforce|health-care worker|uhc|universal health|health system|healthcare system|health-care system|health care system|health service|healthcare service|health-care service|health care service| oral health|health and education|health coverage|public health|free health|access to health|quality health|strenghthen health|right to health|rights to health|guarantee health|right to a health|guarantee the rights of life, education and health|guarantee the right of health|guarantee the rights to education and health|rights of the Palestinian people, inter alia, to housing, education, health|improve its health - care service|guaranteeing the provision of health|guarantee health care and education|guarantee health assistance to all|achieving health-related goals|highest level of health possible|strengthen its policies in the fields of education and health|programmes aimed at guaranteeing the rights to education, health|programmes to guarantee the rights to education, health|guarantee essential health care for all citizens|digital health|emergency care|critical care|healthy environment|health promotion polic|large scale public health|effective poverty reduction and health strategies|improve the level of education and health|free basic healthcare|national census on health care|abuja declaration|national health insurance"
 hss_other_keywords <- "data"
 
 hss_keywords_comb1a <- "health"
@@ -417,12 +420,12 @@ SOCED_keywords <- "social determinants|migrant|poverty| poor|destitut|inequality
 > This category includes any violence which has been perpetrated against another based on their sex, gender identity and expression, or their sexual orientation, as well as harmful practices such as female genital mutilation (FGM), female infanticide, sex-selective abortions, forced and early marriage, honour crimes or killings, polygamy, wife inheritance, virginity tests, breast ironing and similar practices.
 
 ```{r}
-GBV_keywords <- "child marriage|early marriage|forced marriage|marriage of children|minimum age of marriage|minimum age for marriage|marriage for girls and boys under the age |mutilation|fgm|excision|honor crime|honor killing|honour crime|honour killing|breast ironing|harmful practices|harmful traditional practices|violence against women|domestic violence|family violence|violence in the family|gender-based violence|sexual violence|marital violence|partner violence|gender violence| rape|^rape|virginity|sexual abuse|femicide|polygam|sex selection|prenatal selection|prenatal genetic|dowry|bride kidnap|child bride|forced steril|coerced steril|istanbul convention| conversion therap|sexual harassment|levirate|sexual exploit|sexually exploit|sexual and labour exploitation|child prostitution|forced prostitution|invasive pregnancy test|domestic violence|domestic abuse|domestic maltreatment|forced anal exam"
+GBV_keywords <- "child marriage|early marriage|forced marriage|marriage of children|minimum age of marriage|minimum age for marriage|marriage for girls and boys under the age |age of marriage|mutilation|fgm|excision|honor crime|honor killing|honour crime|honour killing|breast ironing|harmful practices|harmful traditional practices|violence against women|domestic violence|family violence|violence in the family|gender-based violence|sexual violence|marital violence|partner violence|gender violence| rape|^rape|virginity|sexual abuse|femicide|polygam|sex selection|prenatal selection|prenatal genetic|dowry|bride kidnap|child bride|forced steril|coerced steril|istanbul convention| conversion therap|sexual harassment|levirate|sexual exploit|sexually exploit|sex traffic|sexual and labour exploitation|child prostitution|forced prostitution|invasive pregnancy test|domestic violence|domestic abuse|domestic maltreatment|forced anal exam"
 
 GBV_keywords_comb1a <- " forced|minimum|under the age of"
 GBV_keywords_comb1b <- "marriage|pregnancy"
 
-GBV_keywords_comb2a <- "girl|women|sexual|gender|marital|lgbt|lgtb|same-sex|intersex"
+GBV_keywords_comb2a <- "girl|women|sexual|gender|marital|lgbt|lgtb|same-sex|intersex|sexual minorit"
 GBV_keywords_comb2b <- "abuse|maltreatment|violence" #harassment|intimidation
 
 GBV_keywords_comb3a <- "abort"
@@ -434,6 +437,9 @@ GBV_keywords_comb4c <- "unnecessary| forced|consent|non-consensual|irreversible"
 
 GBV_keywords_comb5a <- "child|infant|adolescent| teen| boy| girl| crc| minors "
 GBV_keywords_comb5b <- "victims of abuse|corporal punishment|violen|prostitut|sexual abuse|sexual exploitation| rape|^rape"
+
+GBV_keywords_comb6a <- "sex"
+GBV_keywords_comb6b <- "traffic"
 ```
 #### Women's health
 > This category is concerned with any health recommendation relating to women’s health, which was not linked to violence or SRHR, but rather addresses general health through a gendered lens. Recommendations classified here include the ratification of CEDAW.
@@ -454,7 +460,7 @@ CAH_keywords <- "newborn| infant|neonatal|new-born|breastfe|protection of women 
 # !! Need to exclude capital punishment/death sentence etc.
 
 CAH_keywords_comb1a <- "child|infant|adolescent| teen| boy| girl| crc| minors "
-CAH_keywords_comb1b <- "victims of abuse|death|mortality|pregnan|corporal punishment|health|violen|prostitut|sexual abuse|sexual exploitation|ill-treatment|cancer| rape|with hiv| hiv |hiv/aids|hiv-aids|hiv and aids|hiv & aids|hiv-positive| hiv,| hiv-|prevention of aids|fight against aids|combating aids| sti | std | stds | stis |sti,| std,| stds,| stis,|chlamydia|gonorrhea|syphilis|herpes|papillomavirus| hpv | hpv,|trichomoniasis|sexually transm|sexual transm|antiretroviral|anti-retroviral"
+CAH_keywords_comb1b <- "victims of abuse|death|mortality|pregnan|corporal punishment|flogging|amputation|health|violen|prostitut|sexual abuse|sexual exploitation|ill-treatment|cancer| rape|with hiv| hiv |hiv/aids|hiv-aids|hiv and aids|hiv & aids|hiv-positive| hiv,| hiv-|prevention of aids|fight against aids|combating aids| sti | std | stds | stis |sti,| std,| stds,| stis,|chlamydia|gonorrhea|syphilis|herpes|papillomavirus| hpv | hpv,|trichomoniasis|sexually transm|sexual transm|antiretroviral|anti-retroviral"
 NOT_CAH_keywords_comb1c <- "death penalty|death sentence|capital punishment"
 
 
@@ -491,7 +497,7 @@ Also need to refine for health-related rights vs rights in general
 ```{r}
 LGBTI_keywords <- "hormone therapy|requirement of infertility|requirement of sterilisation|requirement of sterilization|requirement for infertility|requirement for sterilisation|requirement for sterilization|need for sterilization|mandatory sterility|coerced into sterilization| unwanted gender reassignment|gender affirmation treatment"
 
-LGBTI_keywords_comb1a <- "lgbt|lgtb| gay|lesbian|transgender|intersex|same sex|same-sex|bisexual| trans |transsexual|trans-specific"
+LGBTI_keywords_comb1a <- "lgbt|lgtb| gay|lesbian|transgender|intersex|same sex|same-sex|bisexual| trans |transsexual|trans-specific|sexual minorit"
 LGBTI_keywords_comb1b <- "health|gender reassignment|medical"
 #medical care|medical intervention
 
@@ -502,7 +508,7 @@ NOT_LGBTI_keywords <- "trans mountain|implement the trans health strategy|trans 
 > This category is concerned with any recommendation relating to HIV/ AIDS and sexually transmitted infections (STIs), such as access to healthcare for persons with HIV/AIDS or STIs or prevention of the spread of HIV/AIDS and STIs.
 
 ```{r}
-HIV_keywords <- "with hiv| hiv |hiv/aids|hiv-aids|hiv and aids|hiv & aids|hiv-positive| hiv,| hiv-|prevention of aids|fight against aids|combating aids| sti | std | stds | stis |sti,| std,| stds,| stis,|chlamydia|gonorrhea|syphilis|herpes|papillomavirus| hpv | hpv,|trichomoniasis|sexually transm|sexual transm|antiretroviral|anti-retroviral"
+HIV_keywords <- "with hiv| hiv |hiv/aids|hiv-aids|hiv and aids|hiv & aids|hiv-positive| hiv,| hiv-|prevention of aids|fight against aids|combating aids|aids pandemic| sti | std | stds | stis |sti,| std,| stds,| stis,|chlamydia|gonorrhea|syphilis|herpes|papillomavirus| hpv | hpv,|trichomoniasis|sexually transm|sexual transm|antiretroviral|anti-retroviral"
 
 HIV_keywords_comb1a <- ""
 HIV_keywords_comb1b <- ""
@@ -823,6 +829,10 @@ sdg_data <- uhri_upr |>
       # Combo 5
       str_detect(tolower(text_2), GBV_keywords_comb5a)&
         str_detect(tolower(text_2), GBV_keywords_comb5b)~ "GBV",
+      
+      # Combo 6
+      str_detect(tolower(text_2), GBV_keywords_comb6a)&
+        str_detect(tolower(text_2), GBV_keywords_comb6b)~ "GBV",
       
       .default = "Other"
     ), levels = c("Other", "GBV"))
