@@ -1,5 +1,5 @@
 ---
-title: "Maternal Health and the UPR"
+title: "Right to Health in the Universal Periodic Review"
 params:
   country_name: "Bahrain"
   upr_all: NULL
@@ -232,6 +232,41 @@ fertility_rate_text <- paste0(fertility_rate_C |>
 
 constitutions_C <- constitutions |> filter(iso3 == iso3_SUR)
 
+FCS_count <- state_geo |> filter(iso3 == iso3_SUR) |> st_drop_geometry() |> 
+  mutate(FCS_count = case_when(is.na(FCS_count) ~ 0, .default = FCS_count)) |> pull(FCS_count)
+
+health_expenditure <- GHED_CHEGDP_SHA2011 |> filter(SpatialDim == iso3_SUR) |> 
+  filter(YEAR == max(YEAR))
+
+health_expenditure_text <- if(is_empty(health_expenditure |> 
+                                  pull(NumericValue))){
+  "Data not available"
+} else{
+  paste0(round(health_expenditure |> 
+           pull(NumericValue),1),
+         "% in ", 
+         health_expenditure |> 
+           pull(YEAR)
+  )
+}
+
+GDP_profile <- GDP_long |> 
+  filter(!is.na(GDP_long)) |> 
+  filter(country_code == iso3_SUR) |> 
+  filter(year == max(year)) |> 
+  mutate(GDP_long = round(GDP_long))
+
+GDP_text <- if(is_empty(GDP_profile |> 
+                                  pull(GDP_long))){
+  "Data not available"
+} else{
+  paste0("$", format(GDP_profile |> 
+           pull(GDP_long), big.mark = ","),
+         " in ", 
+         GDP_profile |> 
+           pull(year)
+  )
+}
 
 ```
 
@@ -378,7 +413,7 @@ contraceptive_prevalence_text_20_49 <-
 
 ```
 \maketitle
-# \underline{`r params$country_name`}
+# \textcolor{fgcolor}{`r params$country_name`}
 <!-- Some brief text here, for context, that runs the \textcolor{CeHDIRed}{entire width of the page}. Indicator results, tables, and figures can go into the columns below. -->
 ```{=latex}
 \begin{multicols}{2}
@@ -518,18 +553,21 @@ a |>
 \ \ - Right to a healthy environment: `r constitutions |> filter(iso3 == iso3_SUR) |> pull(const_enviro)`  
 \textbf{{Legal status of abortion (as of June 2023):}}\footnote{\href{https://reproductiverights.org/wp-content/uploads/2023/12/WALM_2023-v3-Updated_12-20-23.pdf}{reproductiverights.org} \label{fn:reproductiverights}} `r world_abortion_laws |> filter(country == params$country_name) |> pull(category)`
 \columnbreak
-\begin{center}\textcolor{fgcolor}{\textbf{\hlCeHDIRed{\ \ \ \ Demographics \ \ \ \ }}}\end{center}  
+\begin{center}\textcolor{fgcolor}{\textbf{\hlCeHDIRed{\ \ \ \ Demographics and background information \ \ \ \ }}}\end{center}  
 \textbf{{Population:}}\footnote{\href{https://population.un.org/wpp}{population.un.org/wpp} \label{fn:WPP}} `r pop_text`  
-\textbf{{Life expectancy at birth:}}\textsuperscript{\ref{fn:WPP}} `r life_expectancy_text`
+\textbf{{Life expectancy at birth:}}\textsuperscript{\ref{fn:WPP}} `r life_expectancy_text`  
+\textbf{{GDP per capita (PPP):}} `r GDP_text`  
+\textbf{{Health expenditure (percent of GDP):}} `r health_expenditure_text`  
+\textbf{{Years on list of Fragile and Conflict-affected Situations:}}\footnote{\href{https://www.worldbank.org/ext/en/topic/fragility-conflict-and-violence}{2006-2023; worldbank.org/ext/en/topic/fragility-conflict-and-violence} \label{fn:WBFCS}} `r FCS_count`  
 \begin{center}\textcolor{fgcolor}{\textbf{\hlCeHDIRed{\ \ \ \ Sexual and Reproductive Health \ \ \ \ }}}\end{center}  
 \textbf{{Total fertility rate:}}\textsuperscript{\ref{fn:WPP}} `r fertility_rate_text`  
 \textbf{{Met need for family planning:}}\textsuperscript{\ref{fn:whoGHO}} `r family_planning_text`  
-\textbf{{Adolescent birth rate:}}\footnote{\href{https://www.who.int/data/gho/info/gho-odata-api}{WHO Global Health Observatory} \label{fn:whoGHO}}  
+\textbf{{Adolescent birth rate:}}\footnote{\href{https://www.who.int/data/gho}{who.int/data/gho} \label{fn:whoGHO}}  
 \ \ - Aged 10 to 14: `r adolescent_birth_rate_text_10_14`  
 \ \ - Aged 15 to 19: `r adolescent_birth_rate_text_15_19`  
 \textbf{{Births attended by skilled health personnel:}}\textsuperscript{\ref{fn:whoGHO}} `r skilled_birth_text`  
 \textbf{{Maternal mortality ratio (MMR):}}\textsuperscript{\ref{fn:whoGHO}} `r MMR |> filter(SpatialDim == iso3_SUR, YEAR == 2023) |> pull(NumericValue) |> round(digits = 0)` maternal deaths per 100,000 live births in 2023 (`r MMR |> filter(SpatialDim == iso3_SUR, YEAR == 2005) |> pull(NumericValue) |> round(digits = 0)` in 2005)  
-```{r, out.width="90%"}
+```{r, out.width="98%"}
 # mmr_estimate_2023 = params$mmr_map_plot@data |>
 #   filter(country_name == params$country_name,
 #          YEAR == "2023") |>
@@ -649,7 +687,7 @@ dat_plot <- MMR |>
   )) |>
   filter(country_name %in% c(
     params$country_name,
-    nearest_neighbors_list[, params$country_name][1:5]
+    nearest_neighbors_list[, params$country_name][1:4]
   )) |>
   filter(year >= ymd(paste0(start_year, "-01-01"))) |>
   mutate(country_name = fct_relevel(country_name, params$country_name)) |>
@@ -677,12 +715,14 @@ dat_plot |>
   ) +
   scale_x_continuous(breaks = c(2005, 2020), 
                      expand = expansion(mult = c(0, 0)))+
+  scale_y_continuous(limits = c(0,NA))+
   geom_line(lwd = 1, aes(color = selected_sur)) +
   geom_ribbon(aes(ymin = Low, ymax = High, fill = selected_sur), color = NA, alpha = 0.4) +
   scale_color_manual(values = c("#ec5557", "#1c164d")) +
   scale_fill_manual(values = c("#ec5557", "#1c164d")) +
   guides(color = "none", lwd = "none", fill = "none") +
-  facet_wrap(. ~ country_name, nrow=1, scales = "free"
+  facet_wrap(. ~ country_name, nrow=1
+             , scales = "free"
              # ,labeller = labeller(country_name = label_wrap_gen(21))
   ) +
   geom_hline(data = hline_data, aes(yintercept = NumericValue), lty = 2) +
@@ -690,9 +730,11 @@ dat_plot |>
   theme(
     plot.margin = margin(0,0,0,0),
     axis.text = element_text(color = "#1c164d"),
+    axis.text.x = element_text(color = "#1c164d", angle = 20),
     axis.title = element_text(color = "#1c164d"),
     axis.line = element_line(color = "#1c164d"),
     axis.ticks = element_line(color = "#1c164d"),
+    panel.grid = element_blank(),
     panel.border = element_blank(),
     margins = margin(0,0,0,0),
     plot.background = element_blank(),
@@ -700,7 +742,7 @@ dat_plot |>
     strip.background =element_rect(fill="#1c164d", color = "#1c164d"),
     # strip.text = element_text(colour = 'white'),
     strip.text = element_textbox_simple(
-      color="white",
+      color="white", face = "bold",
       height = unit(str_max_height, "lines"),
       hjust = 0.5, 
       vjust = 0.5, 
@@ -715,8 +757,8 @@ dat_plot |>
 <!-- \ \ - Aged 20 to 49:  `r contraceptive_prevalence_text_20_49` -->
 \begin{center}\textcolor{fgcolor}{\textbf{\hlCeHDIRed{\ \ \ \ Health Services Coverage (latest available data) \ \ \ \ }}}\end{center}  
 <!-- \textbf{{UHC service coverage index:}}\textsuperscript{\ref{fn:whoGHO}} `r UHC_estimate |> pull(Value)` in `r UHC_estimate |> pull(YEAR)`   -->
-\textbf{{UHC service coverage (`r UHC_all |> filter(COUNTRY == iso3_SUR, IndicatorCode == "UHC_INDEX_REPORTED", YEAR == min(YEAR)) |> pull(YEAR)` to `r UHC_all |> filter(COUNTRY == iso3_SUR, IndicatorCode == "UHC_INDEX_REPORTED", YEAR == max(YEAR)) |> pull(YEAR)`):}}\textsuperscript{\ref{fn:whoGHO}}
-```{r, fig.align="center", fig.width=7, fig.height=1.5, out.width="90%"}
+\textbf{{UHC Service Coverage Index and components (`r UHC_all |> filter(COUNTRY == iso3_SUR, IndicatorCode == "UHC_INDEX_REPORTED", YEAR == min(YEAR)) |> pull(YEAR)` to `r UHC_all |> filter(COUNTRY == iso3_SUR, IndicatorCode == "UHC_INDEX_REPORTED", YEAR == max(YEAR)) |> pull(YEAR)`):}}\textsuperscript{\ref{fn:whoGHO}}
+```{r, fig.align="center", fig.width=7, fig.height=1.5, out.width="100%"}
 uhc_plots <- function(dat, title_text = "Update title", yMAX = 100){
   p_data <- dat |> 
     filter(COUNTRY == iso3_SUR)
@@ -752,21 +794,22 @@ uhc_plots <- function(dat, title_text = "Update title", yMAX = 100){
     labs(title = title_text)+
     theme(
       axis.line = element_line(color = "#1c164d"),
-      plot.title = element_text(color = "#1c164d", size = 10, hjust = 0.5))+
+      plot.title = element_text(color = "#1c164d", size = 10, hjust = 0.5, vjust = 0.5))+
     coord_cartesian(clip = "off")
   p1
 }
 
 p1<-uhc_plots(UHC_all |> filter(IndicatorCode == "UHC_INDEX_REPORTED"), 
-              title_text = "Services Coverage\nIndex (max: 80)", yMAX = 80)
+              title_text = "Services Coverage\nIndex"#, yMAX = 80
+              )
 p2<-uhc_plots(UHC_all |> filter(IndicatorCode == "UHC_SCI_CAPACITY"), 
-              title_text = "Sub-index on service\ncapacity and access")
+              title_text = "Service capacity\nand access")
 p3<-uhc_plots(UHC_all |> filter(IndicatorCode == "UHC_SCI_INFECT"), 
-              title_text = "Sub-index on\ninfectious diseases")
+              title_text = "Infectious diseases")
 p4<-uhc_plots(UHC_all |> filter(IndicatorCode == "UHC_SCI_NCD"), 
-              title_text = "Sub-index on NCDs")
+              title_text = "Non-communicable\ndiseases")
 p5<-uhc_plots(UHC_all |> filter(IndicatorCode == "UHC_SCI_RMNCH"), 
-              title_text = "Sub-index on RMNCH")
+              title_text = "Reproductive,\nmaternal, newborn\nand child health")
 
 (p1 | p2 | p3 | p4 | p5)+plot_annotation(
   theme = theme(plot.margin = margin(0,0,0,0), 
@@ -774,7 +817,7 @@ p5<-uhc_plots(UHC_all |> filter(IndicatorCode == "UHC_SCI_RMNCH"),
   ))
 ```
 <!-- \textbf{{UHC sub-index on RMNCH:}}\textsuperscript{\ref{fn:whoGHO}} `r UHC_RMNCH_estimate |> pull(Value)` in `r UHC_RMNCH_estimate |> pull(YEAR)`   -->
-\textbf{{Antenatal care coverage (\ge 4 visits):}}\footnote{\href{https://platform.who.int/data/maternal-newborn-child-adolescent-ageing}{WHO MNCAH Data Portal} \label{fn:whoMNCAH}} `r antenatal_WHO_text`  
+\textbf{{Antenatal care coverage (\ge 4 visits):}}\footnote{\href{https://platform.who.int/data/maternal-newborn-child-adolescent-ageing}{platform.who.int/data/maternal-newborn-child-adolescent-ageing} \label{fn:whoMNCAH}} `r antenatal_WHO_text`  
 \textbf{{Nursing/midwifery personnel (per 10,000):}}\textsuperscript{\ref{fn:whoGHO}}  `r nursing_density_text`  
 
 \textbf{{HPV coverage (9-14 year old girls):}}\textsuperscript{\ref{fn:whoGHO}}  `r HPV_coverage_text`  
@@ -784,11 +827,11 @@ p5<-uhc_plots(UHC_all |> filter(IndicatorCode == "UHC_SCI_RMNCH"),
 \end{multicols}
 ```
 \newpage
-\begin{center}\textcolor{fgcolor}{\textbf{\hlCeHDIRed{\ \ \ Recommendations from the UPR, on the themes of maternal health, family planning, and abortion \ \ \ }}}\end{center}  
+\begin{center}\textcolor{fgcolor}{\textbf{\hlCeHDIRed{\ \ \ Recommendations from the UPR on the themes of maternal health, family planning, abortion, and sexual education \ \ \ }}}\end{center}  
 ```{r}
 table_data <- sdg_data |> 
   filter(iso3==iso3_SUR) |> 
-  filter(if_any(any_of(c("maternal_health", "abortion", "contraception")), ~ .x != "Other")) |>
+  filter(if_any(any_of(c("maternal_health", "abortion", "contraception", "sexual_education")), ~ .x != "Other")) |>
   # filter(maternal_health != "Other") |> 
   select(text_2, cycle, response_upr
          # , recommending_state_upr_comma
