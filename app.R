@@ -949,7 +949,7 @@ Under the Right to Health, States have the following obligations:
   ),
   
   ## Constitutions  ------------------
-  nav_panel(title = "Constitutions", icon = icon("people-group"),
+  nav_panel(title = "Constitutions", icon = icon("building-columns"),
             # "Family planning",
             layout_column_wrap(
               full_screen = TRUE,
