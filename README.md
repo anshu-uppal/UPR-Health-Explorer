@@ -52,7 +52,6 @@ The full, version-locked dependency set lives in `manifest.json`.
 UPR-Health-Explorer/
 ├── app.R                       # Main Shiny app — Setup → UI (page_navbar) → Server → shinyApp()
 ├── manifest.json               # Posit Connect lockfile (R version, 262 pkgs, tracked files)
-├── utils.R                     # Helper functions (NOTE: currently empty — see Maintenance notes)
 │
 ├── code/                       # Data-prep & analysis scripts (run order matters — see Data pipeline)
 │   ├── geo_code.R                          # Country geometries → output/state_geo_enhanced.rds (+ neighbours)
