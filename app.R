@@ -371,27 +371,6 @@ ui <- page_navbar(
                   pull(country),
                 multiple = FALSE),
     
-    ### PDF downloader ------------------------
-    # downloadButton(
-    #   outputId = "download_report",
-    #   label = "Download Country Profile"
-    #   # ,style = "width: 100%;" # Make the button full-width
-    # ),
-    
-    ### JESSE's PDF downloader ------------------------
-    # downloadButton(
-    #   outputId = "download_report_JESSE",
-    #   label = "Download Country Profile"
-    #   # ,style = "width: 100%;" # Make the button full-width
-    # ),
-    
-    #### qmd --------------------------
-    # downloadButton(
-    #   outputId = "download_report_qmd",
-    #   label = "Download Report QMD (IN DEVELOPMENT)"
-    #   # ,style = "width: 100%;" # Make the button full-width
-    # ),
-    
     card(
       class = "bg-light",
       full_screen = TRUE,
@@ -425,7 +404,27 @@ Grouping by Fragile/Conflict-affected Situations (**FCS status**) was made accor
         # Grouping by Fragile/Conflict-affected Situations (**FCS status**) was made according to the [FCS grouping obtained from the World Bank](https://thedocs.worldbank.org/en/doc/5c7e4e268baaafa6ef38d924be9279be-0090082025/original/FCSListFY26.pdf).
         # 
         # **Map disclaimer:** CeHDI makes no statement or judgment about the legal status or borders of any country, territory, or city shown on these maps. The information is for reference only.")
-      )
+      ,  ### PDF downloader ------------------------
+      downloadButton(
+        outputId = "download_report",
+        label = "Download Country Profile"
+        # ,style = "width: 100%;" # Make the button full-width
+      ),
+      
+      ### JESSE's PDF downloader ------------------------
+      # downloadButton(
+      #   outputId = "download_report_JESSE",
+      #   label = "Download Country Profile"
+      #   # ,style = "width: 100%;" # Make the button full-width
+      # ),
+      
+      #### qmd --------------------------
+      # downloadButton(
+      #   outputId = "download_report_qmd",
+      #   label = "Download Report QMD (IN DEVELOPMENT)"
+      #   # ,style = "width: 100%;" # Make the button full-width
+      # )
+        )
     )
   ),
   
@@ -936,14 +935,25 @@ Under the Right to Health, States have the following obligations:
                    card_header("Met need for family planning using modern methods (%, latest year available)"),
                    markdown("Women of reproductive age (aged 15-49 years) who have their need for family planning satisfied with modern methods (%). Data: <a href='https://www.who.int/data/gho/data/indicators/indicator-details/GHO/proportion-of-women-of-reproductive-age-who-have-their-need-for-family-planning-satisfied-with-modern-methods' target='_blank'>WHO</a>"),
                    leafletOutput("family_planning_map_interactive")),
-              
-              card(
-                full_screen = TRUE,
-                card_header("Estimated unintended pregnancy rate, per 1,000 (annual estimate for the period 2015-2019)"),
-                markdown("Data: <a href='https://www.who.int/data/gho/data/indicators/indicator-details/GHO/SRH_PREGNANCY_UNINTENDED_RATE' target='_blank'>WHO</a>"),
-                leafletOutput("unintended_pregnancy_map_interactive")
-                # card_header("Estimated Unintended Pregnancy Rate (2015-2019)"),
-                # plotOutput("unintended_pregnancy")
+              layout_column_wrap(
+                width=1,
+                style = css(grid_template_rows = "1fr 1fr"),
+                card(
+                  full_screen = TRUE,
+                  card_header("Adolescent birth rate, per 1000 women aged 15-19 (latest year available)"),
+                  markdown("Data: <a href='https://www.who.int/data/gho/data/indicators/indicator-details/GHO/adolescent-birth-rate-(per-1000-women-aged-15-19-years)' target='_blank'>WHO</a>"),
+                  leafletOutput("adolescent_birth_map_interactive")
+                  # card_header("Estimated Unintended Pregnancy Rate (2015-2019)"),
+                  # plotOutput("unintended_pregnancy")
+                ),
+                card(
+                  full_screen = TRUE,
+                  card_header("Estimated unintended pregnancy rate, per 1,000 (annual estimate for the period 2015-2019)"),
+                  markdown("Data: <a href='https://www.who.int/data/gho/data/indicators/indicator-details/GHO/SRH_PREGNANCY_UNINTENDED_RATE' target='_blank'>WHO</a>"),
+                  leafletOutput("unintended_pregnancy_map_interactive")
+                  # card_header("Estimated Unintended Pregnancy Rate (2015-2019)"),
+                  # plotOutput("unintended_pregnancy")
+                )
               )
             )
   ),
@@ -1297,7 +1307,7 @@ server <- function(input, output, session) {
     
     content = function(file) {
       withProgress(message = 'Downloading your report', value = 0, {
-
+        
         # Copy the generated PDF to the final download path that Shiny expects.
         file.copy(file.path("report_pdfs", paste0(input$selected_SUR,".pdf")), file, overwrite = TRUE)
         
@@ -3108,20 +3118,20 @@ server <- function(input, output, session) {
           scale_fill_manual(values = c("Health-related" = "#ec5557", "Other" = "grey80"))+
           theme(
             panel.grid = element_blank(),
-            axis.text.x = element_text(size = 12, color = "white"),
-            axis.text.y = element_text(size = 12, color = "white"),
+            axis.text.x = element_text(size = 12, color = "#1c164d"),
+            axis.text.y = element_text(size = 12, color = "#1c164d"),
             axis.title.x = element_blank(),
-            axis.title.y = element_text(size = 14, color = "white"),
+            axis.title.y = element_text(size = 14, color = "#1c164d"),
             # legend.position = "bottom",
             legend.position = c(0, 1),
             legend.justification = c("left", "top"), 
-            legend.text = element_text(size = 11,colour = "white"),
+            legend.text = element_text(size = 11,colour = "#1c164d"),
             legend.key.size = unit(15,"pt"),
             # plot.background = element_blank(),
-            plot.background = element_rect(color = "white", fill = NA),
-            panel.border = element_rect(color = "white"),
+            plot.background = element_rect(color = "#1c164d", fill = NA),
+            panel.border = element_rect(color = "#1c164d"),
             # panel.border = element_blank(),
-            axis.ticks = element_line(color = "white"),
+            axis.ticks = element_line(color = "#1c164d"),
             panel.background = element_blank(),
             legend.background = element_blank(),
             strip.background = element_blank(),
@@ -4289,6 +4299,44 @@ server <- function(input, output, session) {
     
     leaflet_function(data =  family_planning_dat, pal_object = pal, hover_labels = hover_labels, 
                      legend_title = "%",
+                     coord_selected_SUR = coord_selected_SUR(),
+                     zoom_level = m_zoom(),
+                     fill_outcome =  "NumericValue")
+    
+  })
+  
+  ## Adolescent birth rate outputs -------------------------------------
+  
+  #### Map - interactive ---------------------
+  output$adolescent_birth_map_interactive <- renderLeaflet({
+    
+    adolescent_birth_rate_dat <- adolescent_birth_rate |>
+      filter(!is.na(COUNTRY)) |>
+      filter(Dim2 == "AGEGROUP_YEARS15-19") |> 
+      group_by(COUNTRY) |>
+      slice_max(order_by = year, n = 1) |>
+      ungroup() |>
+      right_join(state_geo_reactive(), by = c("COUNTRY" = "iso3")) |>
+      mutate(selected_sur = case_when(country == input$selected_SUR ~ TRUE, 
+                                      .default = FALSE)) |> 
+      st_as_sf() |> 
+      st_set_geometry("polygon")
+    
+    pal <- colorNumeric(
+      palette = "RdYlBu"
+      , reverse = TRUE
+      , domain = NULL
+    )
+    
+    hover_labels <- sprintf(
+      "<strong>%s</strong><br/>%s in %s",
+      adolescent_birth_rate_dat$country,
+      format(adolescent_birth_rate_dat$Value, big.mark = ",", scientific = FALSE),
+      adolescent_birth_rate_dat$YEAR
+    ) %>% lapply(htmltools::HTML)
+    
+    leaflet_function(data =  adolescent_birth_rate_dat, pal_object = pal, hover_labels = hover_labels, 
+                     legend_title = NULL,
                      coord_selected_SUR = coord_selected_SUR(),
                      zoom_level = m_zoom(),
                      fill_outcome =  "NumericValue")
