@@ -1,0 +1,857 @@
+---
+title: "Right to Health in the Universal Periodic Review"
+params:
+  country_name: "Bahrain"
+  upr_all: NULL
+  rec_plot: NULL
+  mmr_map_plot: NULL
+  bbox_SUR_region_dynamic: NULL
+  bbox_selected_SUR: NULL
+  sur_area: NULL
+documentclass: article
+# classoption: twocolumn
+output: 
+  pdf_document:
+    includes:
+      in_header: preamble.tex
+    keep_tex: true
+    latex_engine: xelatex
+geometry: 
+  - top=1.8cm
+  - bottom=0.5cm
+  - left=0.2cm
+  - right=0.2cm
+papersize: a4
+date: "2025-09-30"
+---
+```{r setup, include=FALSE}
+# This chunk loads the necessary packages for the report
+knitr::opts_chunk$set(echo = FALSE, warning = FALSE, message = FALSE, fig.align='center', out.width="100%")
+pacman::p_load(
+  here,
+  dplyr, forcats, ggplot2, magrittr, readr, readxl, stringr, tibble, tidyr, lubridate,
+  rlang,
+  ggtext, 
+  patchwork,
+  kableExtra,
+  # apyramid,
+  sf
+)
+
+# sdg_data <- readRDS(here("data", "SDG_data_enhanced.rds")) |> droplevels() |> 
+#   mutate(response_upr = fct_recode(response_upr, "Noted" = "Noted/Other"))
+sdg_data <- readRDS(here("output", "UHRI_UPR_enhanced.rds")) |> 
+  mutate(
+    response_upr_2 = response_upr,
+    response_upr = fct_recode(response_upr, 
+                              "Noted" = "Partially supported"),
+    response_upr = fct_relevel(response_upr, "Noted")) |> 
+  droplevels()
+state_geo <- readRDS(here("output", "state_geo_enhanced.rds"))
+nearest_neighbors_list <- readRDS(here("output", "nearest_neighbors_list.rds"))
+source(here("code", "theme_labels.R"))
+theme_labels <- theme_labels |> 
+  filter(!variable %in% c(
+    "SRHR", "health_related", "SOCED",
+    "essential_medicines","TB_malaria", "NTD","vaccinations"
+  ))
+sdg_data <- sdg_data |> select(-any_of(c("SRHR", "SOCED",
+                                         "essential_medicines","TB_malaria", 
+                                         "NTD","vaccinations")))
+iso3_SUR <- state_geo |> filter(country==params$country_name) |> pull(iso3)
+
+# Loop through API-generated files
+for (file_name in list.files(path = here("data", "API_data"), pattern = "\\.rds$")) {
+  object_name <- gsub("\\.rds$", "", file_name)
+  assign(object_name, readRDS(here("data", "API_data", file_name)))
+}
+
+# UPR plot data
+health_rec_C <- sdg_data |> 
+  filter(state_under_review == params$country_name) |> 
+  droplevels() |>
+  group_by(cycle, state_under_review) |>
+  count(health_related, .drop = FALSE) |> 
+  group_by(cycle) |>
+  mutate(
+    n_tot = sum(n),
+    perc = (n / n_tot) * 100,
+    perc = case_when(
+      health_related == "Other" ~ "",
+      .default = paste0(sprintf("%1.0f", perc), "%")
+    )
+  ) |> ungroup()
+
+# Life expectancy
+life_expectancy <- e01dt |> 
+  left_join(state_geo |> sf::st_drop_geometry() |> select(iso3,iso2, loc_id),
+            join_by(country_code==loc_id)) |> 
+  filter(
+    !is.na(iso3),
+    year>=2005
+  );rm(e01dt)
+
+pop_wpp <- pop1dt |> 
+  left_join(state_geo |> sf::st_drop_geometry() |> select(iso3,iso2, loc_id),
+            join_by(country_code==loc_id)) |> 
+  filter(
+    !is.na(iso3),
+    year>=2005
+  )
+
+pop_age_wpp_C <- popAge5dt |> 
+  left_join(state_geo |> sf::st_drop_geometry() |> select(iso3,iso2, loc_id),
+            join_by(country_code==loc_id)) |> 
+  filter(
+    !is.na(iso3),
+    year %in% c(2005,2020)
+  ) |> 
+  filter(iso3 == iso3_SUR) |> 
+  # filter(year==max(year)) |> 
+  select(name, year, age, popM, popF) |> 
+  rename(Male=popM, Female=popF) |> 
+  mutate(age = fct_inorder(age)) |> 
+  pivot_longer(cols = Male:Female,
+               names_to = "Gender",
+               values_to = "pop"
+  ) |> 
+  mutate(Gender=fct(Gender)) |> 
+  group_by(year) |> 
+  mutate(prop = pop/sum(pop, na.rm = TRUE)) |> 
+  ungroup()
+
+fertility_rate_C <- tfr1dt |> 
+  left_join(state_geo |> sf::st_drop_geometry() |> select(iso3,iso2, loc_id),
+            join_by(country_code==loc_id)) |> 
+  filter(
+    !is.na(iso3),
+    year>=2005
+  ) |> 
+  filter(iso3 == iso3_SUR) 
+
+relabel_na <- function(x) {
+  x <- as.character(x)
+  x[is.na(x)] <- "No data"
+  factor(x)
+}
+```
+
+```{r}
+UHC_estimate <- UHC_all |>
+  filter(IndicatorCode == "UHC_INDEX_REPORTED",
+         country_name == params$country_name,
+         YEAR == max(YEAR)
+  )
+
+UHC_RMNCH_estimate <- UHC_all |>
+  filter(IndicatorCode == "UHC_SCI_RMNCH",
+         country_name == params$country_name,
+         YEAR == max(YEAR)
+  )
+
+antenatal_WHO_C <- antenatal_WHO |> filter(country_iso_3_code == iso3_SUR)
+antenatal_WHO_text <- if(is_empty(antenatal_WHO_C |> 
+                                  filter(year == max(year)) |> 
+                                  pull(antenatal_WHO))){
+  "Data not available"
+} else{
+  paste0(antenatal_WHO_C |> 
+           filter(year == max(year)) |> 
+           pull(antenatal_WHO), 
+         "% in ", 
+         antenatal_WHO_C |> 
+           filter(year == max(year)) |> 
+           pull(year)
+  )
+}
+
+skilled_birth_C <- skilled_birth |> filter(COUNTRY == iso3_SUR)
+skilled_birth_text <- if(is_empty(skilled_birth_C |> 
+                                  filter(YEAR == max(YEAR)) |> 
+                                  pull(NumericValue))){
+  "Data not available"
+} else{
+  paste0(skilled_birth_C |> 
+           filter(YEAR == max(YEAR)) |> 
+           pull(NumericValue), 
+         "% in ", 
+         skilled_birth_C |> 
+           filter(YEAR == max(YEAR)) |> 
+           pull(YEAR)
+  )
+}
+
+
+#########
+
+life_expectancy_C <- life_expectancy |> filter(iso3 == iso3_SUR)
+life_expectancy_text <- paste0(life_expectancy_C |> 
+                                 filter(year==max(year)) |>  
+                                 pull(e0B) |> round(1), 
+                               " years in ",
+                               life_expectancy_C |> 
+                                 filter(year==max(year)) |> 
+                                 pull(year),
+                               " (",
+                               life_expectancy_C |> 
+                                 filter(year==min(year)) |>  
+                                 pull(e0B) |> round(1),
+                               " in ",
+                               life_expectancy_C |> 
+                                 filter(year==min(year)) |> 
+                                 pull(year),
+                               ")")
+
+pop_C <- pop_wpp |> 
+  filter(iso3==iso3_SUR)
+pop_text <- paste0(round(pop_C |> filter(year==max(year)) |> pull(pop)/1000,1),
+                   " million in ",
+                   pop_C |> filter(year==max(year)) |> pull(year),
+                   " (",
+                   sprintf("%+.0f", (round(pop_C |> filter(year==max(year)) |> pull(pop)/pop_C |> filter(year==min(year)) |> pull(pop),2)-1)*100),
+                   "% since ",
+                   pop_C |> filter(year==min(year)) |> pull(year),
+                   ")")
+
+fertility_rate_text <- paste0(fertility_rate_C |> 
+                                filter(year==max(year)) |>  
+                                pull(tfr) |> round(1), 
+                              " births per woman in ",
+                              fertility_rate_C |> 
+                                filter(year==max(year)) |> 
+                                pull(year),
+                              " (",
+                              fertility_rate_C |> 
+                                filter(year==min(year)) |>  
+                                pull(tfr) |> round(1),
+                              " in ",
+                              fertility_rate_C |> 
+                                filter(year==min(year)) |> 
+                                pull(year),
+                              ")")
+
+constitutions_C <- constitutions |> filter(iso3 == iso3_SUR)
+
+FCS_count <- state_geo |> filter(iso3 == iso3_SUR) |> st_drop_geometry() |> 
+  mutate(FCS_count = case_when(is.na(FCS_count) ~ 0, .default = FCS_count)) |> pull(FCS_count)
+
+health_expenditure <- GHED_CHEGDP_SHA2011 |> filter(SpatialDim == iso3_SUR) |> 
+  filter(YEAR == max(YEAR))
+
+health_expenditure_text <- if(is_empty(health_expenditure |> 
+                                  pull(NumericValue))){
+  "Data not available"
+} else{
+  paste0(round(health_expenditure |> 
+           pull(NumericValue),1),
+         "% in ", 
+         health_expenditure |> 
+           pull(YEAR)
+  )
+}
+
+GDP_profile <- GDP_long |> 
+  filter(!is.na(GDP_long)) |> 
+  filter(country_code == iso3_SUR) |> 
+  filter(year == max(year)) |> 
+  mutate(GDP_long = round(GDP_long))
+
+GDP_text <- if(is_empty(GDP_profile |> 
+                                  pull(GDP_long))){
+  "Data not available"
+} else{
+  paste0("$", format(GDP_profile |> 
+           pull(GDP_long), big.mark = ","),
+         " in ", 
+         GDP_profile |> 
+           pull(year)
+  )
+}
+
+```
+
+```{r, warning=FALSE}
+#####################
+HPV_coverage_C <- HPV_coverage |> filter(SpatialDim==iso3_SUR)
+HPV_coverage_text <- if(is_empty(HPV_coverage_C |> filter(YEAR == max(YEAR)) |> pull(NumericValue))){
+  "Data not available"
+} else{
+  paste0(HPV_coverage_C |> filter(YEAR == max(YEAR)) |> pull(NumericValue), 
+         "% in ", HPV_coverage_C |> filter(YEAR == max(YEAR)) |> pull(YEAR))
+}
+
+family_planning_C <- family_planning |> filter(SpatialDim==iso3_SUR)
+family_planning_text <- if(is_empty(family_planning_C |> filter(YEAR == max(YEAR)) |> pull(NumericValue))){
+  "Data not available"
+} else{
+  paste0(family_planning_C |> filter(YEAR == max(YEAR)) |> pull(Value), 
+         "% in ", family_planning_C |> filter(YEAR == max(YEAR)) |> pull(YEAR))
+}
+
+unintended_pregnancy_C <- unintended_pregnancy |> 
+  filter(SpatialDim==iso3_SUR, 
+         Dim1 == "UNCERTAINTY_INTERVAL_UI95")
+unintended_pregnancy_text <- if(is_empty(unintended_pregnancy_C |> filter(YEAR == max(YEAR)) |> pull(NumericValue))){
+  "Data not available"
+} else{
+  paste0(unintended_pregnancy_C |> filter(YEAR == max(YEAR)) |> pull(NumericValue) |> round(0), 
+         " per 1,000 women in ", unintended_pregnancy_C |> filter(YEAR == max(YEAR)) |> pull(YEAR))
+}
+
+
+HPV_national_C <- HPV_national |> filter(SpatialDim==iso3_SUR)
+HPV_national_text <- if(is_empty(HPV_national_C |> filter(YEAR == max(YEAR)) |> pull(Value))){
+  "Data not available"
+} else{
+  paste0(HPV_national_C |> filter(YEAR == max(YEAR)) |> pull(Value), 
+         " (evaluated in ", HPV_national_C |> filter(YEAR == max(YEAR)) |> pull(YEAR), ")")
+}
+
+HPV_national_alt_C <- HPV_national_alt |> filter(ISO_3_CODE==iso3_SUR)
+HPV_national_alt_text <- if(is_empty(HPV_national_alt_C |> pull(INTRO_text))){
+  "Data not available"
+} else{
+  paste0(HPV_national_alt_C |> pull(INTRO_text))
+}
+
+#####################
+DTP3_coverage_C <- DTP3_coverage |> filter(SpatialDim==iso3_SUR)
+DTP3_coverage_text <- if(is_empty(DTP3_coverage_C |> filter(YEAR == max(YEAR)) |> pull(NumericValue))){
+  "Data not available"
+} else{
+  paste0(DTP3_coverage_C |> filter(YEAR == max(YEAR)) |> pull(NumericValue), 
+         "% in ", DTP3_coverage_C |> filter(YEAR == max(YEAR)) |> pull(YEAR))
+}
+
+#####################
+nursing_density_C <- nursing_density |> filter(SpatialDim==iso3_SUR)
+nursing_density_text <- if(is_empty(nursing_density_C |> filter(YEAR == max(YEAR)) |> pull(NumericValue))){
+  "Data not available"
+} else{
+  paste0(round(nursing_density_C |> filter(YEAR == max(YEAR)) |> pull(NumericValue),0), 
+         " in ", nursing_density_C |> filter(YEAR == max(YEAR)) |> pull(YEAR))
+}
+
+####################
+adolescent_birth_rate_C <- adolescent_birth_rate |> filter(SpatialDim==iso3_SUR)
+adolescent_birth_rate_text_10_14 <- if(is_empty(adolescent_birth_rate_C |> 
+                                                filter(Dim2=="AGEGROUP_YEARS10-14") |> 
+                                                filter(YEAR == max(YEAR)) |> 
+                                                pull(NumericValue))){
+  "Data not available"
+} else{
+  paste0(adolescent_birth_rate_C |> 
+           filter(Dim2=="AGEGROUP_YEARS10-14") |> 
+           filter(YEAR == max(YEAR)) |> 
+           pull(Value), 
+         " per 1,000 women in ", 
+         adolescent_birth_rate_C |> 
+           filter(Dim2=="AGEGROUP_YEARS10-14") |> 
+           filter(YEAR == max(YEAR)) |> 
+           pull(YEAR)
+  )
+}
+adolescent_birth_rate_text_15_19 <- if(is_empty(adolescent_birth_rate_C |> 
+                                                filter(Dim2=="AGEGROUP_YEARS15-19") |> 
+                                                filter(YEAR == max(YEAR)) |> 
+                                                pull(NumericValue))){
+  "Data not available"
+} else{
+  paste0(adolescent_birth_rate_C |> 
+           filter(Dim2=="AGEGROUP_YEARS15-19") |> 
+           filter(YEAR == max(YEAR)) |> 
+           pull(Value), 
+         " per 1,000 women in ", 
+         adolescent_birth_rate_C |> 
+           filter(Dim2=="AGEGROUP_YEARS15-19") |> 
+           filter(YEAR == max(YEAR)) |> 
+           pull(YEAR)
+  )
+}
+
+##############
+contraceptive_prevalence_C <- contraceptive_prevalence |> 
+  filter(Dim1Type == "AGEGROUP") |> 
+  filter(SpatialDim==iso3_SUR)
+
+contraceptive_prevalence_text_15_19 <- 
+  if(is_empty(contraceptive_prevalence_C |> 
+              filter(Dim1=="AGEGROUP_YEARS15-19") |> 
+              filter(YEAR == max(YEAR)) |> 
+              pull(NumericValue))){
+    "Data not available"
+  } else{
+    paste0(round(contraceptive_prevalence_C |> 
+                   filter(Dim1=="AGEGROUP_YEARS15-19") |> 
+                   filter(YEAR == max(YEAR)) |> 
+                   pull(NumericValue),1), 
+           "% in ", 
+           contraceptive_prevalence_C |> 
+             filter(Dim1=="AGEGROUP_YEARS15-19") |> 
+             filter(YEAR == max(YEAR)) |> 
+             pull(YEAR)
+    )
+  }
+contraceptive_prevalence_text_20_49 <- 
+  if(is_empty(contraceptive_prevalence_C |> 
+              filter(Dim1=="AGEGROUP_YEARS20-49") |> 
+              filter(YEAR == max(YEAR)) |> 
+              pull(NumericValue))){
+    "Data not available"
+  } else{
+    paste0(round(contraceptive_prevalence_C |> 
+                   filter(Dim1=="AGEGROUP_YEARS20-49") |> 
+                   filter(YEAR == max(YEAR)) |> 
+                   pull(NumericValue),1),
+           "% in ", 
+           contraceptive_prevalence_C |> 
+             filter(Dim1=="AGEGROUP_YEARS20-49") |> 
+             filter(YEAR == max(YEAR)) |> 
+             pull(YEAR)
+    )
+  }
+
+```
+\maketitle
+# \textcolor{fgcolor}{`r params$country_name`}
+<!-- Some brief text here, for context, that runs the \textcolor{CeHDIRed}{entire width of the page}. Indicator results, tables, and figures can go into the columns below. -->
+```{=latex}
+\begin{multicols}{2}
+\raggedcolumns     %new code
+\interlinepenalty=10000
+```
+\begin{center}\textcolor{fgcolor}{\textbf{\hlCeHDIRed{\ \ \ \ The Right to Health \ \ \ \ }}}\end{center}  
+Enshrined in Article 12 of the International Convenant on Economic, Social and Cultural Rights (ICESCR), the right to health is an inclusive human right covering health care and the underlying determinants of health. It imposes three obligations on States:  
+\ \ - \textbf{{Respect:}} refrain from interfering, directly or indirectly, with its enjoyment.  
+\ \ - \textbf{{Protect:}} prevent third parties from violating it.  
+\ \ - \textbf{{Fulfill:}} adopt legislative, administrative, budgetary, judicial, and other measures toward its full realization.  
+\begin{center}\textcolor{fgcolor}{\textbf{\hlCeHDIRed{\ \ \ \ The Universal Periodic Review (UPR) \ \ \ \ }}}\end{center}  
+The UPR is a **State-led** mechanism for evaluating human rights commitments, where UN Member States issue recommendations that the State under review may **"Support"** or **"Note"**.  
+
+CeHDI's analysis across all UPR cycles identified health-related recommendations, which have globally gained prominence over time. For `r params$country_name`, health-related recommendations accounted for `r health_rec_C |> filter(cycle == "Cycle 1", health_related == "Health-related") |> pull(perc)` of all recommendations in Cycle 1, and `r health_rec_C |> filter(health_related == "Health-related") |> slice_max(order_by = cycle) |> pull(perc)` in `r health_rec_C |> filter(health_related == "Health-related") |> slice_max(order_by = cycle) |> pull(cycle)`. These were categorized into the following themes:\footnote{Visit \href{https://cehdi-har.share.connect.posit.cloud/}{cehdi-har.share.connect.posit.cloud} for more details.\label{fn:cehdiHAR}}
+```{r, fig.width=5.2, fig.height=4}
+a_1 <- 
+  sdg_data |>    
+  filter(state_under_review == params$country_name) |> 
+  select(cycle, state_under_review, health_related:other_health_related, response_upr) |>
+  group_by(response_upr) |>
+  summarise(across(c(health_related:other_health_related), ~ sum(.x != "Other"))) |>
+  ungroup() |>
+  filter(response_upr %in% c("Supported", "Noted")) |>
+  pivot_longer(
+    cols = health_related:other_health_related,
+    names_to = "theme",
+    values_to = "n"
+  )
+
+a_2 <- 
+  sdg_data |>    
+  filter(state_under_review == params$country_name) |> 
+  select(cycle, state_under_review, health_related:other_health_related, response_upr) |>
+  group_by(response_upr) |>
+  summarise(across(c(health_related:other_health_related), ~ sum(.x == "Other"))) |>
+  ungroup() |>
+  filter(response_upr %in% c("Supported", "Noted")) |>
+  pivot_longer(
+    cols = health_related:other_health_related,
+    names_to = "theme",
+    values_to = "n_other"
+  )
+
+a <- left_join(a_1, a_2) |>
+  group_by(theme) |>
+  mutate(
+    n_tot = sum(n) + sum(n_other),
+    n_tot_theme = sum(n)
+  ) |>
+  mutate(
+    perc = n / n_tot * 100,
+    perc_theme = n_tot_theme / n_tot * 100
+  ) |>
+  group_by(theme) |>
+  mutate(
+    n_sup = paste0("(", sprintf("%1.0f", n / sum(n) * 100), "%)"),
+    n_sup = case_when(n_tot_theme == 0 ~ "", .default = n_sup)
+  ) |>
+  ungroup() |>
+  filter(!theme %in% c("health_related")) |>
+  left_join(theme_labels, by = c("theme" = "variable")) |>
+  arrange(-n_tot_theme) |>
+  mutate(
+    theme_label = case_when(is.na(theme_label) ~ theme, .default = theme_label),
+    theme_label = fct_inorder(theme_label)
+  )
+
+
+max_a <- max(a$perc_theme, na.rm = TRUE)
+a |>
+  ggplot(aes(x = perc, y = fct_rev(theme_label))) +
+  geom_col(aes(fill = response_upr), alpha = 0.8, width = 0.85) +
+  scale_fill_manual(values = c("#ec5557", "#1c164d"))+
+  labs(
+    x = "Proportion of all recommendations (%)", y = NULL,
+    fill = "State's response",
+    title = paste("All health-related recommendations of the UPR\n", params$country_name),
+    caption = "*Numbers after the bars indicate N (% supported)"
+  ) +
+  theme_classic() +
+  scale_x_continuous(
+    labels = function(x) paste0(x, "%"),
+    # limits = c(0, max_a + 2),
+    expand = expansion(mult = c(0, 0.15))
+  ) +
+  coord_cartesian(clip = "off")+
+  guides(fill=guide_legend(reverse=T))+
+  theme(
+    plot.margin = margin(l=2,t=2,b=2, r = 30, unit = "pt"),
+    legend.position = c(0.99, 0.01),
+    legend.justification = c("right", "bottom"),
+    legend.margin = margin(0,0,0,0),
+    legend.frame = element_blank(),
+    legend.text = element_text(size = 9, color = "#1c164d"),
+    legend.title = element_text(size = 11, color = "#1c164d"),
+    legend.background = element_blank(),
+    legend.key.size = unit(10,"pt"),
+    axis.text.y = element_text(size = 9, color = "#1c164d"),
+    axis.text.x = element_text(size = 10, color = "#1c164d"),
+    plot.title = element_text(hjust = 0.5, face = "bold", color = "#1c164d"),
+    axis.title.y = element_blank(),
+    axis.title.x = element_text(color = "#1c164d"),
+    plot.title.position = "plot",
+    panel.grid = element_blank(),
+    plot.caption = element_text(color = "#1c164d"),
+    plot.background = element_rect(color = "#1c164d", fill = NA),
+    panel.background = element_blank()
+  ) +
+  geom_text(
+    data = a |> filter(response_upr == "Supported"),
+    aes(label = paste0(n_tot_theme, " ", n_sup), x = perc_theme),
+    hjust = -0.1, size = 3, vjust = 0.5, color = "#1c164d"
+  )
+
+
+# print(params$upr_all+
+#         labs(title = params$country_name)+
+#         theme(
+#           axis.title.x = element_text(color = "#1c164d"),
+#           axis.text = element_text(color = "#1c164d"),
+#           plot.title = element_text(color = "#1c164d"),
+#           plot.caption = element_text(color = "#1c164d"),
+#           plot.background = element_rect(color = "#1c164d", fill = NA),
+#           panel.background = element_blank(),
+#           legend.background = element_blank()
+#         )
+# )
+```
+\begin{center}\textcolor{fgcolor}{\textbf{\hlCeHDIRed{\ \ \ \ Legal Basis for Health in `r params$country_name` \ \ \ \ }}}\end{center}  
+\textbf{{Constitutional guarantees for citizens (as of June 2024):}}\footnote{\href{https://www.worldpolicycenter.org/maps-data/data-download/constitutions-data-download}{worldpolicycenter.org} \label{fn:worldpolicy}}  
+\ \ - Right to health: `r constitutions |> filter(iso3 == iso3_SUR) |> pull(const_health)`  
+\ \ - Right to public health: `r constitutions |> filter(iso3 == iso3_SUR) |> pull(const_publichealth)`  
+\ \ - Right to medical care: `r constitutions |> filter(iso3 == iso3_SUR) |> pull(const_medcare)`  
+\ \ - Right to a healthy environment: `r constitutions |> filter(iso3 == iso3_SUR) |> pull(const_enviro)`  
+\textbf{{Legal status of abortion (as of June 2023):}}\footnote{\href{https://reproductiverights.org/wp-content/uploads/2023/12/WALM_2023-v3-Updated_12-20-23.pdf}{reproductiverights.org} \label{fn:reproductiverights}} `r world_abortion_laws |> filter(country == params$country_name) |> pull(category)`
+\columnbreak
+\begin{center}\textcolor{fgcolor}{\textbf{\hlCeHDIRed{\ \ \ \ Demographics and background information \ \ \ \ }}}\end{center}  
+\textbf{{Population:}}\footnote{\href{https://population.un.org/wpp}{population.un.org/wpp} \label{fn:WPP}} `r pop_text`  
+\textbf{{Life expectancy at birth:}}\textsuperscript{\ref{fn:WPP}} `r life_expectancy_text`  
+\textbf{{GDP per capita (PPP):}} `r GDP_text`  
+\textbf{{Health expenditure (\\% of GDP):}} `r health_expenditure_text`  
+\textbf{{Years on list of Fragile and Conflict-affected Situations:}}\footnote{\href{https://www.worldbank.org/ext/en/topic/fragility-conflict-and-violence}{2006-2023; worldbank.org/ext/en/topic/fragility-conflict-and-violence} \label{fn:WBFCS}} `r FCS_count`  
+\begin{center}\textcolor{fgcolor}{\textbf{\hlCeHDIRed{\ \ \ \ Sexual and Reproductive Health \ \ \ \ }}}\end{center}  
+\textbf{{Total fertility rate:}}\textsuperscript{\ref{fn:WPP}} `r fertility_rate_text`  
+\textbf{{Met need for family planning:}}\textsuperscript{\ref{fn:whoGHO}} `r family_planning_text`  
+\textbf{{Adolescent birth rate:}}\footnote{\href{https://www.who.int/data/gho}{who.int/data/gho} \label{fn:whoGHO}}  
+\ \ - Aged 10 to 14: `r adolescent_birth_rate_text_10_14`  
+\ \ - Aged 15 to 19: `r adolescent_birth_rate_text_15_19`  
+\textbf{{Births attended by skilled health personnel:}}\textsuperscript{\ref{fn:whoGHO}} `r skilled_birth_text`  
+\textbf{{Maternal mortality ratio (MMR):}}\textsuperscript{\ref{fn:whoGHO}} `r MMR |> filter(SpatialDim == iso3_SUR, YEAR == 2023) |> pull(NumericValue) |> round(digits = 0)` maternal deaths per 100,000 live births in 2023 (`r MMR |> filter(SpatialDim == iso3_SUR, YEAR == 2005) |> pull(NumericValue) |> round(digits = 0)` in 2005)  
+```{r, out.width="98%"}
+# mmr_estimate_2023 = params$mmr_map_plot@data |>
+#   filter(country_name == params$country_name,
+#          YEAR == "2023") |>
+#   pull(NumericValue) |>
+#   round(0)
+# 
+# map_insetting(
+#   p1 = params$mmr_map_plot,
+#   p_caption_text = paste0(params$country_name, ": ", mmr_estimate_2023, " per 100,000 live births"),
+#   legend_title_text = "MMR",
+#   p_title_text = "Maternal mortality ratio (MMR) estimates in 2023",
+#   bbox_SUR_region_dynamic = params$bbox_SUR_region_dynamic,
+#   bbox_sur = params$bbox_selected_SUR,
+#   sur_area = params$sur_area
+# )+labs(fill="MMR")
+
+p1<-MMR |> 
+  filter(YEAR==2023, !is.na(country_name)) |> 
+  right_join(state_geo, by=join_by(SpatialDim==iso3)) |> 
+  mutate(selected_sur = factor(case_when(
+    country_name == params$country_name ~ params$country_name,
+    .default = "Other"
+  ),
+  levels = c(params$country_name, "Other")
+  )) |> 
+  ggplot(aes(geometry = polygon))+
+  geom_sf(aes(fill=mmr_cat), color = NA)+
+  scale_fill_brewer(palette = "YlOrRd", na.value = "grey80", labels = relabel_na)+
+  theme_void()+
+  labs(fill="MMR\nin 2023")
+
+p2 <- p1 +
+  geom_sf(color="grey70", fill=NA)+
+  geom_rect(
+    aes(
+      xmin = params$bbox_selected_SUR["xmin"] - 0.7,
+      xmax = params$bbox_selected_SUR["xmax"] + 0.7,
+      ymin = params$bbox_selected_SUR["ymin"] - 0.7,
+      ymax = params$bbox_selected_SUR["ymax"] + 0.7
+    ),
+    fill = "transparent",
+    color = "red",
+    linewidth = 0.5
+  )+
+  coord_sf(
+    # expand = FALSE,
+    xlim = c(params$bbox_SUR_region_dynamic[[1]],params$bbox_SUR_region_dynamic[[3]]),
+    ylim = c(params$bbox_SUR_region_dynamic[[2]], params$bbox_SUR_region_dynamic[[4]])
+  )
+
+p3<-p1+
+  guides(fill="none")+
+  ggnewscale::new_scale_fill()+ 
+  geom_sf(
+    aes(fill = selected_sur),
+    color = "transparent")+ 
+  scale_fill_manual(values=c("transparent", "white"))+
+  guides(fill="none")+
+  coord_sf(
+    expand=FALSE,
+    xlim = c(params$bbox_selected_SUR[[1]]-.11, params$bbox_selected_SUR[[3]]+.11),
+    ylim = c(params$bbox_selected_SUR[[2]]-.11, params$bbox_selected_SUR[[4]]+.11)
+  )+
+  theme(panel.background = element_rect(fill="white"))+
+  geom_rect(
+    aes(
+      xmin = params$bbox_selected_SUR["xmin"]-.1,
+      xmax = params$bbox_selected_SUR["xmax"]+.1,
+      ymin = params$bbox_selected_SUR["ymin"]-.1,
+      ymax = params$bbox_selected_SUR["ymax"]+.1
+    ),
+    fill = "transparent",
+    color = "red",
+    linewidth = 0.5
+  )
+
+a<-ggplot_build(p2)
+b<-ggplot_build(p3)
+multiplier_a <- abs(a$layout$coord$limits$x[1]-a$layout$coord$limits$x[2])/abs(a$layout$coord$limits$y[1]-a$layout$coord$limits$y[2])
+multiplier_b <- abs(b$layout$coord$limits$x[1]-b$layout$coord$limits$x[2])/abs(b$layout$coord$limits$y[1]-b$layout$coord$limits$y[2])
+
+area_a <- abs(a$layout$coord$limits$x[1]-a$layout$coord$limits$x[2])*abs(a$layout$coord$limits$y[1]-a$layout$coord$limits$y[2])
+area_b <- abs(b$layout$coord$limits$x[1]-b$layout$coord$limits$x[2])*abs(b$layout$coord$limits$y[1]-b$layout$coord$limits$y[2])
+
+key_dim <- 0.3/(multiplier_a/multiplier_b)
+inset_dimensions <- if(multiplier_b<=3){c(0,0,key_dim,key_dim*multiplier_a/multiplier_b)}else{c(0,0,key_dim*multiplier_a/multiplier_b,0.2)}
+
+if (
+  # sur_area > 11^11 | 
+  area_b > 0.02*area_a
+) {
+  p2
+} else {
+  p2 + inset_element(p3, inset_dimensions[1], inset_dimensions[2],inset_dimensions[3],inset_dimensions[4])+ plot_annotation(
+    theme = theme(plot.margin = margin(0,0,0,0), plot.background = element_blank()
+    ))
+}
+
+# params$mmr_map_plot
+
+# params$mmr_map_plot+theme(
+#   plot.background = element_blank()
+# )&
+# plot_annotation(theme = theme(
+#   plot.background = element_rect(color = "#1c164d", fill=NA)
+#   )
+#   )
+```
+```{r, fig.width=8, fig.height=1.5}
+start_year <- "2005"
+dat_plot <- MMR |>
+  mutate(selected_sur = factor(case_when(
+    country_name == params$country_name ~ params$country_name,
+    .default = "Other"
+  ),
+  levels = c(params$country_name, "Other")
+  )) |>
+  filter(country_name %in% c(
+    params$country_name,
+    nearest_neighbors_list[, params$country_name][1:4]
+  )) |>
+  filter(year >= ymd(paste0(start_year, "-01-01"))) |>
+  mutate(country_name = fct_relevel(country_name, params$country_name)) |>
+  group_by(country_name) |>
+  mutate(
+    num_stand = NumericValue - NumericValue[YEAR == start_year],
+    num_low = Low - NumericValue[YEAR == start_year],
+    num_high = High - NumericValue[YEAR == start_year]
+  ) |>
+  ungroup()
+
+hline_data <- dat_plot |>
+  filter(YEAR == as.numeric(start_year))
+str_max <- max(str_width(dat_plot |> pull(country_name)))
+str_max_height <- if(str_max<21){0.8} else if(str_max <37){1.5} else{2.1}
+
+dat_plot |>
+  mutate(country_name = fct_relevel(country_name, params$country_name)) |>
+  ggplot(aes(x = YEAR, y = NumericValue)) +
+  labs(
+    # title = paste0("Trends in MMR, neighboring States plotted for comparison"),
+    x = NULL, y = "MMR",
+    color = NULL,
+    fill = NULL
+  ) +
+  scale_x_continuous(breaks = c(2005, 2020), 
+                     expand = expansion(mult = c(0, 0)))+
+  scale_y_continuous(limits = c(0,NA))+
+  geom_line(lwd = 1, aes(color = selected_sur)) +
+  geom_ribbon(aes(ymin = Low, ymax = High, fill = selected_sur), color = NA, alpha = 0.4) +
+  scale_color_manual(values = c("#ec5557", "#1c164d")) +
+  scale_fill_manual(values = c("#ec5557", "#1c164d")) +
+  guides(color = "none", lwd = "none", fill = "none") +
+  facet_wrap(. ~ country_name, nrow=1
+             , scales = "free"
+             # ,labeller = labeller(country_name = label_wrap_gen(21))
+  ) +
+  geom_hline(data = hline_data, aes(yintercept = NumericValue), lty = 2) +
+  theme_bw()+
+  theme(
+    plot.margin = margin(0,0,0,0),
+    axis.text = element_text(color = "#1c164d"),
+    axis.text.x = element_text(color = "#1c164d", angle = 20),
+    axis.title = element_text(color = "#1c164d"),
+    axis.line = element_line(color = "#1c164d"),
+    axis.ticks = element_line(color = "#1c164d"),
+    panel.grid = element_blank(),
+    panel.border = element_blank(),
+    margins = margin(0,0,0,0),
+    plot.background = element_blank(),
+    panel.background = element_blank(),
+    strip.background =element_rect(fill="#1c164d", color = "#1c164d"),
+    # strip.text = element_text(colour = 'white'),
+    strip.text = element_textbox_simple(
+      color="white", face = "bold",
+      height = unit(str_max_height, "lines"),
+      hjust = 0.5, 
+      vjust = 0.5, 
+      halign = 0.5,
+      valign = 0.5
+    )
+  )+
+  coord_cartesian(clip="off")
+```
+<!-- \textbf{{Contraceptive prevalence (modern methods):}}\textsuperscript{\ref{fn:whoGHO}}   -->
+<!-- \ \ - Aged 15 to 19:  `r contraceptive_prevalence_text_15_19`   -->
+<!-- \ \ - Aged 20 to 49:  `r contraceptive_prevalence_text_20_49` -->
+\begin{center}\textcolor{fgcolor}{\textbf{\hlCeHDIRed{\ \ \ \ Health Services Coverage (latest available data) \ \ \ \ }}}\end{center}  
+<!-- \textbf{{UHC service coverage index:}}\textsuperscript{\ref{fn:whoGHO}} `r UHC_estimate |> pull(Value)` in `r UHC_estimate |> pull(YEAR)`   -->
+\textbf{{UHC Service Coverage Index and components (`r UHC_all |> filter(COUNTRY == iso3_SUR, IndicatorCode == "UHC_INDEX_REPORTED", YEAR == min(YEAR)) |> pull(YEAR)` to `r UHC_all |> filter(COUNTRY == iso3_SUR, IndicatorCode == "UHC_INDEX_REPORTED", YEAR == max(YEAR)) |> pull(YEAR)`):}}\textsuperscript{\ref{fn:whoGHO}}
+```{r, fig.align="center", fig.width=7, fig.height=1.5, out.width="100%"}
+uhc_plots <- function(dat, title_text = "Update title", yMAX = 100){
+  p_data <- dat |> 
+    filter(COUNTRY == iso3_SUR)
+  label_data_1 <- p_data |> 
+    filter(YEAR %in% c(min(YEAR)))
+  label_data_2 <- p_data |> 
+    filter(YEAR %in% c(max(YEAR)))
+  p1<-p_data |> 
+    # mutate(val_maxtime = NumericValue[TimeDim==max(TimeDim)])
+    ggplot(aes(x=YEAR, y= NumericValue))+
+    geom_hline(aes(yintercept = yMAX), color = "green", lty=2, lwd=1)+
+    geom_line(color = "#ec5557", lwd=1, fill=NA)+
+    geom_text(
+      data = label_data_1, # Use the special, single-row data frame
+      aes(label = Value, # The text for the label
+          nudge_y = if_else(label_data_1$NumericValue> 30, -12,13)
+      ),      # Nudge the label slightly
+      size=5, hjust = 0,
+      color = "#1c164d", # Match theme color
+      # fontface = "bold" # Make it stand out
+    )+
+    geom_text(
+      data = label_data_2, # Use the special, single-row data frame
+      aes(label = Value, # The text for the label
+          nudge_y = if_else(label_data_2$NumericValue> 30, -12,13)
+      ),      # Nudge the label slightly
+      size=5, hjust = 1,
+      color = "#1c164d", # Match theme color
+      # fontface = "bold" # Make it stand out
+    )+
+    scale_y_continuous(limits = c(0,yMAX))+
+    theme_void()+
+    labs(title = title_text)+
+    theme(
+      axis.line = element_line(color = "#1c164d"),
+      plot.title = element_text(color = "#1c164d", size = 10, hjust = 0.5, vjust = 0.5))+
+    coord_cartesian(clip = "off")
+  p1
+}
+
+p1<-uhc_plots(UHC_all |> filter(IndicatorCode == "UHC_INDEX_REPORTED"), 
+              title_text = "Services Coverage\nIndex"#, yMAX = 80
+              )
+p2<-uhc_plots(UHC_all |> filter(IndicatorCode == "UHC_SCI_CAPACITY"), 
+              title_text = "Service capacity\nand access")
+p3<-uhc_plots(UHC_all |> filter(IndicatorCode == "UHC_SCI_INFECT"), 
+              title_text = "Infectious diseases")
+p4<-uhc_plots(UHC_all |> filter(IndicatorCode == "UHC_SCI_NCD"), 
+              title_text = "Non-communicable\ndiseases")
+p5<-uhc_plots(UHC_all |> filter(IndicatorCode == "UHC_SCI_RMNCH"), 
+              title_text = "Reproductive,\nmaternal, newborn\nand child health")
+
+(p1 | p2 | p3 | p4 | p5)+plot_annotation(
+  theme = theme(plot.margin = margin(0,0,0,0), 
+                plot.background = element_blank()
+  ))
+```
+<!-- \textbf{{UHC sub-index on RMNCH:}}\textsuperscript{\ref{fn:whoGHO}} `r UHC_RMNCH_estimate |> pull(Value)` in `r UHC_RMNCH_estimate |> pull(YEAR)`   -->
+\textbf{{Antenatal care coverage (\ge 4 visits):}}\footnote{\href{https://platform.who.int/data/maternal-newborn-child-adolescent-ageing}{platform.who.int/data/maternal-newborn-child-adolescent-ageing} \label{fn:whoMNCAH}} `r antenatal_WHO_text`  
+\textbf{{Nursing/midwifery personnel (per 10,000):}}\textsuperscript{\ref{fn:whoGHO}}  `r nursing_density_text`  
+
+\textbf{{HPV coverage (9-14 year old girls):}}\textsuperscript{\ref{fn:whoGHO}}  `r HPV_coverage_text`  
+\textbf{{HPV vaccine introduction:}}\footnote{\href{https://immunizationdata.who.int}{immunizationdata.who.int} \label{fn:whoimmunization}} `r HPV_national_alt_text`  
+\textbf{{DTP3 coverage (among 1-year-olds):}}\textsuperscript{\ref{fn:whoGHO}} `r DTP3_coverage_text`
+```{=latex}
+\end{multicols}
+```
+\newpage
+\begin{center}\textcolor{fgcolor}{\textbf{\hlCeHDIRed{\ \ \ Recommendations from the UPR on the themes of maternal health, family planning, abortion, and sexual education \ \ \ }}}\end{center}  
+```{r}
+table_data <- sdg_data |> 
+  filter(iso3==iso3_SUR) |> 
+  filter(if_any(any_of(c("maternal_health", "abortion", "contraception", "sexual_education")), ~ .x != "Other")) |>
+  # filter(maternal_health != "Other") |> 
+  select(text_2, cycle, response_upr
+         # , recommending_state_upr_comma
+         # , maternal_health, abortion, contraception
+  ) |> 
+  rename(
+    Recommendation  = text_2,
+    Cycle = cycle,
+    Response = response_upr
+    # , `Recommending State(s)` = recommending_state_upr_comma
+  )
+
+kableExtra::kbl(
+  table_data, 
+  format = "latex", 
+  longtable = TRUE,
+  booktabs = TRUE) |> 
+  kableExtra::kable_styling(
+    latex_options = c("striped"),
+    stripe_color = "#b7b4cc", 
+    font_size = 10
+    # ,position = "left"
+  ) |> 
+  kableExtra::column_spec(1,width = "45em")
+```
