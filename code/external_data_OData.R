@@ -5,6 +5,10 @@
 # First make sure to clear all objects from the workspace, then source the whole file.
 # All objects that exist in the workspace will be saved as rds to the API_data folder !
 
+# This file inputs data from a variety of sources, with some pre-processing for downstream use.
+
+rm(list=ls()) # clear all objects from the workspace
+
 # Setup ####
 pacman::p_load(
   here,
@@ -31,33 +35,6 @@ state_geo <- readRDS(here("output", "state_geo_enhanced.rds"))
 # Load in custom functions
 # source(here("utils.R"))
 
-theme_labels <- tribble(
-  ~"variable", ~"theme_label",
-  "health_systems", "Health systems and services",
-  "emergencies", "Health security, emergencies, and disaster relief",
-  "ncd", "Non-communicable diseases",
-  "communicable", "Communicable diseases",
-  "SRHR", "Sexual and reproductive health and rights",
-  "mental_health", "Mental health",
-  "SOCED", "Social and economic determinants of health",
-  "GBV", "Gender-based violence",
-  "women", "Women's health",
-  "MCAH", "Maternal, child, and adolescent health",
-  "essential_medicines", "Essential medicines and health products",
-  "disabilities", "Disabilities and health",
-  "LGBTI", "Health of LGBTI persons",
-  "HIV", "HIV/AIDS and STIs",
-  "TB_malaria", "TB and malaria",
-  "NTD", "Neglected tropical diseases",
-  "TB_malaria_NTD", "TB, malaria, and neglected tropical diseases",
-  "vaccinations", "Vaccinations",
-  "WASH", "Water and Sanitation",
-  "nutrition", "Nutrition",
-  "maternal_health", "Maternal health",
-  "abortion", "Abortion",
-  "incarcerated", "Health of incarcerated persons"
-)
-
 # Population data --------------------------------------
 # from the wpp2024 package
 data(e01dt);data(pop1dt);data(popAge5dt);data(tfr1dt)
@@ -68,6 +45,16 @@ HDI <- vroom::vroom(here("data", "HDR25_Composite_indices_complete_time_series.c
   select(iso3, hdi_1990:hdi_2023) |> 
   pivot_longer(cols = hdi_1990:hdi_2023, names_to = "year", values_to = "HDI") |> 
   mutate(year = as.numeric(str_remove(year, "hdi_")))
+
+HDI_f <- vroom::vroom(here("data", "HDR25_Composite_indices_complete_time_series.csv")) |> 
+  select(iso3, hdi_f_1990:hdi_f_2023) |> 
+  pivot_longer(cols = hdi_f_1990:hdi_f_2023, names_to = "year", values_to = "HDI_F") |> 
+  mutate(year = as.numeric(str_remove(year, "hdi_f_")))
+
+I_HDI <- vroom::vroom(here("data", "HDR25_Composite_indices_complete_time_series.csv")) |> 
+  select(iso3, ihdi_2010:ihdi_2023) |> 
+  pivot_longer(cols = ihdi_2010:ihdi_2023, names_to = "year", values_to = "I_HDI") |> 
+  mutate(year = as.numeric(str_remove(year, "ihdi_")))
 
 # World abortion laws -----------------------------------------------------
 # https://reproductiverights.org/maps/worlds-abortion-laws/
@@ -572,6 +559,15 @@ family_planning <- gho_api$path("SDGFPALL")$retrieve()$value |> tibble() |>
       levels = c("10", "<30", "<60", "<90", "90+")
     ))
 
+#### Contraceptive prevalence rate - ANY METHOD ####
+# World Bank: https://data.worldbank.org/indicator/SP.DYN.CONU.ZS
+contraceptive_prevalence_ANY <- read_csv(here("data", "API_SP.DYN.CONU.ZS_DS2_en_csv_v2_2852.csv"), 
+                                         skip = 4) |> 
+  janitor::clean_names() |> 
+  select(-x70) |> 
+  pivot_longer(cols = x1960:x2024, names_to = "YEAR", values_to = "CPR_any") |> 
+  mutate(YEAR = as.numeric(str_remove(YEAR, "x")))
+
 #### Modern contraceptive prevalence ####
 contraceptive_prevalence <- gho_api$path("cpmowho")$retrieve()$value |>
   mutate(
@@ -807,10 +803,69 @@ NMIRF <- left_join(nmirf_X, nmirf_Y) |>
     ))
 rm(nmirf_X, nmirf_Y)
 
+# World Bank  --------
+## GDP ------------------------------------
+# World Bank: https://data.worldbank.org/indicator/NY.GDP.PCAP.PP.KD
+GDP <- read_csv(here("data", "API_NY.GDP.PCAP.PP.KD_DS2_en_csv_v2_1423.csv"), skip = 4) |> 
+  janitor::clean_names() |> 
+  select(country_name, country_code, indicator_name, x2005, x2019, x2023) |> 
+  rename(GDP_2005 = x2005, GDP_2019 = x2019, GDP_2023 = x2023)
+
+GDP_long <- read_csv(here("data", "API_NY.GDP.PCAP.PP.KD_DS2_en_csv_v2_1423.csv"), skip = 4) |> 
+  janitor::clean_names() |> 
+  select(country_name, country_code, indicator_name, x2005:x2024) |> 
+  pivot_longer(names_to = "year", values_to = "GDP_long", cols = x2005:x2024) |> 
+  mutate(year = as.numeric(str_remove(year, "x")))
+
+## Income group ----
+WB_income_group <- read_xlsx(here("data", "WorldBank_income.xlsx")) |> 
+  janitor::clean_names() |> 
+  select(iso3, country, x2005, x2023) |> 
+  mutate(
+    x2005 = factor(case_match(x2005,
+                              "L" ~ "Low income",
+                              "LM" ~ "Lower middle income",
+                              "UM" ~ "Upper middle income",
+                              "H" ~ "High income"
+    ), 
+    levels = c("Low income", "Lower middle income",
+               "Upper middle income", "High income")),
+    x2023 = factor(case_match(x2023,
+                              "L" ~ "Low income",
+                              "LM" ~ "Lower middle income",
+                              "UM" ~ "Upper middle income",
+                              "H" ~ "High income"
+    ), 
+    levels = c("Low income", "Lower middle income",
+               "Upper middle income", "High income"))
+  ) |> 
+  rename(WBIncome_2005 = x2005, WBIncome_2023 = x2023)
+
+## Literacy rate -----
+# https://data.worldbank.org/indicator/SE.ADT.LITR.ZS
+literacy_long <- read_csv(here("data", "API_SE.ADT.LITR.ZS_DS2_en_csv_v2_69.csv"), skip = 4) |> 
+  janitor::clean_names() |> 
+  select(country_name, country_code, indicator_name, x1995:x2023) |> 
+  pivot_longer(names_to = "year", values_to = "literacy_long", cols = x1995:x2023) |> 
+  mutate(year = as.numeric(str_remove(year, "x")))
+
+## Female literacy ----
+# https://data.worldbank.org/indicator/SE.ADT.LITR.FE.ZS
+literacy_female_long <- read_csv(here("data", "API_SE.ADT.LITR.FE.ZS_DS2_en_csv_v2_4635.csv"), skip = 4) |> 
+  janitor::clean_names() |> 
+  select(country_name, country_code, indicator_name, x1995:x2023) |> 
+  pivot_longer(names_to = "year", values_to = "literacy_female", cols = x1995:x2023) |> 
+  mutate(year = as.numeric(str_remove(year, "x")))
+
+# Armed conflict ------------------------------------
+# UCDP: https://ucdp.uu.se/downloads/index.html#armedconflict
+armed_conflict <- readRDS(here("data", "UcdpPrioConflict_v25_1.rds")) |> 
+  filter(year >= 2005)
+
 # Remove non-indicator objects -----------------------
 rm(
   country_codes, gho_dimensions, gho_indicators, region_codes, 
-  state_geo, theme_labels, gestational_text, UN_region_codes, WB_income_codes, 
+  state_geo, gestational_text, UN_region_codes, WB_income_codes, 
   search_term, search_term_results
 )
 
