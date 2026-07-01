@@ -1158,8 +1158,8 @@ server <- function(input, output, session) {
         
         # Remaining code
         file.copy("preamble.tex", temp_dir, overwrite = TRUE)
-        file.copy("logo.png", temp_dir, overwrite = TRUE)
-        file.copy("logo2.png", temp_dir, overwrite = TRUE)
+        file.copy(here("logos", "logo.png"), temp_dir, overwrite = TRUE)
+        file.copy(here("logos", "logo2.png"), temp_dir, overwrite = TRUE)
         file.copy(here("www", "WHO_UPR_nobg.png"), temp_dir, overwrite = TRUE)
         file.copy(here("www", "WHO_UPR-removebg3.png"), temp_dir, overwrite = TRUE)
         file.copy(source_flag, temp_dir, overwrite = TRUE)
