@@ -5148,10 +5148,22 @@
       "checksum": "f79e257e2da4921d5d6254b19041d2b8"
     },
     "app.R": {
-      "checksum": "ea5959fd7488b27dcb686cbb328e9709"
+      "checksum": "5c2c408c1184b7659fc74ffe52e1270c"
     },
     "code/.gitkeep": {
       "checksum": "81051bcc2cf1bedf378224b0a93e2877"
+    },
+    "code/01_prep_geo_code.R": {
+      "checksum": "8f560ef0e4d64ac72283137174b69f22"
+    },
+    "code/02_prep_UHRI_recommendations_refactored.qmd": {
+      "checksum": "5abc6e8df131cefabcd8acc460c07c50"
+    },
+    "code/03_classify_UHRI_recommendations.html": {
+      "checksum": "ca3c85c7aab897072f58ec6c116e85d9"
+    },
+    "code/03_classify_UHRI_recommendations.qmd": {
+      "checksum": "bbd96381585b9b6c3be1996b2a3243d3"
     },
     "code/external_data_GBD.R": {
       "checksum": "8952ddc95bdef9346124d5d4d53f6a37"
@@ -6354,10 +6366,16 @@
       "checksum": "e681890bd84e1a54ad7d8affe720620a"
     },
     "output/state_geo_enhanced.rds": {
-      "checksum": "84f773945d1802ab4dbfff8af82c2b5b"
+      "checksum": "0ed124751d182bef38e7313a785ebee7"
     },
     "output/state_geo2_enhanced.rds": {
-      "checksum": "6e8178f90d760fe1431ddb24f4d3777b"
+      "checksum": "e989c4f0fd9296dda68ec357fa7f64b3"
+    },
+    "output/UHRI_UPR_classified.rds": {
+      "checksum": "a6e498bead48782ec2e3d4df787593b8"
+    },
+    "output/UHRI_UPR_classified_long.rds": {
+      "checksum": "ba201d318f431f13531e7847102e1f1b"
     },
     "output/UHRI_UPR_enhanced.rds": {
       "checksum": "234b46d729ae6d11373b74ade6395b00"
@@ -6372,7 +6390,7 @@
       "checksum": "bfa3c2d307a592e7b49bd51218a2049b"
     },
     "report-template-3.Rmd": {
-      "checksum": "5697e14d7fd885f6d339ea948967f414"
+      "checksum": "7c6cb4b7b51486af37e241f5910ea9a9"
     },
     "report-template.Rmd": {
       "checksum": "955d2b99df77f302d10fc1226ee74855"
@@ -6388,6 +6406,9 @@
     },
     "report_pdfs/Namibia.pdf": {
       "checksum": "e71b235748025732b6f8aa11c7b12db5"
+    },
+    "test.R": {
+      "checksum": "d41d8cd98f00b204e9800998ecf8427e"
     },
     "www/custom_bslib.css": {
       "checksum": "1160c7dacb22688b3c0a93588d39da95"
