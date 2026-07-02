@@ -16,7 +16,8 @@ locations <-  read_xlsx(tf, sheet = "DB") |>
   filter(!is.na(iso3_code)) |> 
   mutate(sub_reg_name = case_when(is.na(sub_reg_name) ~ sdg_sub_reg_name, 
                                   .default=sub_reg_name)) |> 
-  select(loc_id, sub_reg_name, sdg_reg_name, geo_reg_name, iso3_code);unlink(tf);rm(tf)
+  select(loc_id, #loc_id is UN code
+         sub_reg_name, sdg_reg_name, geo_reg_name, iso3_code);unlink(tf);rm(tf) 
 
 ##############
 # Get member states geometries
