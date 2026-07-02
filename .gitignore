@@ -44,3 +44,4 @@ vignettes/*.pdf
 data/UHRI_*
 README.html
 code/*.html
+output/state_geo2_enhanced.rds
