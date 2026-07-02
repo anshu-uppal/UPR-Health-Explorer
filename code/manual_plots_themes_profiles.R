@@ -12,12 +12,6 @@ theme_labels <- theme_labels |>
     "essential_medicines","TB_malaria", "NTD","vaccinations"
   ))
 
-theme_labels_fr <- theme_labels_fr |> 
-  filter(!variable %in% c(
-    "SRHR", "health_related", "SOCED",
-    "essential_medicines","TB_malaria", "NTD","vaccinations"
-  ))
-
 sdg_data <- sdg_data |> select(-any_of(c("SRHR", "SOCED",
                                          "essential_medicines","TB_malaria", 
                                          "NTD","vaccinations")))
@@ -96,15 +90,15 @@ a1 <- sdg_data |>
   ungroup() |> 
   mutate(label_n = paste0(n_tot_theme, " (", sprintf("%1.0f", perc_supported), "%)")) |> 
     
-  left_join(theme_labels_fr, join_by(theme == variable)) |> 
+  left_join(theme_labels, join_by(theme == variable)) |> 
   arrange(n_tot_theme) |> 
   filter(theme != "health_related") |> 
-  mutate(theme_label = fct_inorder(theme_label),
+  mutate(theme_label_fr = fct_inorder(theme_label_fr),
          response_upr = fct_relevel(response_upr, "Noted"),
          response_upr = fct_recode(response_upr, "Acceptées" = "Supported", "Notées" = "Noted"))
 
 a1 |> 
-  ggplot(aes(x = n, y = theme_label, fill = response_upr))+geom_col(alpha = 0.8, width = 0.85)+
+  ggplot(aes(x = n, y = theme_label_fr, fill = response_upr))+geom_col(alpha = 0.8, width = 0.85)+
   scale_fill_manual(values = c("#ec5557", "#1c164d"))+
   labs(
     x = paste0(
