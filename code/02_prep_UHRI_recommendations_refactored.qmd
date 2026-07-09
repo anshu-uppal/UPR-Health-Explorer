@@ -84,14 +84,16 @@ df_0 <- readRDS(here("data", "UHRI_extract_raw.rds"))
 # (see the folder data/UPR_WG_docs/)
 df_0_merged <- bind_rows(df_0, readRDS(here("data", "UPR_WG_docs", "recs_combined.rds"))) |> 
   mutate(
-    across(c(provisional, manual_upload), \(x) case_when(is.na(x) ~ FALSE, .default = x)),
-    countries_concerned = str_remove(countries_concerned, "- "),
-    upr_session        = str_split_i(str_remove(upr_session, "- "), " - ", 1),
-    upr_session_number = as.numeric(str_extract(upr_session, "\\d+"))
+    across(c(provisional, manual_upload), \(x) case_when(is.na(x) ~ FALSE, .default = x))
      )
 
+df_0_merged_test <- df_0_merged |>
+  mutate(countries_concerned = str_remove(countries_concerned, "- "),
+    upr_session        = str_split_i(str_remove(upr_session, "- "), " - ", 1),
+    upr_session_number = as.numeric(str_extract(upr_session, "\\d+")))
+
 # check for duplicates in manually extracted recommendations present in raw extract.
-overlap_check <- df_0_merged |>
+overlap_check <- df_0_merged_test |>
   group_by(countries_concerned, upr_session_number) |>
   summarise(
     has_official = any(manual_upload == FALSE),
@@ -300,7 +302,7 @@ sub-number) which are retained as columns for compatibility with downstream use.
 #| label: build-full
 df <- df_0_merged |>
   mutate(
-    # countries_concerned = str_remove(countries_concerned, "- "),
+    countries_concerned = str_remove(countries_concerned, "- "),
     reccomending_body   = str_remove(reccomending_body, "- ")
   ) |>
   # Clean the recommendation text; keep the pre-clean version in `text1`.
@@ -316,8 +318,8 @@ df <- df_0_merged |>
   # Parse identifiers and UPR session/cycle metadata.
   mutate(
     paragraph          = derive_paragraph(text),
-    # upr_session        = str_split_i(str_remove(upr_session, "- "), " - ", 1),
-    # upr_session_number = as.numeric(str_extract(upr_session, "\\d+")),
+    upr_session        = str_split_i(str_remove(upr_session, "- "), " - ", 1),
+    upr_session_number = as.numeric(str_extract(upr_session, "\\d+")),
     upr_cycle = case_when(
       upr_session_number <= 12 ~ "Cycle 1",
       upr_session_number <= 26 ~ "Cycle 2",
