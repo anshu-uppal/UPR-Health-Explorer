@@ -1425,8 +1425,8 @@ Under the Right to Health, States have the following obligations:
               navset_card_tab(
                 # title = "Causes of Maternal Death",
                 full_screen = TRUE,
-                nav_panel("Status of ratification of the International Covenant on Economic, Social and Cultural Rights (as of October 2025)", 
-                          markdown("Data: <a href='https://indicators.ohchr.org' target='_blank'>OHCHR</a>"),
+                nav_panel("International Covenant on Economic, Social and Cultural Rights", 
+                          markdown("Status of ratification (as of October 2025). Data: <a href='https://indicators.ohchr.org' target='_blank'>OHCHR</a>"),
                           leafletOutput("ICESCR_status_map_interactive")),
                 nav_panel(
                   shiny::icon("circle-info"),
